@@ -11,6 +11,7 @@ import { CreateProfileStep1 } from './pages/profile/CreateProfileStep1';
 import { CreateProfileStep2 } from './pages/profile/CreateProfileStep2';
 import { CreateProfileStep3 } from './pages/profile/CreateProfileStep3';
 import { CreateProfileSuccess } from './pages/profile/CreateProfileSuccess';
+import { EditProfile } from './pages/profile/EditProfile';
 
 function App() {
   return (
@@ -91,6 +92,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <CreateProfileSuccess />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/edit"
+            element={
+              <ProtectedRoute>
+                <EditProfile />
               </ProtectedRoute>
             }
           />
