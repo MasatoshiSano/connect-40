@@ -203,6 +203,49 @@ export class ApiStack extends cdk.Stack {
       authorizer,
     });
 
+    // Chat management Lambda functions
+    const createChatRoomFunction = new lambda.Function(this, 'CreateChatRoomFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'createRoom.handler',
+      code: lambda.Code.fromAsset('../backend/functions/chat'),
+      environment: {
+        TABLE_NAME: props.table.tableName,
+      },
+      layers: [commonLayer],
+      timeout: cdk.Duration.seconds(10),
+    });
+
+    const getChatRoomsFunction = new lambda.Function(this, 'GetChatRoomsFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'getRooms.handler',
+      code: lambda.Code.fromAsset('../backend/functions/chat'),
+      environment: {
+        TABLE_NAME: props.table.tableName,
+      },
+      layers: [commonLayer],
+      timeout: cdk.Duration.seconds(10),
+    });
+
+    // Grant permissions
+    props.table.grantReadWriteData(createChatRoomFunction);
+    props.table.grantReadWriteData(getChatRoomsFunction);
+
+    this.functions.push(createChatRoomFunction, getChatRoomsFunction);
+
+    // Chat API Routes
+    const chat = this.api.root.addResource('chat');
+    const chatRooms = chat.addResource('rooms');
+
+    // POST /chat/rooms - Create chat room
+    chatRooms.addMethod('POST', new apigateway.LambdaIntegration(createChatRoomFunction), {
+      authorizer,
+    });
+
+    // GET /chat/rooms - Get user's chat rooms
+    chatRooms.addMethod('GET', new apigateway.LambdaIntegration(getChatRoomsFunction), {
+      authorizer,
+    });
+
     // Outputs
     new cdk.CfnOutput(this, 'ApiEndpoint', {
       value: this.apiEndpoint,

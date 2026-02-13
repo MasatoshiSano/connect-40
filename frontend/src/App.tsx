@@ -15,6 +15,8 @@ import { EditProfile } from './pages/profile/EditProfile';
 import { CreateActivity } from './pages/activities/CreateActivity';
 import { Activities } from './pages/activities/Activities';
 import { ActivityDetail } from './pages/activities/ActivityDetail';
+import { ChatList } from './pages/chat/ChatList';
+import { Plans } from './pages/subscription/Plans';
 
 function App() {
   return (
@@ -129,6 +131,26 @@ function App() {
             element={
               <ProtectedRoute>
                 <ActivityDetail />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Chat routes */}
+          <Route
+            path="/chat"
+            element={
+              <ProtectedRoute>
+                <ChatList />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Subscription routes */}
+          <Route
+            path="/subscription/plans"
+            element={
+              <ProtectedRoute>
+                <Plans />
               </ProtectedRoute>
             }
           />
