@@ -1,0 +1,38 @@
+{
+  "name": "connect40",
+  "version": "1.0.0",
+  "description": "40代男性向け孤独解消マッチングプラットフォーム",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "cdk"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=frontend",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "cdk:deploy": "npm run deploy --workspace=cdk",
+    "cdk:synth": "npm run synth --workspace=cdk"
+  },
+  "keywords": [
+    "matching",
+    "community",
+    "activities",
+    "aws",
+    "serverless"
+  ],
+  "author": "Masatoshi Sano",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20.18.1",
+    "npm": ">=10.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2"
+  }
+}
