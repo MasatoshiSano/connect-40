@@ -120,3 +120,98 @@ export async function updateUserProfile(
     body: JSON.stringify(input),
   });
 }
+
+// Activity API
+
+export interface CreateActivityInput {
+  title: string;
+  description: string;
+  category: string;
+  location: {
+    latitude: number;
+    longitude: number;
+    address: string;
+  };
+  dateTime: string;
+  duration: number;
+  maxParticipants: number;
+  imageUrl?: string;
+  tags: string[];
+}
+
+export interface Activity {
+  activityId: string;
+  hostUserId: string;
+  hostNickname: string;
+  title: string;
+  description: string;
+  category: string;
+  location: {
+    latitude: number;
+    longitude: number;
+    address: string;
+  };
+  dateTime: string;
+  duration: number;
+  maxParticipants: number;
+  currentParticipants: number;
+  participants: string[];
+  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
+  imageUrl?: string;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Upload activity image
+ */
+export async function uploadActivityImage(file: File): Promise<string> {
+  // TODO: Implement S3 presigned URL upload
+  return uploadProfilePhoto(file);
+}
+
+/**
+ * Create activity
+ */
+export async function createActivity(input: CreateActivityInput): Promise<Activity> {
+  return fetchWithAuth<Activity>('/activities', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+}
+
+/**
+ * Get activities list
+ */
+export async function getActivities(params?: {
+  category?: string;
+  limit?: number;
+}): Promise<{ activities: Activity[]; count: number }> {
+  const queryParams = new URLSearchParams();
+  if (params?.category) queryParams.append('category', params.category);
+  if (params?.limit) queryParams.append('limit', params.limit.toString());
+
+  const query = queryParams.toString();
+  return fetchWithAuth(`/activities${query ? `?${query}` : ''}`, {
+    method: 'GET',
+  });
+}
+
+/**
+ * Get single activity
+ */
+export async function getActivity(activityId: string): Promise<Activity> {
+  return fetchWithAuth<Activity>(`/activities/${activityId}`, {
+    method: 'GET',
+  });
+}
+
+/**
+ * Join activity
+ */
+export async function joinActivity(activityId: string): Promise<{ message: string }> {
+  return fetchWithAuth<{ message: string }>(`/activities/${activityId}/join`, {
+    method: 'POST',
+  });
+}

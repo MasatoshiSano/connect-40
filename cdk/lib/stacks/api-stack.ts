@@ -120,6 +120,89 @@ export class ApiStack extends cdk.Stack {
       authorizer,
     });
 
+    // Activity management Lambda functions
+    const createActivityFunction = new lambda.Function(this, 'CreateActivityFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'create.handler',
+      code: lambda.Code.fromAsset('../backend/functions/activities'),
+      environment: {
+        TABLE_NAME: props.table.tableName,
+      },
+      layers: [commonLayer],
+      timeout: cdk.Duration.seconds(10),
+    });
+
+    const listActivitiesFunction = new lambda.Function(this, 'ListActivitiesFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'list.handler',
+      code: lambda.Code.fromAsset('../backend/functions/activities'),
+      environment: {
+        TABLE_NAME: props.table.tableName,
+      },
+      layers: [commonLayer],
+      timeout: cdk.Duration.seconds(10),
+    });
+
+    const getActivityFunction = new lambda.Function(this, 'GetActivityFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'get.handler',
+      code: lambda.Code.fromAsset('../backend/functions/activities'),
+      environment: {
+        TABLE_NAME: props.table.tableName,
+      },
+      layers: [commonLayer],
+      timeout: cdk.Duration.seconds(10),
+    });
+
+    const joinActivityFunction = new lambda.Function(this, 'JoinActivityFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'join.handler',
+      code: lambda.Code.fromAsset('../backend/functions/activities'),
+      environment: {
+        TABLE_NAME: props.table.tableName,
+      },
+      layers: [commonLayer],
+      timeout: cdk.Duration.seconds(10),
+    });
+
+    // Grant permissions
+    props.table.grantReadWriteData(createActivityFunction);
+    props.table.grantReadWriteData(listActivitiesFunction);
+    props.table.grantReadWriteData(getActivityFunction);
+    props.table.grantReadWriteData(joinActivityFunction);
+
+    this.functions.push(
+      createActivityFunction,
+      listActivitiesFunction,
+      getActivityFunction,
+      joinActivityFunction
+    );
+
+    // Activity API Routes
+    const activities = this.api.root.addResource('activities');
+
+    // POST /activities - Create activity
+    activities.addMethod('POST', new apigateway.LambdaIntegration(createActivityFunction), {
+      authorizer,
+    });
+
+    // GET /activities - List activities
+    activities.addMethod('GET', new apigateway.LambdaIntegration(listActivitiesFunction), {
+      authorizer,
+    });
+
+    // GET /activities/{id} - Get activity
+    const activityById = activities.addResource('{id}');
+    activityById.addMethod('GET', new apigateway.LambdaIntegration(getActivityFunction), {
+      authorizer,
+    });
+
+    // POST /activities/{id}/join - Join activity
+    const activityJoin = activityById.addResource('join');
+    activityJoin.addMethod('POST', new apigateway.LambdaIntegration(joinActivityFunction), {
+      authorizer,
+    });
+
     // Outputs
     new cdk.CfnOutput(this, 'ApiEndpoint', {
       value: this.apiEndpoint,
