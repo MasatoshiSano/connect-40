@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(if [ -d \".tmp\" ])",
+      "Bash(then echo \".tmp exists\")",
+      "Bash(else echo \".tmp does not exist\")",
+      "Bash(fi)",
+      "Skill(requirements)",
+      "Skill(requirements:*)",
+      "Skill(design)",
+      "Skill(design:*)",
+      "Skill(tasks)",
+      "Skill(tasks:*)",
+      "Bash(npx:*)",
+      "Bash(timeout:*)",
+      "Bash(ping:*)"
+    ]
+  }
+}

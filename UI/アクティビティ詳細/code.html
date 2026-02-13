@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="dark" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>アクティビティ詳細 - ゆるつな</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;family=Noto+Sans+JP:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#19d4e6",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#112021",
+                        "surface-dark": "#1A2C2E",
+                        "surface-border": "#2F4345",
+                        "text-secondary": "#9db6b8"
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "Noto Sans JP", "sans-serif"],
+                        "body": ["Noto Sans JP", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "1.5rem", "xl": "2rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #112021; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2F4345; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3d5558; 
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#111718] dark:text-white font-display antialiased min-h-screen flex flex-col">
+<header class="sticky top-0 z-50 w-full border-b border-surface-border bg-background-dark/95 backdrop-blur-sm px-4 md:px-10 py-3">
+<div class="mx-auto flex max-w-[1280px] items-center justify-between">
+<div class="flex items-center gap-8">
+<a class="flex items-center gap-3 text-white hover:opacity-80 transition-opacity" href="#">
+<div class="size-8 text-primary">
+<svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M47.2426 24L24 47.2426L0.757355 24L24 0.757355L47.2426 24ZM12.2426 21H35.7574L24 9.24264L12.2426 21Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-white text-xl font-bold tracking-tight">ゆるつな</h2>
+</a>
+<div class="hidden md:flex flex-col min-w-60 h-10">
+<div class="flex w-full flex-1 items-center rounded-xl h-full bg-surface-dark border border-surface-border focus-within:border-primary transition-colors">
+<div class="text-text-secondary pl-4 flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full bg-transparent border-none text-white placeholder:text-text-secondary focus:ring-0 px-3 text-sm" placeholder="エリアやキーワードで検索"/>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<nav class="hidden lg:flex items-center gap-8">
+<a class="text-white text-sm font-medium hover:text-primary transition-colors" href="#">ホーム</a>
+<a class="text-primary text-sm font-bold border-b-2 border-primary py-1" href="#">イベント</a>
+<a class="text-white text-sm font-medium hover:text-primary transition-colors" href="#">メッセージ</a>
+<a class="text-white text-sm font-medium hover:text-primary transition-colors" href="#">マイページ</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="hidden md:flex items-center justify-center rounded-full h-10 px-5 bg-primary/10 hover:bg-primary/20 text-primary text-sm font-bold border border-primary/30 transition-all">
+<span class="truncate">イベント作成</span>
+</button>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 border-2 border-surface-border cursor-pointer hover:border-primary transition-colors" data-alt="ユーザーのプロフィール画像" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCaSu0wAamThXU_kTFOanA_Tnt4D99FcsVCGSO546T59K9S7GpIq_O5PkG5C_0tJr3BcOb5xdsUK6aY-Rq4lxLACMWZbfCHuVtvJcpNsHi4ITNYYcLVqjK6vL7i4gLkWb6jt8U7osiPIvd8ooB5oZmqXF9EHtnCOBXK0niWDXylok_NtjXHyPsnDoO_yyVH4Dfn7KjfO1tnVoGYYh3duTWsvc8znuz7VipTJi9_HZeCBcOO9rd-QJGmcRb3oMSVnOtO8S_FWzOmjhw");'></div>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-1 w-full px-4 md:px-10 py-6 pb-20">
+<div class="mx-auto max-w-[1120px] flex flex-col gap-6">
+<nav class="flex flex-wrap items-center gap-2 text-sm">
+<a class="text-text-secondary hover:text-white transition-colors" href="#">ホーム</a>
+<span class="text-text-secondary material-symbols-outlined text-[16px]">chevron_right</span>
+<a class="text-text-secondary hover:text-white transition-colors" href="#">検索結果</a>
+<span class="text-text-secondary material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-white font-medium">週末の河川敷掃除とコーヒー</span>
+</nav>
+<div class="relative w-full rounded-xl overflow-hidden group">
+<div class="aspect-[21/9] w-full bg-surface-dark relative">
+<img class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" data-alt="晴れた日に緑豊かな川岸を歩く人々" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7Q5048gXf8-58ALSRRpIc5hoR-L35BCZXRcrVNI7mVPICAF-B1EPD1INhHYoFng6xDrjCexrdJ_5QYqR8gXG4kk2316Iwm9Gx-aa25rjTHJ8oDEX4QqhH3NUma6hQyf4HRlIDsjt3N1gOJDKQMIBLzgDat_cfvgLFsCOpP3rHZGQjnfkpHiignXy_s0K0LGhtBco_Szuiw6lDrypqyH1H7RGJIXT4Nb4QHnS2nkK_Ywh63rgCmXtfVE2yErHxcauUfvMz_XfjKSs"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent"></div>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-6 md:p-8 flex flex-col gap-3">
+<div class="flex flex-wrap gap-2 mb-1">
+<span class="px-3 py-1 rounded-full bg-primary text-[#111718] text-xs font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">check_circle</span> 募集中
+                        </span>
+<span class="px-3 py-1 rounded-full bg-surface-dark/80 backdrop-blur-md border border-surface-border text-white text-xs font-medium">#アウトドア</span>
+<span class="px-3 py-1 rounded-full bg-surface-dark/80 backdrop-blur-md border border-surface-border text-white text-xs font-medium">#初心者歓迎</span>
+<span class="px-3 py-1 rounded-full bg-surface-dark/80 backdrop-blur-md border border-surface-border text-white text-xs font-medium">#地域貢献</span>
+</div>
+<h1 class="text-white text-3xl md:text-4xl font-bold leading-tight tracking-tight">週末の河川敷掃除とコーヒー</h1>
+<div class="flex items-center gap-2 text-text-secondary text-sm md:text-base">
+<span class="material-symbols-outlined text-[20px]">location_on</span>
+<span>東京都台東区 隅田公園エリア</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div class="lg:col-span-8 flex flex-col gap-8">
+<div class="bg-surface-dark rounded-xl p-6 border border-surface-border">
+<h3 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">description</span>
+                            イベント概要
+                        </h3>
+<div class="text-gray-300 leading-relaxed space-y-4">
+<p>休日の朝、少し早起きをして河川敷を散歩しながらゴミ拾いをしませんか？</p>
+<p>「社会貢献」と意気込まず、あくまで散歩のついでに街をきれいにする、そんなゆるい活動です。作業の後は近くのカフェで美味しいコーヒーを飲みながら、少しだけ雑談をして解散します。</p>
+<p>40代の参加者が多く、初参加の方もお一人様も大歓迎です。無理に話さなくても大丈夫、その場にいるだけでOKな雰囲気です。</p>
+</div>
+</div>
+<div class="bg-surface-dark rounded-xl p-6 border border-surface-border">
+<h3 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">info</span>
+                            詳細情報
+                        </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+<div class="flex flex-col gap-1 border-l-2 border-surface-border pl-4">
+<span class="text-text-secondary text-sm font-medium">日時</span>
+<span class="text-white text-base font-semibold">2023/11/18 (土) 09:00 - 11:00</span>
+</div>
+<div class="flex flex-col gap-1 border-l-2 border-surface-border pl-4">
+<span class="text-text-secondary text-sm font-medium">集合場所</span>
+<span class="text-white text-base font-semibold">隅田公園入口 (水上バス乗り場付近)</span>
+</div>
+<div class="flex flex-col gap-1 border-l-2 border-surface-border pl-4">
+<span class="text-text-secondary text-sm font-medium">参加費</span>
+<span class="text-white text-base font-semibold">無料 (カフェ代は実費)</span>
+</div>
+<div class="flex flex-col gap-1 border-l-2 border-surface-border pl-4">
+<span class="text-text-secondary text-sm font-medium">持ち物</span>
+<span class="text-white text-base font-semibold">軍手、動きやすい服装</span>
+</div>
+<div class="flex flex-col gap-1 border-l-2 border-surface-border pl-4">
+<span class="text-text-secondary text-sm font-medium">定員</span>
+<span class="text-white text-base font-semibold">6名 (残り3枠)</span>
+</div>
+<div class="flex flex-col gap-1 border-l-2 border-surface-border pl-4">
+<span class="text-text-secondary text-sm font-medium">募集締切</span>
+<span class="text-white text-base font-semibold">2023/11/17 18:00まで</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-dark rounded-xl p-6 border border-surface-border">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-white text-xl font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">map</span>
+                                アクセス
+                            </h3>
+<button class="text-primary text-sm font-bold hover:underline flex items-center gap-1">
+                                Googleマップで見る <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</button>
+</div>
+<div class="w-full h-64 rounded-lg overflow-hidden relative bg-[#243436]">
+<img class="w-full h-full object-cover opacity-60" data-alt="隅田公園エリアの地図" data-location="Tokyo, Sumida Park Map" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBL8LPBnzVHK1dbXWqyCUY289x5RTVA4mNv50nxTig9JbI75TJ20FARE0_WABnpMUiXmkm93JhAzC-XcbA84_hvxZwiPXJZhVw_Ynvv5t8nGQdiQyqGGSkvSV_VUcy_Bqi1_HnhYSPl4n7n_6HjWN34I7C_gV4cNvwpj4Fj1nEdEZ6toVmDAy0JurSNuL49aunHKNZmaOrw4_jtDvJgun8EDPyhCT5LAamQSBgvupEEb7vxTSmbMG2aFCvuvigH15YbbIkmEQkQZZA"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="bg-primary/20 backdrop-blur-sm p-4 rounded-full border border-primary/50">
+<span class="material-symbols-outlined text-primary text-4xl">location_on</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="lg:col-span-4 flex flex-col gap-6">
+<div class="bg-surface-dark rounded-xl p-6 border border-surface-border sticky top-24 shadow-xl shadow-black/20">
+<div class="flex justify-between items-end mb-4">
+<div>
+<p class="text-text-secondary text-sm mb-1">現在の参加状況</p>
+<div class="flex items-baseline gap-1">
+<span class="text-3xl font-bold text-white font-display">3</span>
+<span class="text-text-secondary text-sm">/ 6名</span>
+</div>
+</div>
+<div class="bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+<span class="text-primary text-xs font-bold">募集中</span>
+</div>
+</div>
+<div class="w-full bg-[#2F4345] rounded-full h-2 mb-6">
+<div class="bg-primary h-2 rounded-full" style="width: 50%"></div>
+</div>
+<div class="flex flex-col gap-3">
+<button class="w-full bg-primary hover:bg-[#15bacc] text-[#111718] font-bold py-4 px-6 rounded-full flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] shadow-lg shadow-primary/20">
+<span>このイベントに参加する</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="w-full bg-transparent hover:bg-white/5 text-white font-bold py-3 px-6 rounded-full border border-surface-border flex items-center justify-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-[20px]">bookmark</span>
+<span>とりあえず保存</span>
+</button>
+</div>
+<div class="mt-4 pt-4 border-t border-surface-border text-center">
+<p class="text-text-secondary text-xs">キャンセル料はかかりません</p>
+</div>
+</div>
+<div class="bg-surface-dark rounded-xl p-6 border border-surface-border">
+<h4 class="text-text-secondary text-sm font-bold uppercase tracking-wider mb-4">主催者</h4>
+<div class="flex items-start gap-4">
+<div class="relative">
+<div class="size-16 rounded-full bg-cover bg-center border-2 border-surface-border" data-alt="イベント主催者のポートレート（笑顔の中年男性）" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAjvuaCv3w6LOdBlrltiwzcwFqFB1_sTpRVArg7hseMR7jmWr3_3WiOwlWQi-bFFhJQScU4oUS7nSVG1E__MHyuSFLN5Us5bBtN3cHaj_NOsQWK9OEdI1gI4UOQwoIlUmNvecwyE-WPQ1gI2F-xR_NI5UWfLtS18-5wWDngyOaoawV8X_bMmvXrIk-WxOwvqwjS1aUsjh-ZcqXubiiG5V4V9G6nGBC_qYBEXe_PUVYW3taOSGbsX6FeQp7Liheq9FyRvH1VuRKL_gc");'></div>
+<div class="absolute -bottom-1 -right-1 bg-green-500 size-4 rounded-full border-2 border-surface-dark"></div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-white font-bold text-lg">ケンジ.T</h3>
+<p class="text-text-secondary text-xs">42歳 / 会社員 / 台東区</p>
+</div>
+<button class="text-primary hover:bg-primary/10 p-2 rounded-full transition-colors" title="メッセージを送る">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+</button>
+</div>
+<p class="text-gray-300 text-sm mt-2 line-clamp-2">週末は基本的にのんびり過ごしています。無理なく続けられる趣味を探し中。</p>
+</div>
+</div>
+<div class="mt-4 flex gap-2">
+<div class="flex-1 bg-[#112021] rounded-lg p-2 text-center border border-surface-border">
+<span class="block text-white font-bold text-sm">12</span>
+<span class="block text-text-secondary text-[10px]">開催数</span>
+</div>
+<div class="flex-1 bg-[#112021] rounded-lg p-2 text-center border border-surface-border">
+<span class="block text-white font-bold text-sm">4.8</span>
+<span class="block text-text-secondary text-[10px]">評価</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-dark rounded-xl p-6 border border-surface-border">
+<div class="flex justify-between items-center mb-4">
+<h4 class="text-text-secondary text-sm font-bold uppercase tracking-wider">参加者</h4>
+<a class="text-primary text-xs hover:underline" href="#">すべて見る</a>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-cover bg-center border border-surface-border" data-alt="参加者のアバター1" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBJc8DmCc4CvO6wBj6bWGhTt4l0seE_ekAb6KJ1sebS8iY6vBT736rP4oBr28B5T1C2WHpxAgKC6OX-U-86RNx_QnwP-kviAw6uLg7appM6CnlN9nQuu8mfNqHUH-lQw41wAFfrhF3mLXufNDzourfkw4ut8_jB3M-zIggTKQwNQky5xDcRWZRKAyHgo2C2VNtMZcaXYI8_xero83Pfpbj-2f6wADUAB1ll9LM8mLVtEAJ2GSxkVvv_CDMoIdGPN0Ji9iuvsqW5aBY");'></div>
+<div class="flex-1">
+<p class="text-white text-sm font-medium">ヨウスケ</p>
+<p class="text-text-secondary text-xs">45歳</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-cover bg-center border border-surface-border" data-alt="参加者のアバター2" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBs9ACYbL67o70iOajPf7RTYZ-M62gQb1A3D5DzVAYA9eISVEB6sbJRGbdtgzSLu_1BFGF_uQlIZI53Uc6zQ6Kq0aTZ26rIJ5glkEjx2iGvvbCJzdWl2ew3QHxVN69epSDbckLZ1k0iZ2v0Wh9h1lFe7I1HzxgkVcXSrXB49TXxve2h-M19RHoLrtNqEG3Mrl_ng8gM4-wOKXU7p6wFb6pAlx2-D9-FOr6zOLQAIqBVH7KBf-eqXR7vVKGel9cIsDgSV4_48NHJZRo");'></div>
+<div class="flex-1">
+<p class="text-white text-sm font-medium">ヒロ</p>
+<p class="text-text-secondary text-xs">39歳</p>
+</div>
+</div>
+<div class="flex items-center gap-3 opacity-50">
+<div class="size-10 rounded-full bg-surface-border flex items-center justify-center border border-dashed border-gray-500">
+<span class="material-symbols-outlined text-text-secondary text-sm">person_add</span>
+</div>
+<div class="flex-1">
+<p class="text-text-secondary text-sm italic">募集中</p>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-primary/5 rounded-xl p-4 border border-primary/10 flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-1">shield</span>
+<div>
+<p class="text-white text-sm font-bold mb-1">本人確認済みユーザーのみ</p>
+<p class="text-text-secondary text-xs">このイベントは本人確認済みのユーザーのみ参加可能です。安心してご参加ください。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

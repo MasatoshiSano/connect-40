@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="dark" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Connect 40 - チャット</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#19d4e6",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#112021",
+                        "surface-dark": "#1A2628", // Slightly lighter than background-dark for cards/sidebars
+                        "surface-highlight": "#233032" // Hover states
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "1.5rem", "xl": "2rem", "2xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white overflow-hidden h-screen flex flex-col">
+<header class="flex-none flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#293738] bg-background-dark px-10 py-3 z-20">
+<div class="flex items-center gap-4 text-white">
+<div class="size-8 text-primary">
+<svg class="w-full h-full" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-white text-xl font-bold leading-tight tracking-[-0.015em]">Connect 40</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8 items-center">
+<nav class="hidden md:flex items-center gap-9">
+<a class="text-gray-400 hover:text-white text-sm font-medium leading-normal transition-colors" href="#">ホーム</a>
+<a class="text-gray-400 hover:text-white text-sm font-medium leading-normal transition-colors" href="#">アクティビティ</a>
+<a class="text-primary text-sm font-bold leading-normal relative after:content-[''] after:absolute after:-bottom-6 after:left-0 after:w-full after:h-1 after:bg-primary after:rounded-t-lg" href="#">チャット</a>
+<a class="text-gray-400 hover:text-white text-sm font-medium leading-normal transition-colors" href="#">プロフィール</a>
+</nav>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-6 bg-primary hover:bg-cyan-400 text-[#111718] text-sm font-bold leading-normal tracking-[0.015em] transition-colors">
+<span class="truncate">アクティビティ作成</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-[#293738]" data-alt="User profile picture showing a smiling middle-aged man" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDKDDe0HfGlr7uJzo8CnaU9DuuO1GrcYuPLUipEMW_2emVFLmCCvCfzpQVywUNzgnzlCCP_xO-_wWuGYLi-X3rT_uL6epTbz4ocGycrSLEbjNFGvyFN9SEd0-j9brBSJDHJNMiFUUx4NJZ5nVzTcDuB--SmdEZKh2y0SdXNUztmaRv8Maky0K1Bz7qYENnUf7gnepPDsJXqHrQ6a2A0M3qZT4U6JPq2LApXFtEGkfty65S1WAQgUQE_rw4A1Cl7LrjTad9r6lZORVE");'></div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden relative">
+<aside class="w-full md:w-[380px] flex flex-col border-r border-[#293738] bg-surface-dark z-10 flex-shrink-0">
+<div class="p-6 pb-2">
+<div class="flex justify-between items-center mb-6">
+<h1 class="text-white text-2xl font-bold leading-normal">チャット一覧</h1>
+<button class="text-primary hover:bg-[#293738] p-2 rounded-full transition-colors" title="新規チャット">
+<span class="material-symbols-outlined text-[28px]">edit_square</span>
+</button>
+</div>
+<div class="relative w-full">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-[#9db6b8]">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 border-none rounded-xl bg-[#293738] text-white placeholder-[#9db6b8] focus:outline-none focus:ring-2 focus:ring-primary/50 sm:text-base" placeholder="会話を検索..." type="text"/>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar px-3 pb-4 space-y-2 mt-2">
+<div class="flex items-center gap-4 bg-[#233032] border border-[#293738] rounded-xl px-4 py-3 cursor-pointer relative group transition-all hover:bg-[#293738]">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-12 bg-primary rounded-r-lg"></div>
+<div class="shrink-0 relative">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-14" data-alt="Group of men playing futsal indoors" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBu3LZ8xXuFnwp8VDT6M84KKNNpZ2tVJZSwZKTOHo-cPruLtg1GiHecAGa0xeXEe6scexG51BMSt4c3Fb71NHn50-fFIg73lmSaRMywGhNB8KFj909m1ODFxZ5H62E96lrnE2D9e9qofDdHLTVRi5fWHvODaUqmBIEf3xsAHeIZ4KMNIwci8lwWWiQrBkWxCDS_akO1nM0nvh1snYeNvwUjk1El0D18JLXusbBBeZiYiOgEJA0PaUFNAZs8hXVgPS7-ZABCPWR5xHM");'></div>
+<div class="absolute bottom-0 right-0 size-3.5 bg-green-500 border-2 border-[#233032] rounded-full"></div>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<p class="text-white text-base font-bold truncate pr-2">週末フットサル (8)</p>
+<span class="text-primary text-xs font-medium shrink-0">10:42</span>
+</div>
+<p class="text-white text-sm font-normal truncate">あなた: 了解です！ボール持っていきます。</p>
+</div>
+</div>
+<div class="flex items-center gap-4 hover:bg-[#233032] rounded-xl px-4 py-3 cursor-pointer transition-colors border border-transparent hover:border-[#293738]">
+<div class="shrink-0 relative">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-14" data-alt="Bowl of ramen with steam rising" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAfdAl0nNDsOgUFm3bDFt5C4OhVcpSwyLS_45ZUJWAdBt50VNpj_QV89bjAcIxiVSzCW83wNMHwp--NzesAcnkRnSfFx0Re4nG6ioQ01jhfeYdTF4muvd19BgAqp4O7YIVP037_xntqRZFnX1fC5XadcSxV_pNnstCLUpA93uf0dcCJGuh4gWC_88cCLpraEY9_1AC8W8VO9ewl-pULwK81_-KlJH_8nS1QqFcQ_awgiNyV-6_eB6dUC3hHf4PqJxmks6PsCfDr2xQ");'></div>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<p class="text-[#dbeae9] text-base font-medium truncate pr-2">地元ラーメン巡り (4)</p>
+<span class="text-[#9db6b8] text-xs font-normal shrink-0">昨日</span>
+</div>
+<p class="text-[#9db6b8] text-sm font-normal truncate">山田: 美味しそうですね！楽しみです。</p>
+</div>
+</div>
+<div class="flex items-center gap-4 hover:bg-[#233032] rounded-xl px-4 py-3 cursor-pointer transition-colors border border-transparent hover:border-[#293738]">
+<div class="shrink-0 relative">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-14" data-alt="Portrait of a middle aged Japanese man" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCjxIQsXbWs7deB3H_uXrDOSjP1iJfSPCVkMM409xpk6Iko00ki3RjC4RwyzwFhdU0m-QqNC2A7cl6kB6arrOH4IdzOmsdMX2CSQ7Z5x6zpM-GKmpvnDSPbQJ1xrIbDLE-dMScJo0zXxPaBJa5gMJnziWTvcFoqNyLr07h8sdQ5ekRSWEKzPkZQEyMPEJEsmzRxfyryh6ZsX1dq7GYPGwRL6K34dEAYgNPvgTw_EqylpK-GNEBOJpfgNCjMpmyJXifNAA8f4tokEn4");'></div>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<p class="text-[#dbeae9] text-base font-medium truncate pr-2">田中さん</p>
+<span class="text-[#9db6b8] text-xs font-normal shrink-0">火曜日</span>
+</div>
+<p class="text-[#9db6b8] text-sm font-normal truncate">先ほどはありがとうございました。</p>
+</div>
+</div>
+<div class="flex items-center gap-4 hover:bg-[#233032] rounded-xl px-4 py-3 cursor-pointer transition-colors border border-transparent hover:border-[#293738]">
+<div class="shrink-0 relative">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-14" data-alt="Hiking boots on a trail" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC92W2Hgzk9gdTXg84W-ZXtCnsm2cILSjRE5KlEILQZLFCUTxpG5uwG09MbdNMh7eOVEpAjqGpWBbfdTrS8oUYBjspokaksvlHDhlLi0hB4AqbLN5F6KO-EMjehscdCtAblAx36sWwa2acUAxm_n1zGRh-loaZmEl8oKCaKkRzEf2BDEWrHmQD1FQCoTqNeozyzSJ2pN6oEO2jLq37DvZWEHS-e4YgZ_ZwHPHJeDhtVsYQrz9spRSSzz4tnjNEzUa6gxfSri07PeH0");'></div>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<p class="text-[#dbeae9] text-base font-medium truncate pr-2">高尾山ハイキング</p>
+<span class="text-[#9db6b8] text-xs font-normal shrink-0">月曜日</span>
+</div>
+<p class="text-[#9db6b8] text-sm font-normal truncate">日曜日は天気が良さそうですね。</p>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full bg-background-dark relative">
+<div class="flex items-center justify-between px-6 py-4 border-b border-[#293738] bg-surface-dark/50 backdrop-blur-sm z-10">
+<div class="flex items-center gap-4">
+<div class="md:hidden">
+<button class="text-[#9db6b8] hover:text-white">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12 shadow-sm" data-alt="Group of men playing futsal indoors" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCgjJJzuH_MxT2G9yrj0sMAfgqAkILk7tDau3oej3YASF2BAA8zSJ-V5S-hFgfjSt82_ncp7Ejmw4pFedORWfuSMpvkJA4m1aIDOfgy_eBMYlZEVvxO6V27EkJzBK4IFfyI1WCaJeCKcGRgXdkGMHcRe2H2yovuvgtSZV5oMh16TaCcZFPjhWALD6v8yA7q0hEEyvLRrXvMLZYbmSAZNj5_u4IybqLdTiIQGARZDBhSSKkI0P6-5ff_BAMkSTbPyRXRhVJ0Q_AJnM0");'></div>
+<div>
+<h2 class="text-white text-lg font-bold leading-tight">週末フットサル</h2>
+<p class="text-[#9db6b8] text-sm font-medium">参加者8名 • 次回イベント: 土曜日 10:00</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-[#9db6b8] hover:text-primary transition-colors p-2 rounded-full hover:bg-[#293738]">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="text-[#9db6b8] hover:text-primary transition-colors p-2 rounded-full hover:bg-[#293738]">
+<span class="material-symbols-outlined">info</span>
+</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-6 py-4 space-y-6 custom-scrollbar flex flex-col-reverse">
+<div class="flex flex-row-reverse items-end gap-3 group">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 mb-1 shadow-md" data-alt="User profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCJwMAI5uvDXIpXXRDKMDxWz8FEDmRg6x-23U9zsPsMo78EWyWJ8CZhLRMtnd7XmrnA4CkYqQxHeVx0GNREvDge1DaSj5fK-YBQWtpSLBHdvPVyR2bHX6x1O-FD5431c41YTkckPEIPvAvRFNOuK9AHGnCo86mhiiHgzwLHdH3JA6d2usaLbnB37pRJDxnBnK6lmoV50BWSLgO_d_ORfEwj9eBpyvrzyfyYogSJ8CvlCy0wCp_Vt89Nxy38uI8O4lstsmE-KoY2YOo");'></div>
+<div class="flex flex-col items-end max-w-[80%] md:max-w-[60%]">
+<div class="bg-primary text-[#111718] px-5 py-3 rounded-lg rounded-br-none shadow-sm">
+<p class="text-base font-medium leading-relaxed">了解です！ボール持っていきます。</p>
+</div>
+<span class="text-[#6b8587] text-xs font-medium mt-1 mr-1 opacity-0 group-hover:opacity-100 transition-opacity">10:42</span>
+</div>
+</div>
+<div class="flex items-end gap-3 group">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 mb-1" data-alt="Portrait of Suzuki-san" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDeDT7t2RronYoABMtJ85QKBUzMe-zrUif1IBoftUWnxhrX33HQCiCxNp5Rjt85Ayb9yw2R30uwAKrZgHh15_-hoC0AcTN8JECVxgn9Q6PwaiQ_5RUTYxoZpEcdP1AuZDYlvexHzrcg1ixJT7rqS_OB1hgghrKLT_1srN_3lqY4_igVANylDXBNrSGqjqkOl6dG-0Kif3Udd8_8wjnrIBDGQyLkljOXICcdYRJDL7f2_N16ThFx_hdMKJzylxL_Ov17zEhI23FwgGU");'></div>
+<div class="flex flex-col items-start max-w-[80%] md:max-w-[60%]">
+<span class="text-[#9db6b8] text-xs font-medium ml-1 mb-1">鈴木さん</span>
+<div class="bg-[#293738] text-white px-5 py-3 rounded-lg rounded-bl-none">
+<p class="text-base font-normal leading-relaxed">ビブス持っていきますね。オレンジと緑があります。</p>
+</div>
+<span class="text-[#6b8587] text-xs font-medium mt-1 ml-1 opacity-0 group-hover:opacity-100 transition-opacity">10:38</span>
+</div>
+</div>
+<div class="flex items-end gap-3 group">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 mb-1" data-alt="Portrait of Sato-san" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDIvmS7s-G3R0KpPolCgaNR_OHG0SIsiKfi9JkGOviWAOyZqMqNTZNvEQqR9wbigw5Tzxdxe-jy6xSyxDcH-nxXoD_AY0L_wySMlLRx_4w_6ZYCtydYdaKeW0INY-N2lm84hF9redGo8ie32KRhgWGxmGzxy0a4L_VbWDMM09ff3YD06LmY836REsEMPryMFLfiPSAXL2sZx3ieUBrKrg-7tcxi-Q0oya3Z7Mpoa8Au0ZhlnoO7Rud1k7tw0kIa5oHw4W_t8a8Tof4");'></div>
+<div class="flex flex-col items-start max-w-[80%] md:max-w-[60%]">
+<span class="text-[#9db6b8] text-xs font-medium ml-1 mb-1">佐藤さん</span>
+<div class="bg-[#293738] text-white px-5 py-3 rounded-lg rounded-bl-none">
+<p class="text-base font-normal leading-relaxed">みなさんこんにちは！楽しみです。準備手伝うので9:50くらいに行きますね。</p>
+</div>
+<span class="text-[#6b8587] text-xs font-medium mt-1 ml-1 opacity-0 group-hover:opacity-100 transition-opacity">10:30</span>
+</div>
+</div>
+<div class="flex items-center justify-center my-4">
+<div class="bg-[#233032] px-4 py-1.5 rounded-full border border-[#293738]">
+<span class="text-[#9db6b8] text-xs font-medium">今日</span>
+</div>
+</div>
+<div class="flex justify-center my-2">
+<p class="text-[#6b8587] text-sm italic">あなたがグループ「週末フットサル」に参加しました</p>
+</div>
+</div>
+<div class="px-6 py-5 bg-surface-dark border-t border-[#293738]">
+<form class="flex items-end gap-3" onsubmit="event.preventDefault();">
+<button class="text-[#9db6b8] hover:text-white p-3 rounded-full hover:bg-[#293738] transition-colors flex items-center justify-center h-[52px] w-[52px]" type="button">
+<span class="material-symbols-outlined text-2xl">add_circle</span>
+</button>
+<div class="flex-1 bg-[#293738] rounded-lg flex items-center min-h-[52px] border border-transparent focus-within:border-primary/30 focus-within:ring-1 focus-within:ring-primary/30 transition-all">
+<textarea class="w-full bg-transparent border-none text-white placeholder-[#6b8587] focus:ring-0 px-4 py-3.5 resize-none max-h-32 text-base" placeholder="メッセージを入力..." rows="1"></textarea>
+<button class="text-[#9db6b8] hover:text-white p-2 mr-2 rounded-full hover:bg-[#233032] transition-colors" type="button">
+<span class="material-symbols-outlined text-xl">sentiment_satisfied</span>
+</button>
+</div>
+<button class="bg-primary hover:bg-cyan-400 text-[#111718] rounded-full h-[52px] w-[52px] flex items-center justify-center shadow-lg shadow-primary/20 transition-all transform hover:scale-105" type="submit">
+<span class="material-symbols-outlined text-2xl fill-current">send</span>
+</button>
+</form>
+</div>
+</main>
+</div>
+<style>.custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #293738;
+            border-radius: 20px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: #3b4d4f;
+        }
+    </style>
+
+</body></html>

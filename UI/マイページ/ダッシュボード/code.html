@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html class="dark" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>マイページ - ダッシュボード</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Noto+Sans+JP:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#19d4e6",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#112021",
+                        "surface-dark": "#1a2c2e", 
+                        "surface-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "Noto Sans JP", "sans-serif"],
+                        "body": ["Noto Sans JP", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem", 
+                        "lg": "1.5rem", 
+                        "xl": "2rem", 
+                        "2xl": "2.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white antialiased transition-colors duration-300">
+<div class="flex h-screen w-full overflow-hidden">
+<aside class="hidden md:flex flex-col w-72 h-full bg-surface-light dark:bg-surface-dark border-r border-slate-200 dark:border-slate-800 p-6 z-20 overflow-y-auto">
+<div class="flex flex-col gap-8 h-full">
+<div class="flex items-center gap-2 px-2">
+<div class="size-8 rounded-full bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-background-dark text-xl">diversity_2</span>
+</div>
+<span class="text-xl font-bold tracking-tight">LooseConnect</span>
+</div>
+<div class="flex items-center gap-4 p-3 rounded-2xl bg-slate-50 dark:bg-background-dark border border-slate-100 dark:border-slate-800">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-12 shrink-0 border-2 border-primary" data-alt="眼鏡をかけた笑顔の中年アジア系男性のポートレート" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAMQaUe3LICjL8Dlzpev0wyRibdNhuV4GXIUXuHL2bMReb7lOKcXrZz-lJCOaEsauyoSWsALt8HUdbEVoFm5WnZ9KbKvVMsFAdYJNCp0o-Ou3V20ocorTD7TXMvVtAbFd1lFBIsFcuMWju-EQ_cnofcCtHZyplcRN6gPrxKKTIJ1hdMS2Z2jCxrwq2-j8bxlM0oKAHEholrnhWkbIkKEAlxeCA8Xg1iCkg_CLfaeMOQMLvRaKb6SLvo90OK2Rfpd_njzDVM1hGERGM");'>
+</div>
+<div class="flex flex-col min-w-0">
+<h1 class="text-sm font-bold truncate">田中 健司</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs truncate">プレミアム会員</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2 flex-1">
+<a class="group flex items-center gap-4 px-4 py-3 rounded-full bg-primary/10 text-primary font-bold transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm">ダッシュボード</span>
+</a>
+<a class="group flex items-center gap-4 px-4 py-3 rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">person</span>
+<span class="text-sm">プロフィール</span>
+</a>
+<a class="group flex items-center gap-4 px-4 py-3 rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">history</span>
+<span class="text-sm">参加履歴</span>
+</a>
+<a class="group flex items-center gap-4 px-4 py-3 rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium" href="#">
+<div class="relative">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">chat_bubble</span>
+<span class="absolute top-0 right-0 size-2.5 bg-primary rounded-full border-2 border-surface-light dark:border-surface-dark"></span>
+</div>
+<span class="text-sm">メッセージ</span>
+</a>
+<a class="group flex items-center gap-4 px-4 py-3 rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
+<span class="text-sm">設定</span>
+</a>
+</nav>
+<a class="flex items-center gap-4 px-4 py-3 mt-auto rounded-full text-slate-500 dark:text-slate-500 hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all font-medium" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="text-sm">ログアウト</span>
+</a>
+</div>
+</aside>
+<main class="flex-1 h-full overflow-y-auto bg-background-light dark:bg-background-dark relative">
+<div class="md:hidden flex items-center justify-between p-4 bg-surface-light dark:bg-surface-dark sticky top-0 z-30 shadow-sm">
+<div class="font-bold text-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">diversity_2</span> LooseConnect
+                </div>
+<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<div class="max-w-5xl mx-auto p-4 md:p-8 lg:p-12 flex flex-col gap-8">
+<header class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+<div class="flex flex-col gap-2">
+<h1 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
+                            おかえりなさい、健司さん
+                        </h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm md:text-base font-medium">
+                            次の「ゆるい繋がり」まで、あと少しです。
+                        </p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-700 hover:border-primary/50 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">notifications</span>
+<span class="text-sm font-bold">通知</span>
+<span class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">2</span>
+</button>
+</div>
+</header>
+<section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="flex flex-col gap-1 rounded-2xl p-6 bg-surface-light dark:bg-surface-dark shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-transparent dark:border-slate-800">
+<div class="flex items-center justify-between mb-2">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-bold">繋がった人数</p>
+<span class="material-symbols-outlined text-primary/80">group_add</span>
+</div>
+<p class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">12<span class="text-lg font-medium text-slate-400 ml-1">人</span></p>
+</div>
+<div class="flex flex-col gap-1 rounded-2xl p-6 bg-surface-light dark:bg-surface-dark shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-transparent dark:border-slate-800">
+<div class="flex items-center justify-between mb-2">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-bold">イベント参加数</p>
+<span class="material-symbols-outlined text-primary/80">event_available</span>
+</div>
+<p class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">5<span class="text-lg font-medium text-slate-400 ml-1">回</span></p>
+</div>
+<div class="flex flex-col gap-1 rounded-2xl p-6 bg-surface-light dark:bg-surface-dark shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-transparent dark:border-slate-800 relative overflow-hidden group">
+<div class="absolute inset-0 bg-primary/5 dark:bg-primary/10 group-hover:bg-primary/10 transition-colors"></div>
+<div class="flex items-center justify-between mb-2 relative z-10">
+<p class="text-primary dark:text-primary text-sm font-bold">次のイベントまで</p>
+<span class="material-symbols-outlined text-primary">timer</span>
+</div>
+<p class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white relative z-10">2<span class="text-lg font-medium text-slate-400 ml-1">日</span></p>
+</div>
+</section>
+<section>
+<div class="flex items-center justify-between mb-4 px-1">
+<h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">upcoming</span>
+                            次回の予定
+                        </h2>
+</div>
+<div class="group relative rounded-2xl overflow-hidden bg-surface-light dark:bg-surface-dark shadow-md border border-slate-200 dark:border-slate-800 transition-all hover:shadow-lg">
+<div class="flex flex-col md:flex-row">
+<div class="w-full md:w-2/5 h-64 md:h-auto bg-cover bg-center relative" data-alt="暖かく居心地の良いカフェで撮影された、焙煎コーヒー豆とコーヒーカップのクローズアップ" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCzY4-demKpvxj9Q_djVdZuCue6oPLPbbNVgqRJUbb9I5NXxGLeHa7df8VrEoZVQ6rTnbVq5-k1hDTG_8J5Q-PTT94GU2uuKIyv_zmU-zkRHeJp-PGhgNi22cAvG2Jfd9_XWjpqLSGhUnRBofpF-xFQ5pPvP45yHctSPitpoO2vA_rIp5ogH0Dg8BEryMKnw94Jbv2IMB8W__IBjOt8ZnM75PtZCDDCd3m5QaFjWAUGH6yiSXrhhG0TGbB8tI-eh2CyrOepu7YnLzg");'>
+<div class="absolute top-4 left-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-bold border border-white/20">
+<span class="material-symbols-outlined text-[14px] mr-1">coffee</span>
+                                         趣味・ワークショップ
+                                     </span>
+</div>
+</div>
+<div class="flex-1 p-6 md:p-8 flex flex-col justify-between gap-6">
+<div>
+<div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500 dark:text-slate-400 mb-3 font-medium">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary">calendar_month</span>
+                                            10月24日 (土)
+                                        </div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary">schedule</span>
+                                            14:00 - 16:00
+                                        </div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary">location_on</span>
+                                            世田谷区・ブルーボトル
+                                        </div>
+</div>
+<h3 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white leading-tight mb-3">
+                                        自家焙煎コーヒー体験ワークショップ
+                                    </h3>
+<p class="text-slate-600 dark:text-slate-300 leading-relaxed text-sm md:text-base">
+                                        プロのバリスタから学ぶ、初心者向けの焙煎体験です。香りを楽しみながら、同世代のコーヒー好きとゆるく語り合いましょう。
+                                    </p>
+<div class="flex items-center gap-2 mt-4">
+<div class="flex -space-x-3">
+<div class="size-8 rounded-full border-2 border-surface-light dark:border-surface-dark bg-slate-300 bg-cover" data-alt="参加者 1" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA2UWfEOr1b26FsqQqdtzzzDB7d51n5Gi01F43UdVzaD-FAb8bUBi3VK7fWJWd2Pefcn6W8UuptSCGIFBZYL2zdt4qUzlN8Evy7orSeduBvLR21SYAuzdqXdU6zVv7zUt5YBTKUVV0-NLuvEHZYFEV9xrH6AT0jMh-xjte95_2-3LSQd-56EoY7hDweKZOlJelxhbUSNq4meSKTL12NQM1QKW2ntDrpK5cJk4RuRpJ1lNTQ-RsHEcXAR5zME3ZbQWlfHhDWODu4kSg")'></div>
+<div class="size-8 rounded-full border-2 border-surface-light dark:border-surface-dark bg-slate-300 bg-cover" data-alt="参加者 2" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDu6sj9vVUXCNzary5kIqwN1ji7PiZDmlvR0tETlyw5s4onYOnomyZ7tbpIsXHc_RnCf6qAARQVPsfcK86kaFcX9TbYLSXN-zA9EMxVVus3nQ8x2m_-4wtbsp0PbH2pDZywIgYOJ5AjHtP4nZJnrG2kdPHHT3qWDOBRjiWRTSWxo5Fzwp2a5xcwOVssTFIB4nsN7R9-bmzcdEtlDRz1R6CYMjTdo1KatHBqpjsCb7BnEH9s9yNi_aQY3FaRLApqn_TBJBwD-MjuBjs")'></div>
+<div class="size-8 rounded-full border-2 border-surface-light dark:border-surface-dark bg-slate-300 bg-cover" data-alt="参加者 3" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCDqhT3zCm6IOrkbF1adPV1A4iUZ467-F7NYtZ1SBCs_dqZyQt-JCOry8HYq_C55ftKVD0zfPJ3WiYX5dwDvl_fHeGoLexrW8fR7uEhJY989C7oqjtQ_p0cIWWbgYo4aysw696_ZJdEiUI9vQFcZzNg_9m4nuHfg5Ov1cECnGYjAxg21l4ioVL0CpuiC8ZR1h7VClETpITjHb1zCAF_v5ABBv_pHLhj9Bu_rqvIYKmUvZuxh5YR7ebMkvP00OXLfXl08MLqPW-O6cY")'></div>
+</div>
+<span class="text-xs font-medium text-slate-500 dark:text-slate-400">他 3名が参加予定</span>
+</div>
+</div>
+<div class="flex gap-3 mt-auto">
+<button class="flex-1 md:flex-none md:w-auto bg-primary hover:bg-cyan-400 text-background-dark font-bold py-3 px-6 rounded-full transition-colors flex items-center justify-center gap-2">
+                                        詳細を見る
+                                        <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="flex-1 md:flex-none md:w-auto bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold py-3 px-6 rounded-full transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">chat</span>
+                                        ホストへ連絡
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section>
+<div class="flex items-center justify-between mb-4 px-1">
+<h2 class="text-xl font-bold text-slate-900 dark:text-white">おすすめのアクティビティ</h2>
+<a class="text-primary text-sm font-bold hover:underline flex items-center gap-1" href="#">
+                            すべて見る <span class="material-symbols-outlined text-sm">chevron_right</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<div class="flex flex-col bg-surface-light dark:bg-surface-dark rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-slate-200 dark:border-slate-800 h-full">
+<div class="h-48 bg-cover bg-center relative" data-alt="バックパックを背負って森の小道をハイキングするグループ" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAgZS46ndH7tdtqHKPl_Agdcb93Y6SIdQa7LDZhCrU8kzpTEA220xwYPc7Qs-8dxxK2M90HBQyFk0-Ul4H06JW5N_I3DfU-uaccL0pnOgyLGkhMF4DLOQRQv26lvUY-sAMW9EMFvAVB4j_UbXFEnU8i0Bm8L8x69hCzDlMjk9eTLPBAEVMxRv9g8GaU6SUqxlEPn8ldN_KwnUyRHRSCotEm41fjMXpbmqzegsGVjs3AayHig5gJ7mU45q81qtAwJLaJVVoN9qyQasU");'>
+<div class="absolute top-3 right-3 p-1.5 bg-black/40 backdrop-blur-sm rounded-full text-white cursor-pointer hover:bg-primary hover:text-background-dark transition-colors">
+<span class="material-symbols-outlined block text-[20px]">favorite</span>
+</div>
+</div>
+<div class="p-5 flex flex-col flex-1 gap-3">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-[10px] font-bold tracking-wide uppercase">
+                                        アウトドア
+                                    </span>
+<span class="text-xs text-slate-500 dark:text-slate-400 font-medium">初心者歓迎</span>
+</div>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                                    週末高尾山ハイキング
+                                </h3>
+<div class="flex flex-col gap-1.5 mt-auto">
+<div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
+<span class="material-symbols-outlined text-[16px] text-primary">calendar_month</span>
+                                        11月2日 (日) • 09:00〜
+                                    </div>
+<div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
+<span class="material-symbols-outlined text-[16px] text-primary">location_on</span>
+                                        高尾山口駅集合
+                                    </div>
+</div>
+</div>
+</div>
+<div class="flex flex-col bg-surface-light dark:bg-surface-dark rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-slate-200 dark:border-slate-800 h-full">
+<div class="h-48 bg-cover bg-center relative" data-alt="暖かい照明のジャズクラブで演奏するサックス奏者のクローズアップ" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBevQYNST9U3K4dK4kP0RtVdIaVER8nKDNwuXjFu8ETZ-QaJwGBXkHYcK0eUx-CKFlT2CGa7NSJ17-Xe50D1tpteJJh1EYpmFMxrekR4Hg89uZDszLQdoh01RCO-6ZkNdawHTrq55BwZ_wD4k7Qg39w_z54Moifar4c-QxtwWPC2_qwxU4SmIwtRJtTs5q94GGOyz3hPdmjSLUWHJZMeCWUJdawywOBt9AYpPbmY7xdXqiYk831kBwPeOjTGEqbmvOBjZvPW2XpzYw");'>
+<div class="absolute top-3 right-3 p-1.5 bg-black/40 backdrop-blur-sm rounded-full text-white cursor-pointer hover:bg-primary hover:text-background-dark transition-colors">
+<span class="material-symbols-outlined block text-[20px]">favorite</span>
+</div>
+</div>
+<div class="p-5 flex flex-col flex-1 gap-3">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-[10px] font-bold tracking-wide uppercase">
+                                        音楽・鑑賞
+                                    </span>
+</div>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                                    大人のジャズナイト
+                                </h3>
+<div class="flex flex-col gap-1.5 mt-auto">
+<div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
+<span class="material-symbols-outlined text-[16px] text-primary">calendar_month</span>
+                                        11月5日 (水) • 19:30〜
+                                    </div>
+<div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
+<span class="material-symbols-outlined text-[16px] text-primary">location_on</span>
+                                        新宿・Jazz Bar Blue
+                                    </div>
+</div>
+</div>
+</div>
+<div class="flex flex-col bg-surface-light dark:bg-surface-dark rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-slate-200 dark:border-slate-800 h-full">
+<div class="h-48 bg-cover bg-center relative" data-alt="木のテーブルでレザークラフトに取り組む様子" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBc2H8vhMeDz_3F0_ErWBbWKRJ9Uh4ztX1DkmNjsCICK3PFemLcKdYaYjtfXXvWYHBfuEQTEY1LFD2_r_UBcl3wrtO62EXacvivraZKswTCRjh1BaxDhdDCEhwQF1LCts5x6KxagBuuYTUWfkD7tNuK6nexm77QjYgFqcJX78U8LziwIpFJxv253hwre_kStYCEhUM7wJ-cZA3-z4VJYUcGjQq-8CPQsb0ISxzIxecNTBN7oE4YtWh7CpG9EhPm3KTXZHO3Je_Roxc");'>
+<div class="absolute top-3 right-3 p-1.5 bg-black/40 backdrop-blur-sm rounded-full text-white cursor-pointer hover:bg-primary hover:text-background-dark transition-colors">
+<span class="material-symbols-outlined block text-[20px]">favorite</span>
+</div>
+</div>
+<div class="p-5 flex flex-col flex-1 gap-3">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-[10px] font-bold tracking-wide uppercase">
+                                        DIY・工作
+                                    </span>
+</div>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                                    レザークラフト入門
+                                </h3>
+<div class="flex flex-col gap-1.5 mt-auto">
+<div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
+<span class="material-symbols-outlined text-[16px] text-primary">calendar_month</span>
+                                        11月9日 (日) • 13:00〜
+                                    </div>
+<div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
+<span class="material-symbols-outlined text-[16px] text-primary">location_on</span>
+                                        蔵前・Craft Lab
+                                    </div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="pb-8">
+<div class="p-6 rounded-2xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-lg font-bold text-slate-900 dark:text-white">最近の交流履歴</h2>
+<button class="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">履歴一覧</button>
+</div>
+<div class="space-y-4">
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">sports_bar</span>
+</div>
+<div>
+<h4 class="font-bold text-slate-900 dark:text-white">クラフトビール飲み比べ会</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400">10月15日 • 参加者 6名</p>
+</div>
+</div>
+<div class="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
+<div class="flex -space-x-2">
+<div class="size-8 rounded-full border-2 border-surface-light dark:border-surface-dark bg-slate-300 bg-cover" data-alt="参加者 1" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDMnsmsuNmFIkZfd6cOhc-RB544we3gzqPZdU7lE1G54UZGonvi9BAGOD0iExht4ua4cIssLoX3xoKtBlnKX_XiVSJE4VhZACmAJ1mjRLAF666GTGrFw91Clv7X-VK1hvKTVeeV4t2o3F4VzDoqrAZqEjk5Cxr55jm6n31VPadWWvMJFJaQgtEi13KF2eD3uNLqqHqCFG95tiGgOFXBcDcLKwywF6dJna9eDPXZHbYWXv74nlbKHOTfMmSn7PLjPc1zOiHBeuDmByA")'></div>
+<div class="size-8 rounded-full border-2 border-surface-light dark:border-surface-dark bg-slate-300 bg-cover" data-alt="参加者 2" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBFo3ewi8cKhQmMh67J0FP9XOv3kcBBFBq6sXSA1rCJj65GR9dp3-uHREWjnROYkD_I9FWjZPBeKVWC6o6ej420dG0If8aPAUPtXWIa5KllSP9oevEDYE-BkiynyZyqnH_sw6GB8pncJ8PdkikPKo6BM7hbDZNYKiCELbC9aKAOkDyX8iNZstLXduLisU-2bzzVTz28Xgqerzs8xRQmJ6oyuKQyySB5I6t1PsKf4FOiEBwez1AGUoQnUfwC1Pd2f6Rst8jyWW-GJFE")'></div>
+</div>
+<button class="ml-auto sm:ml-0 text-xs font-bold text-primary border border-primary/30 px-3 py-1.5 rounded-full hover:bg-primary hover:text-background-dark transition-colors">
+                                        メンバーを見る
+                                    </button>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">camera_alt</span>
+</div>
+<div>
+<h4 class="font-bold text-slate-900 dark:text-white">早朝の都市撮影散歩</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400">10月08日 • 参加者 4名</p>
+</div>
+</div>
+<div class="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
+<div class="flex -space-x-2">
+<div class="size-8 rounded-full border-2 border-surface-light dark:border-surface-dark bg-slate-300 bg-cover" data-alt="参加者 3" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCPkU6o9K6HMYEnKCfLqPJ4DZXPXAreNgSM41GuSH_VI9yMm3A7gHFmUUalO9TRd4qK8kLYl5aCfZpBMF2_4Got3EaXJ1xe2AF8JYFAeXybh_nIltmS-Z8F59l40zXuTXGz26O617JeeHKHeEmhBmBPlKWDpP6nNCQ23uixhjRguxmgGjiyK0W_rAaZVU8ZNOhivUjjF_oEccYRCBwmzXY4tWhen-_k1AigNmkfNo4AObQYuc6btulmQ6Lx9AHF9qOBPQiCISmr6YQ")'></div>
+</div>
+<button class="ml-auto sm:ml-0 text-xs font-bold text-primary border border-primary/30 px-3 py-1.5 rounded-full hover:bg-primary hover:text-background-dark transition-colors">
+                                        メンバーを見る
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+
+</body></html>

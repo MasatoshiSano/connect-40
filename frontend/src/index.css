@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary: #19d4e6;
+    --bg-dark: #112021;
+    --surface-dark: #1a2c2e;
+    --bg-light: #f6f8f8;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-bg-light dark:bg-bg-dark text-gray-900 dark:text-gray-100;
+    @apply font-sans antialiased;
+  }
+}

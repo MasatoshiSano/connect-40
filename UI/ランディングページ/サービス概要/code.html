@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html class="dark" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Link40 - 40代のための「ゆるい繋がり」プラットフォーム</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#19d4e6",
+                        "primary-hover": "#14b0bf",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#112021",
+                        "surface-dark": "#1a2c2e",
+                        "surface-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "Noto Sans JP", "sans-serif"],
+                        "sans": ["Plus Jakarta Sans", "Noto Sans JP", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
+        }
+        .text-gradient {
+            background: linear-gradient(to right, #19d4e6, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .dark .text-gradient-dark {
+            background: linear-gradient(to right, #19d4e6, #a5f3fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-display selection:bg-primary selection:text-background-dark">
+<nav class="fixed w-full z-50 top-0 start-0 border-b border-gray-200 dark:border-gray-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex flex-wrap items-center justify-between mx-auto p-4">
+<a class="flex items-center space-x-2 rtl:space-x-reverse" href="#">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-background-dark font-bold text-xl">L</div>
+<span class="self-center text-2xl font-bold whitespace-nowrap dark:text-white">Link40</span>
+</a>
+<div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+<button class="text-background-dark bg-primary hover:bg-primary-hover focus:ring-4 focus:outline-none focus:ring-primary/30 font-bold rounded-full text-sm px-6 py-3 text-center transition-all" type="button">
+                        無料で始める
+                    </button>
+<button aria-controls="navbar-sticky" aria-expanded="false" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" data-collapse-toggle="navbar-sticky" type="button">
+<span class="sr-only">Open main menu</span>
+<span class="material-icons">menu</span>
+</button>
+</div>
+<div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
+<ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 dark:border-gray-700">
+<li>
+<a class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary md:p-0 dark:text-white dark:hover:text-primary dark:hover:bg-gray-700 md:dark:hover:bg-transparent transition-colors" href="#concept">コンセプト</a>
+</li>
+<li>
+<a class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary md:p-0 dark:text-white dark:hover:text-primary dark:hover:bg-gray-700 md:dark:hover:bg-transparent transition-colors" href="#activities">アクティビティ</a>
+</li>
+<li>
+<a class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary md:p-0 dark:text-white dark:hover:text-primary dark:hover:bg-gray-700 md:dark:hover:bg-transparent transition-colors" href="#reason">選ばれる理由</a>
+</li>
+<li>
+<a class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary md:p-0 dark:text-white dark:hover:text-primary dark:hover:bg-gray-700 md:dark:hover:bg-transparent transition-colors" href="#pricing">料金プラン</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</nav>
+<section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="青い色調の夕暮れの抽象的な都市景観" class="w-full h-full object-cover opacity-20 dark:opacity-10 filter grayscale" data-alt="abstract cityscape at dusk with blue tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxH297uGt_Gnd8jEOb0Ir3fVB0UP9d0utBmCcI1e7NQaZQVZr_Syd-x1_jY1ncgSL7SDZwCbYCoYx1l6ykKgOqCmOPSbyxC4bulukGwET1HNpWIqTAxQCKWELlN_2cLReJuvdUyvx9QoaVeCWaQFrAoa3hzXAxKZc--ixWE4Cf-UY7Q0Gz6lNu8j4IBFvOc-dMHIyOWYQy51x9aLVTJLsX6VEwNqWv9adYux9Tw8sY0-PTOTF6iGf_aui5ZsYydc6QUzpJv3X1qHw"/>
+<div class="absolute inset-0 bg-gradient-to-b from-background-light/50 via-background-light/80 to-background-light dark:from-background-dark/50 dark:via-background-dark/80 dark:to-background-dark"></div>
+</div>
+<div class="relative z-10 container mx-auto px-4 text-center">
+<span class="inline-block py-1 px-3 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold mb-6 tracking-wide">
+                40代男性専用コミュニティ
+            </span>
+<h1 class="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight leading-tight dark:text-white">
+                職場でも家庭でもない<br/>
+<span class="text-gradient-dark text-primary">第3の居場所</span>を見つける
+            </h1>
+<p class="text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+                「Link40」は、共通の趣味やアクティビティを通じて<br class="hidden md:inline"/>
+                無理のない「ゆるい繋がり」を作るプラットフォームです。<br/>
+                孤独を感じがちな40代に、新しい日常を。
+            </p>
+<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+<button class="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary-hover text-background-dark font-bold rounded-full text-lg shadow-lg shadow-primary/20 transition-all transform hover:scale-105">
+                    今すぐ参加する
+                </button>
+<button class="w-full sm:w-auto px-8 py-4 bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-semibold rounded-full text-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center justify-center gap-2">
+<span class="material-icons text-primary">play_circle</span>
+                    使い方を見る
+                </button>
+</div>
+<div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto border-t border-gray-200 dark:border-gray-800 pt-8">
+<div>
+<p class="text-3xl font-bold text-primary">150+</p>
+<p class="text-sm text-gray-500 dark:text-gray-400">アクティビティ種類</p>
+</div>
+<div>
+<p class="text-3xl font-bold text-primary">40代</p>
+<p class="text-sm text-gray-500 dark:text-gray-400">メインユーザー層</p>
+</div>
+<div>
+<p class="text-3xl font-bold text-primary">0円</p>
+<p class="text-sm text-gray-500 dark:text-gray-400">登録・検索は無料</p>
+</div>
+<div>
+<p class="text-3xl font-bold text-primary">安心</p>
+<p class="text-sm text-gray-500 dark:text-gray-400">本人確認・審査制</p>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 bg-white dark:bg-surface-dark rounded-t-xl md:rounded-t-[3rem] -mt-10 relative z-20" id="concept">
+<div class="container mx-auto px-4">
+<div class="text-center max-w-3xl mx-auto mb-16">
+<h2 class="text-3xl md:text-4xl font-bold mb-4 dark:text-white">なぜ「ゆるい繋がり」なのか？</h2>
+<p class="text-gray-600 dark:text-gray-400">
+                    深い友情やビジネスパートナーを探す必要はありません。<br/>
+                    「週末の朝にコーヒーを飲むだけ」「たまに一緒に走るだけ」。<br/>
+                    そんな気負わない関係こそが、心の健康を保つ鍵です。
+                </p>
+</div>
+<div class="grid md:grid-cols-3 gap-8">
+<div class="bg-background-light dark:bg-background-dark p-8 rounded-lg hover:shadow-xl transition-shadow border border-transparent hover:border-primary/30 group">
+<div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-background-dark transition-colors text-primary">
+<span class="material-icons text-3xl">coffee</span>
+</div>
+<h3 class="text-xl font-bold mb-3 dark:text-white">アクティビティ起点</h3>
+<p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                        「人」から入るのではなく「やりたいこと」から入るため、会話のネタに困りません。共通の目的があるから自然と打ち解けられます。
+                    </p>
+</div>
+<div class="bg-background-light dark:bg-background-dark p-8 rounded-lg hover:shadow-xl transition-shadow border border-transparent hover:border-primary/30 group">
+<div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-background-dark transition-colors text-primary">
+<span class="material-icons text-3xl">location_on</span>
+</div>
+<h3 class="text-xl font-bold mb-3 dark:text-white">地域密着型</h3>
+<p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                        オンラインだけの繋がりではなく、実際に会える距離感を重視。地元の隠れた名店やスポットを共有し合えます。
+                    </p>
+</div>
+<div class="bg-background-light dark:bg-background-dark p-8 rounded-lg hover:shadow-xl transition-shadow border border-transparent hover:border-primary/30 group">
+<div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-background-dark transition-colors text-primary">
+<span class="material-icons text-3xl">verified_user</span>
+</div>
+<h3 class="text-xl font-bold mb-3 dark:text-white">同世代の安心感</h3>
+<p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                        ユーザーは主に40代男性。仕事の責任や家庭の悩みなど、似たようなライフステージにいるからこそ分かり合える空気感があります。
+                    </p>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 bg-background-light dark:bg-background-dark" id="reason">
+<div class="container mx-auto px-4">
+<div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+<div class="lg:w-1/2">
+<div class="relative rounded-2xl overflow-hidden shadow-2xl">
+<img alt="窓辺で物思いに耽る熟年男性" class="w-full h-full object-cover" data-alt="Mature man looking thoughtful by a window" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_lri5qtb0j4Q_hU6qichgsKM9v3jpV4cmkNysYQHRWBD4A7hs-_b2H0syddqxlD1znYTruWE-KonrzRURx-1VqY5HbX9rlU2aDDqLNZhRazuoosYyXd7X3zs38jBynb_-5I81wqMY1-AUOgj4RpaUHaSP7jnF-aTSWOVBfvQM48c3wM89gv_LWIyQXaCAZNVn8PoxqzgypxCOkHnha0HC1hiJG0r93kHb0FvaPczlzCtSq7_Zf4XHTwb19ww5h0DgvhsPOoSvJWs"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark/90 to-transparent flex items-end p-8">
+<div class="text-white">
+<p class="text-sm font-semibold text-primary uppercase tracking-wider mb-2">40代の現実</p>
+<p class="text-xl font-medium">「友人がいない」と感じる40代男性は増加傾向にあります。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="lg:w-1/2">
+<h2 class="text-3xl md:text-4xl font-bold mb-6 dark:text-white">
+                        40代は<span class="text-primary">「孤独の谷」</span>の入り口？
+                    </h2>
+<p class="text-gray-600 dark:text-gray-400 mb-8 text-lg">
+                        仕事の責任が増し、家庭では役割が固定化され、学生時代の友人とは疎遠になる。
+                        多くの男性にとって、40代は社会的な繋がりが希薄になりやすい時期です。
+                    </p>
+<div class="space-y-6">
+<div class="flex items-start">
+<div class="flex-shrink-0 mt-1">
+<span class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary text-primary font-bold">1</span>
+</div>
+<div class="ml-4">
+<h4 class="text-lg font-bold dark:text-white">健康リスクの軽減</h4>
+<p class="mt-1 text-gray-500 dark:text-gray-400 text-sm">孤独は喫煙や肥満と同等の健康リスクがあると言われています。適度な交流は心身の健康を保ちます。</p>
+</div>
+</div>
+<div class="flex items-start">
+<div class="flex-shrink-0 mt-1">
+<span class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary text-primary font-bold">2</span>
+</div>
+<div class="ml-4">
+<h4 class="text-lg font-bold dark:text-white">利害関係のない第三者</h4>
+<p class="mt-1 text-gray-500 dark:text-gray-400 text-sm">職場の上司・部下でもなく、家族でもない。「ただの趣味仲間」という存在が精神的な逃げ場になります。</p>
+</div>
+</div>
+<div class="flex items-start">
+<div class="flex-shrink-0 mt-1">
+<span class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary text-primary font-bold">3</span>
+</div>
+<div class="ml-4">
+<h4 class="text-lg font-bold dark:text-white">新しい刺激と発見</h4>
+<p class="mt-1 text-gray-500 dark:text-gray-400 text-sm">異なる業界やバックグラウンドを持つ同世代との交流は、マンネリ化した日常に新鮮な風を吹き込みます。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 bg-white dark:bg-surface-dark relative" id="activities">
+<div class="container mx-auto px-4">
+<div class="flex justify-between items-end mb-12">
+<div>
+<h2 class="text-3xl md:text-4xl font-bold mb-4 dark:text-white">募集中のアクティビティ例</h2>
+<p class="text-gray-600 dark:text-gray-400">
+                        「ガチ」ではなく「ゆるく」。初心者歓迎の募集が中心です。
+                    </p>
+</div>
+<a class="hidden md:flex items-center text-primary font-semibold hover:text-primary-hover transition-colors" href="#">
+                    すべて見る <span class="material-icons ml-1 text-sm">arrow_forward</span>
+</a>
+</div>
+<div class="flex overflow-x-auto space-x-6 pb-8 snap-x snap-mandatory hide-scrollbar">
+<div class="min-w-[300px] md:min-w-[350px] snap-center bg-background-light dark:bg-background-dark rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all group cursor-pointer">
+<div class="h-48 overflow-hidden relative">
+<img alt="トレイル上のハイキングブーツ" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Hiking boots on a trail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDXJSdyVnjIxuuRPq4oZvp6G3NodEaBrxug_4FpZH8TwMEiRNSXzsUN1PRHMK1lDJ0D_940fnTHtcYqo48ie61uGUMezFgfT-8ghj0Zv4W8I8hggOfVs2QEpOrkvM_ZLc4UVHpIQ0y6StFJGIGpV1TvsuaHwQbTxKWvPfHKBAVCgSn8_JKGnQ0jtFPnLLxWFkFwFo3xiiEK8ypx111pJql-P2pzQdY3lZSrGcUco5kuZnfZOiD3pm4NliCzsjMxrN59IfUpwLHL6M"/>
+<div class="absolute top-4 left-4 bg-background-dark/80 backdrop-blur text-white text-xs px-3 py-1 rounded-full">
+                            アウトドア
+                        </div>
+</div>
+<div class="p-6">
+<div class="flex items-center text-xs text-primary mb-2">
+<span class="material-icons text-sm mr-1">location_on</span>
+                            東京都・高尾山
+                        </div>
+<h3 class="text-lg font-bold mb-2 dark:text-white group-hover:text-primary transition-colors">初心者向け、朝の軽いハイキング</h3>
+<p class="text-gray-500 dark:text-gray-400 text-sm mb-4">
+                            頂上でコーヒーを飲んで解散です。会話少なめでもOK。運動不足解消に。
+                        </p>
+<div class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
+<div class="flex -space-x-2">
+<img alt="ユーザー1" class="w-8 h-8 rounded-full border-2 border-white dark:border-background-dark" data-alt="User avatar 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWJxazg6Id5_OS98Vj0B2ayU4zFY3NeEgUDfetGEycG4yyCvi2Cxdj8saGceDE4MRkesfaEQba1q9LC1bYwCZg_ekq3GbgV0dfXk-bw3Q35EWyAaAfWXY9KpD-BPT4Dw9ftZjAEU6-SfBnlq5K6y4xppTMU1RWOvzxIfMbFHEN-qKW1nNvrMxhO34N8dRDr_FJskdYRTLDVqPhzfReTdbGspmUe2IuwgubJMeXdV_2TJY7gMXGdx1nhc-KcUmqe072zl3HbR1CxxU"/>
+<img alt="ユーザー2" class="w-8 h-8 rounded-full border-2 border-white dark:border-background-dark" data-alt="User avatar 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaiZfBW01EUFByre5W7NeClKDR9V8EYCdV8psHROh7u71E_S09PVvSbnApc81nED7z3covCRQYE1LXIGv0BZzEo69RZ-xt1D8ChVui61ka2D8br0rm_-R-ms0hAqp0ppPtVCb2JkkGp7lRsXE1f0fBYif2BLxeG6MqwKQdh3BN6i2n-vm7YVyd-Qau51qH76B6shDm04aDIZZaJRAV-Fo_6gtblTA5N_GUnLW0dCGkMyQy3NLT1sHQuQhhRe38_anVQM3glvC6ZRA"/>
+</div>
+<span class="text-xs text-gray-500">募集中 2/4名</span>
+</div>
+</div>
+</div>
+<div class="min-w-[300px] md:min-w-[350px] snap-center bg-background-light dark:bg-background-dark rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all group cursor-pointer">
+<div class="h-48 overflow-hidden relative">
+<img alt="サウナ室内の木製ベンチ" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Sauna interior wooden benches" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD74g5e2txz9ziwL35p72jk5UFP1DzLsfAKX6ryE5zWJp5k6cm7GQem926nC9bwpvtx4rMgLBLaehVKZ_mCRatsEarvqRj7uVgIyClw6ok279O3Z2dqfNifRUTPUVTkowkkPWC7MJYjk3_u10jrHzpUeFpkBFNtzWzEh5fHKbZGMF9oi-E1GLsKfhlMXDqVOituSO8adW8KPiJZ8GClIRVgNQlC3AfcDq6M993g5ARiRGBFgHzdhP1JezDRwB0x2_q6MiYaY3RaDlI"/>
+<div class="absolute top-4 left-4 bg-background-dark/80 backdrop-blur text-white text-xs px-3 py-1 rounded-full">
+                            リラックス
+                        </div>
+</div>
+<div class="p-6">
+<div class="flex items-center text-xs text-primary mb-2">
+<span class="material-icons text-sm mr-1">location_on</span>
+                            神奈川県・横浜
+                        </div>
+<h3 class="text-lg font-bold mb-2 dark:text-white group-hover:text-primary transition-colors">週末サウナ部・整い会</h3>
+<p class="text-gray-500 dark:text-gray-400 text-sm mb-4">
+                            サウナ好きが集まって静かに整う会です。終了後は近場で軽く一杯（自由参加）。
+                        </p>
+<div class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
+<div class="flex -space-x-2">
+<img alt="ユーザー1" class="w-8 h-8 rounded-full border-2 border-white dark:border-background-dark" data-alt="User avatar 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAb4as7jYuqLmZ20EZyppsiFebitQ_xT9xK1WAMhflC5XSy-avtM9sJ79diODLhyba--PH25bF6kMxqjjauBSkVbS7JOxakFGNIdvVSn6oQlcCPDyGunO4yaCHxcGvFhqkC2vTS4aiGkRGZ_J4tc5l0uE5gFl3K0vlpECL6_EiGXB9Oc-jD3BZYoqUMeTVpsXJrYWTBr01irXFizkB2Su81F4YjBF4dhv7-sxJTZZG58pmgojekxCdr0qp8L3leG-6d-hdV0Hq-EVI"/>
+<img alt="ユーザー2" class="w-8 h-8 rounded-full border-2 border-white dark:border-background-dark" data-alt="User avatar 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuZXPiIRH-2X0GEfeMgqtwH-5REvn7CwjvHdXH0vAUd-pT8dN1_NutVO6hNzc2TsDdIvV-gBRtowbigq5V6KsV5WsejK0nIeeZKHA8kBfwHKKk34uRX4aIwkuP7SdA3q5Q4j-GrlJVhbXj4DdeqRubkQDrnpH6YKNtNbagh12HUnpYb-LPZ2MkgTO6HPJ7SzhbVUrrEG0jIAS4XPcF9eDVfCgORaaoOHgtqemjNkcgiGFGsysRV0wSq2L9yzxy_lVfxS1K64ts63k"/>
+<img alt="ユーザー3" class="w-8 h-8 rounded-full border-2 border-white dark:border-background-dark" data-alt="User avatar 3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwv0MG839prRnHRry6tzA6A5aVZUYlP2gUqXYQk6Ec2GlyxZJahjJwzg-MEPs4xVl93tHrXPvmkpOXYj4aRr6DlGRhednEktuD7v1bjOwSY14QDvn6opDMGfnUoGcuTizF2myqJbD0hf-B4Bm28ko_Yvel51S6jeLr89jk1FyUb3Mct4wC8tWXhvvdn_iNzoZV0h4aDqlvNw0ExU0A20GmfY8FGztPa5oFCQaBk3UQ2NT_5ZzPfUx5WFPSdt7UGLbzCQ-MLCs_Esg"/>
+</div>
+<span class="text-xs text-gray-500">募集中 5/6名</span>
+</div>
+</div>
+</div>
+<div class="min-w-[300px] md:min-w-[350px] snap-center bg-background-light dark:bg-background-dark rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all group cursor-pointer">
+<div class="h-48 overflow-hidden relative">
+<img alt="テーブル上のレトロなカメラ" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Retro camera on table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQKsU2Lix-Jj1aNc2brXuBrQtTsFkI84oXXoW0VGjJVwSggwL93t3nKs4nG85oLe83fhV_MnOaaS8nPCQIDRO_n6pMyEi7ZRdKbGOCdcvKTCQ-hVBe45kn24So-Z6fE9srQmxKW56reEX4Q3kF6Ni1if0Swpy43xqehzU691kww4MZfC7jkLJ9kCKwfv_8g-NPghK05SfHM6w5TGR0rPPQu82Y0klazAyk0bRQ-e9SAufNuY__c_g70U5nMeiwbJAO93elx5gP3fM"/>
+<div class="absolute top-4 left-4 bg-background-dark/80 backdrop-blur text-white text-xs px-3 py-1 rounded-full">
+                            クリエイティブ
+                        </div>
+</div>
+<div class="p-6">
+<div class="flex items-center text-xs text-primary mb-2">
+<span class="material-icons text-sm mr-1">location_on</span>
+                            大阪府・梅田
+                        </div>
+<h3 class="text-lg font-bold mb-2 dark:text-white group-hover:text-primary transition-colors">フィルムカメラ散歩</h3>
+<p class="text-gray-500 dark:text-gray-400 text-sm mb-4">
+                            昭和の路地裏を撮り歩きませんか？デジタル・フィルム問いません。機材自慢なしで。
+                        </p>
+<div class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
+<div class="flex -space-x-2">
+<img alt="ユーザー1" class="w-8 h-8 rounded-full border-2 border-white dark:border-background-dark" data-alt="User avatar 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJZ-3i_FXdzaabAkBdQUo3aIZhER9gTcvWWqvip-A-RvTP-QtIUE_mMM7mUQYNN0bgkx7fm_xgHhf7atUQ3-6b8S9w8wXkgGk7kdNUF9GCTZfNvENQp5UKUv5X2qg3oGx-RjotxGpFxkkZiCcTmYFev2v_GCqJEMSTMASE4-Vmki7SrNW2mSMoHvlT2bXSFmbZ00LRhEbBzAg6D6whu7u-2r1B2hIw6-jv7lmo-ecicBVQqc6Qm5Gx-xxayNT4MACLzMfRU0mpo6A"/>
+</div>
+<span class="text-xs text-gray-500">募集中 1/3名</span>
+</div>
+</div>
+</div>
+<div class="min-w-[300px] md:min-w-[350px] snap-center bg-background-light dark:bg-background-dark rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all group cursor-pointer">
+<div class="h-48 overflow-hidden relative">
+<img alt="戦略ボードゲーム" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Strategy board game" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIJBxRjv4nGnk6zZ7J4zeN8Dghyo2pBEhQ6bP5_ksN6MnUgVcXiu9m6MQpjLqeIaSG9RXVF3nDMxpYRWA6L3DwGVtnRfrcyF3_vg4briwxGOHlyhNKVFMwRBfDcTm1UiNwDjdqVR-23PURrff3VeY9Vjhjel6ndJPZVr7pXwjIB6-KVQDb93CeWzIAGaL0bRQIIyZGo7fzfodsB9rZlUyFOl8yQUj0a-YYtzbDN7alddeyysFTeDRk5g4eP5romdzGpIifP1MmKHY"/>
+<div class="absolute top-4 left-4 bg-background-dark/80 backdrop-blur text-white text-xs px-3 py-1 rounded-full">
+                            インドア
+                        </div>
+</div>
+<div class="p-6">
+<div class="flex items-center text-xs text-primary mb-2">
+<span class="material-icons text-sm mr-1">location_on</span>
+                            愛知県・名古屋
+                        </div>
+<h3 class="text-lg font-bold mb-2 dark:text-white group-hover:text-primary transition-colors">大人のボードゲームナイト</h3>
+<p class="text-gray-500 dark:text-gray-400 text-sm mb-4">
+                            重ゲー（プレイ時間長めのゲーム）をじっくり遊ぶ会。ルール説明しますので未経験者も歓迎。
+                        </p>
+<div class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
+<div class="flex -space-x-2">
+<img alt="ユーザー1" class="w-8 h-8 rounded-full border-2 border-white dark:border-background-dark" data-alt="User avatar 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAM7MpibIqnRcXmDV0w2l8GvPS1ZWkQzeeOfMsnWG8EXxb07ahoaMCv4UZh3I3lRJR0TBeat7sV0pvZhwQtUmwhm3y5wtdr3nyA1RFmKvCoVG19G2dNj87pLW_nCYC_E3gUpEMAwwPPmW7uYN9z50Ck5q0Y7mnWvu9-oNhap6o6PrzjL72ncs4I7aPWoAEdWnYW21Bx4BKi69dXoehlkQrFk4-GzUVJPIvppVFlt28LIUwuSPtdorqcvSk7sIWy3whZ2p4O3dKvrKs"/>
+<img alt="ユーザー2" class="w-8 h-8 rounded-full border-2 border-white dark:border-background-dark" data-alt="User avatar 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAygAQ4JBv4CItWdAe63ikJgvESLRcvhy9e70AZ61gTYirncPcmKlKWgVtNKsjRP5JQcWktG2To6JitNw0Ykaew5egz8WH2eqt_jWmAGnH8GmSwx_gd-7-ApdL4Zmt5gog_o7TKgjVWB0tn7SFx6usVVS4Ykgo84BF-5NnoQtSRbeoTsN8Rc5jCFD29bb0vmmJZ3kqLliuAUYBAK7XjXmUVaIMU3dFc2VSudRl80Qx2ZJwQHSCsPAnU-N8qzxu7iHYvjrAho9rl0-g"/>
+</div>
+<span class="text-xs text-gray-500">募集中 3/4名</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 bg-background-light dark:bg-background-dark" id="pricing">
+<div class="container mx-auto px-4">
+<div class="text-center max-w-3xl mx-auto mb-16">
+<h2 class="text-3xl md:text-4xl font-bold mb-4 dark:text-white">シンプルで透明な料金体系</h2>
+<p class="text-gray-600 dark:text-gray-400">
+                    まずは無料で始めて、自分に合うか確かめてください。<br/>
+                    無理な勧誘や自動課金はありません。
+                </p>
+</div>
+<div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+<div class="bg-white dark:bg-surface-dark rounded-2xl p-8 border-2 border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all shadow-sm flex flex-col">
+<div class="mb-6">
+<h3 class="text-xl font-bold dark:text-white mb-2">フリー会員</h3>
+<p class="text-4xl font-bold dark:text-white">¥0 <span class="text-sm font-normal text-gray-500">/ 月</span></p>
+<p class="text-sm text-gray-500 mt-2">まずは雰囲気を知りたい方に</p>
+</div>
+<ul class="space-y-4 mb-8 flex-grow">
+<li class="flex items-center text-gray-600 dark:text-gray-300">
+<span class="material-icons text-primary mr-3">check_circle</span>
+                            アクティビティの検索・閲覧
+                        </li>
+<li class="flex items-center text-gray-600 dark:text-gray-300">
+<span class="material-icons text-primary mr-3">check_circle</span>
+                            月1回までの参加申し込み
+                        </li>
+<li class="flex items-center text-gray-600 dark:text-gray-300">
+<span class="material-icons text-primary mr-3">check_circle</span>
+                            プロフィールの作成
+                        </li>
+</ul>
+<button class="w-full py-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white font-bold rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        無料で登録
+                    </button>
+</div>
+<div class="bg-surface-dark dark:bg-surface-dark rounded-2xl p-8 border-2 border-primary relative shadow-xl flex flex-col">
+<div class="absolute top-0 right-0 bg-primary text-background-dark text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">
+                        人気
+                    </div>
+<div class="mb-6">
+<h3 class="text-xl font-bold text-white mb-2">プレミアム会員</h3>
+<p class="text-4xl font-bold text-primary">¥980 <span class="text-sm font-normal text-gray-400">/ 月</span></p>
+<p class="text-sm text-gray-400 mt-2">積極的に交流したい方に</p>
+</div>
+<ul class="space-y-4 mb-8 flex-grow">
+<li class="flex items-center text-white">
+<span class="material-icons text-primary mr-3">check_circle</span>
+                            参加申し込み無制限
+                        </li>
+<li class="flex items-center text-white">
+<span class="material-icons text-primary mr-3">check_circle</span>
+                            自分で企画・募集が可能
+                        </li>
+<li class="flex items-center text-white">
+<span class="material-icons text-primary mr-3">check_circle</span>
+                            メッセージ機能の無制限利用
+                        </li>
+<li class="flex items-center text-white">
+<span class="material-icons text-primary mr-3">check_circle</span>
+                            優先マッチング表示
+                        </li>
+</ul>
+<button class="w-full py-4 bg-primary text-background-dark font-bold rounded-full hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20">
+                        30日間無料体験
+                    </button>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 bg-white dark:bg-surface-dark relative overflow-hidden">
+<div class="absolute inset-0 z-0 opacity-10">
+<img alt="屋外で笑い合う友人グループ" class="w-full h-full object-cover" data-alt="Group of friends laughing outdoors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiKuLK1vjQPUrB9VLcchqK9a5hrSv12T7jVAGGzjUzfYpS0VEc7MLoJGVdLsuUea-ybHpic3uDEgA15_nkwuEbzeY_TgVWLqjpJi4sRpusI_NSpJjGssRaIfjqtfgl3RH6qINs6RELxAYqB_nO9-Dx2M2IeBTiRdKYkkB0XCTMD1CFtEzWhv2Jk0ocnWT03ZhSgqMNqeEkiUTXxBCar7LMOlIFX7QB8XhupaqT-tsYUtLaKiUM2n8LzIICuwunBqDSJjxnDGUzXr8"/>
+</div>
+<div class="container mx-auto px-4 relative z-10 text-center">
+<h2 class="text-3xl md:text-5xl font-bold mb-6 dark:text-white">
+                新しい週末が、ここから始まります。
+            </h2>
+<p class="text-lg text-gray-600 dark:text-gray-300 mb-10 max-w-2xl mx-auto">
+                まずは、あなたの趣味や興味のあることを登録してみませんか？<br/>
+                同じ温度感で楽しめる仲間が、きっと近くにいます。
+            </p>
+<div class="flex justify-center">
+<button class="px-10 py-5 bg-primary hover:bg-primary-hover text-background-dark font-bold rounded-full text-xl shadow-xl shadow-primary/30 transition-all transform hover:scale-105">
+                    Link40に参加する（無料）
+                </button>
+</div>
+<p class="mt-4 text-sm text-gray-500 dark:text-gray-500">
+                クレジットカード登録不要・1分で完了
+            </p>
+</div>
+</section>
+<footer class="bg-background-light dark:bg-background-dark border-t border-gray-200 dark:border-gray-800 py-12">
+<div class="container mx-auto px-4">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+<div class="mb-8 md:mb-0">
+<a class="flex items-center space-x-2 mb-4" href="#">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-background-dark font-bold text-xl">L</div>
+<span class="text-2xl font-bold dark:text-white">Link40</span>
+</a>
+<p class="text-gray-500 dark:text-gray-400 text-sm max-w-xs">
+                        40代からの「ゆるい繋がり」を作るコミュニティプラットフォーム。孤独を解消し、豊かな人生を。
+                    </p>
+</div>
+<div class="flex flex-wrap gap-8 text-sm text-gray-600 dark:text-gray-400">
+<a class="hover:text-primary transition-colors" href="#">運営会社</a>
+<a class="hover:text-primary transition-colors" href="#">利用規約</a>
+<a class="hover:text-primary transition-colors" href="#">プライバシーポリシー</a>
+<a class="hover:text-primary transition-colors" href="#">特定商取引法に基づく表記</a>
+<a class="hover:text-primary transition-colors" href="#">お問い合わせ</a>
+</div>
+</div>
+<div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 text-center text-xs text-gray-500">
+                © 2023 Link40. All rights reserved.
+            </div>
+</div>
+</footer>
+<script>
+        // Simple script to handle Navbar toggle for mobile
+        document.querySelector('[data-collapse-toggle]').addEventListener('click', function() {
+            const targetEl = document.getElementById(this.getAttribute('aria-controls'));
+            targetEl.classList.toggle('hidden');
+        });
+    </script>
+
+</body></html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html class="dark" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Connect40 - アクティビティ検索</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#19d4e6",
+                        "primary-content": "#112021",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#112021",
+                        "surface-dark": "#1a2c2e",
+                        "text-secondary": "#9db6b8",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "Noto Sans JP", "sans-serif"],
+                        "body": ["Plus Jakarta Sans", "Noto Sans JP", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "none": "0",
+                        "sm": "0.5rem",
+                        "DEFAULT": "1rem", 
+                        "lg": "1.5rem", 
+                        "xl": "2rem", 
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #112021; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #293738; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f5254; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#111718] dark:text-white font-display overflow-x-hidden min-h-screen flex flex-col">
+<header class="sticky top-0 z-50 w-full border-b border-[#293738] bg-background-dark/95 backdrop-blur-md px-6 py-4">
+<div class="mx-auto flex max-w-[1280px] items-center justify-between">
+<div class="flex items-center gap-3 text-white">
+<div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+<span class="material-symbols-outlined" style="font-size: 24px;">diversity_3</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight text-white">Connect40</h2>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium text-white hover:text-primary transition-colors" href="#">ホーム</a>
+<a class="text-sm font-bold text-primary" href="#">アクティビティ</a>
+<a class="text-sm font-medium text-[#9db6b8] hover:text-white transition-colors" href="#">メッセージ</a>
+<a class="text-sm font-medium text-[#9db6b8] hover:text-white transition-colors" href="#">プロフィール</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-[#293738] text-white hover:bg-[#3f5254] transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-10 w-10 overflow-hidden rounded-full border-2 border-[#293738]">
+<img alt="Smiling middle aged man portrait" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQr4xEResu205alKK3ZYyAgkZBPAM2w1214TLtWuHInoVltWVSuT0AQzzFjWR3bBJvbHWjobX9lSOXA_cwe45HBSooxEtYGLq_bpi44IH7KelfUhY7pzjgjajft1w99xtYgHavBpwjhEbZGDsX52QbTbRmAsw1QZ7aZWE732qakfSU0v9ZCL7NvXDFaX1PRh-xT9qJgCwIMWBGqOjD5WtVQH60dEpu4tLOTTmKekQ23O3gActFQn0yggeyf60CxBH6YtmehW5TVyw"/>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-1 flex flex-col w-full max-w-[1280px] mx-auto px-6 py-8">
+<section class="flex flex-col gap-6 mb-8">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="text-3xl md:text-4xl font-bold text-white mb-2">地域のアクティビティを探す</h1>
+<p class="text-text-secondary text-base">共通の趣味を通じて、近くの人とつながりましょう。</p>
+</div>
+<button class="hidden md:flex h-12 items-center gap-2 rounded-full bg-primary px-6 text-sm font-bold text-primary-content hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(25,212,230,0.3)]">
+<span class="material-symbols-outlined">add</span>
+                    募集を作成
+                </button>
+</div>
+<div class="relative w-full">
+<div class="flex w-full items-center rounded-xl bg-[#293738] p-1 ring-1 ring-white/5 focus-within:ring-primary/50 transition-all">
+<div class="flex h-12 w-12 items-center justify-center text-text-secondary">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="h-12 w-full bg-transparent border-none text-white placeholder-text-secondary focus:ring-0 text-base" placeholder="キーワード検索（例：フットサル、コーヒー、ハイキング）..." type="text"/>
+<button class="hidden sm:block mr-1 h-10 rounded-lg bg-surface-dark px-4 text-sm font-medium text-white hover:bg-[#3f5254] transition-colors">
+                        検索
+                    </button>
+</div>
+</div>
+<div class="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
+<div class="flex flex-wrap gap-2">
+<button class="group flex h-9 items-center gap-2 rounded-full bg-primary text-primary-content px-4 transition-colors">
+<span class="text-sm font-bold">すべて</span>
+</button>
+<button class="group flex h-9 items-center gap-2 rounded-full bg-[#293738] px-4 hover:bg-[#3f5254] transition-colors">
+<span class="material-symbols-outlined text-[18px] text-primary">sports_soccer</span>
+<span class="text-sm font-medium text-white">スポーツ</span>
+</button>
+<button class="group flex h-9 items-center gap-2 rounded-full bg-[#293738] px-4 hover:bg-[#3f5254] transition-colors">
+<span class="material-symbols-outlined text-[18px] text-purple-400">local_bar</span>
+<span class="text-sm font-medium text-white">飲み会</span>
+</button>
+<button class="group flex h-9 items-center gap-2 rounded-full bg-[#293738] px-4 hover:bg-[#3f5254] transition-colors">
+<span class="material-symbols-outlined text-[18px] text-orange-400">hiking</span>
+<span class="text-sm font-medium text-white">アウトドア</span>
+</button>
+<button class="group flex h-9 items-center gap-2 rounded-full bg-[#293738] px-4 hover:bg-[#3f5254] transition-colors">
+<span class="material-symbols-outlined text-[18px] text-green-400">palette</span>
+<span class="text-sm font-medium text-white">趣味</span>
+</button>
+</div>
+<div class="flex w-full lg:w-auto items-center justify-between gap-4 border-t border-[#293738] pt-4 lg:border-none lg:pt-0">
+<div class="flex gap-2">
+<button class="flex h-9 items-center gap-1 rounded-full border border-[#293738] px-3 hover:bg-[#293738] transition-colors">
+<span class="text-sm font-medium text-text-secondary">距離順</span>
+<span class="material-symbols-outlined text-[16px] text-text-secondary">expand_more</span>
+</button>
+<button class="flex h-9 items-center gap-1 rounded-full border border-[#293738] px-3 hover:bg-[#293738] transition-colors">
+<span class="text-sm font-medium text-text-secondary">日付順</span>
+<span class="material-symbols-outlined text-[16px] text-text-secondary">expand_more</span>
+</button>
+</div>
+<div class="flex bg-[#293738] rounded-lg p-1">
+<button class="flex items-center justify-center w-9 h-8 rounded bg-surface-dark shadow text-white">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+</button>
+<button class="flex items-center justify-center w-9 h-8 rounded text-text-secondary hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">map</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20">
+<article class="group flex flex-col gap-3 rounded-2xl bg-[#1a2c2e] p-3 hover:bg-[#223638] transition-all hover:translate-y-[-2px] hover:shadow-xl cursor-pointer">
+<div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
+<div class="absolute top-3 left-3 z-20 flex gap-2">
+<span class="inline-flex items-center rounded-md bg-black/50 backdrop-blur-sm px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-white/10">
+<span class="mr-1 h-1.5 w-1.5 rounded-full bg-green-400"></span>
+                            募集中
+                        </span>
+</div>
+<img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Group of men playing futsal on an indoor court" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCY4Yuw4w-LBtaO89DDAQSllLZaOdj-jX-h51ALQ5voNAoU8tBDgOFBD4HSBjLvpqhCX-0BIAyGwn1Db0rjx54HVhSMrjSLkrfHA9VJEbsHf6H_cI_7ouhfPBF7aDoa2eE0UtusVmKjQ4nBYTHn80Qo9kRQKZPZ-Lh3pc0RzIgZU5J6-mfsYszm_dSz_8AK3oomva0CtLAqzMhWl7F_GUtMmgV7rDK-Zb3xKEIb1l0oH3S0NMkOdwoIDi1G0ewZrydzjRgR-n_3a_A"/>
+</div>
+<div class="flex flex-col gap-1 px-1">
+<div class="flex justify-between items-start">
+<h3 class="text-white text-lg font-bold leading-snug group-hover:text-primary transition-colors">週末朝のフットサル</h3>
+</div>
+<p class="text-text-secondary text-sm line-clamp-2">初心者歓迎！体を動かして楽しむだけです。経験不問。</p>
+<div class="mt-3 flex flex-col gap-2 border-t border-white/5 pt-3">
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span>代々木公園 • 1.2km</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span>10月24日(土) • 10:00</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">group</span>
+<span>参加者 3/10人</span>
+</div>
+</div>
+</div>
+</article>
+<article class="group flex flex-col gap-3 rounded-2xl bg-[#1a2c2e] p-3 hover:bg-[#223638] transition-all hover:translate-y-[-2px] hover:shadow-xl cursor-pointer">
+<div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
+<div class="absolute top-3 left-3 z-20 flex gap-2">
+<span class="inline-flex items-center rounded-md bg-black/50 backdrop-blur-sm px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-white/10">
+<span class="mr-1 h-1.5 w-1.5 rounded-full bg-orange-400"></span>
+                            残りわずか
+                        </span>
+</div>
+<img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Coffee cups on a wooden table in a cozy cafe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmIfkssZ_qXvyNYb0VSwwksW7MCOAQmWzxAE7IlW5zHe54ppSEHEg5IcpKsmOau3ZCfB2UMqFb0T4AsVHbQ-N3wbkxsoiL9Dnho_5FCx2J8-SNqWxY7hQRe_u0uzlseZ40mAPwkPbEgcs5uO6VJdHWY7i2xn_aTYey_Ap9R2NoNtAUrCrcrBz8PL9EMSgA0r6szXba0ZkP_N2GYyQg6v5z1xNnvGaKBAHz8WNsBJ8R2_4Ual3R3-F_Hsw6MSNq_jlOaZEDsXsLES0"/>
+</div>
+<div class="flex flex-col gap-1 px-1">
+<h3 class="text-white text-lg font-bold leading-snug group-hover:text-primary transition-colors">コーヒー &amp; テックトーク</h3>
+<p class="text-text-secondary text-sm line-clamp-2">美味しいコーヒーを飲みながら、最新ガジェットやテックニュースについて語りましょう。</p>
+<div class="mt-3 flex flex-col gap-2 border-t border-white/5 pt-3">
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span>渋谷ストリーム • 0.5km</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span>10月23日(金) • 19:00</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">group</span>
+<span>参加者 5/6人</span>
+</div>
+</div>
+</div>
+</article>
+<article class="group flex flex-col gap-3 rounded-2xl bg-[#1a2c2e] p-3 hover:bg-[#223638] transition-all hover:translate-y-[-2px] hover:shadow-xl cursor-pointer">
+<div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
+<img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Craft beer glasses lined up on a bar counter" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUJTr_HsUoYimkASukaekRyUUt-B9kaOyFv6BsGYX10rJoReJB9maserpiNfJl6ainXCUiR3qOm8r_65HhLZRN_nc02Tq9sZxM4dwJtNYrJx7-EEfOrBL53SnfRXiQ_52WfnQ22WDYHi-dPgtb1ByMzl4qIDbKn9HryfUoAOEzgFFLoI6ClW5Ms-Pbmg3MkBsYSCDds9_BUV0hfg9KkQHWpYWNBu_HDirJM5kntCoosLlYDJYT1TyuSIHpHxvnPG_BOshb4S2EvOg"/>
+</div>
+<div class="flex flex-col gap-1 px-1">
+<h3 class="text-white text-lg font-bold leading-snug group-hover:text-primary transition-colors">クラフトビール飲み比べ</h3>
+<p class="text-text-secondary text-sm line-clamp-2">街の新しい醸造所へ行きます。良い雰囲気の中でリラックスして話しましょう。</p>
+<div class="mt-3 flex flex-col gap-2 border-t border-white/5 pt-3">
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span>恵比寿 • 3.0km</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span>10月24日(土) • 18:00</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">group</span>
+<span>参加者 2/4人</span>
+</div>
+</div>
+</div>
+</article>
+<article class="group flex flex-col gap-3 rounded-2xl bg-[#1a2c2e] p-3 hover:bg-[#223638] transition-all hover:translate-y-[-2px] hover:shadow-xl cursor-pointer">
+<div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
+<div class="absolute top-3 left-3 z-20 flex gap-2">
+<span class="inline-flex items-center rounded-md bg-black/50 backdrop-blur-sm px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-white/10">
+<span class="mr-1 h-1.5 w-1.5 rounded-full bg-blue-400"></span>
+                            新着
+                        </span>
+</div>
+<img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="People hiking on a mountain trail with backpacks" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0GLG8p46J1p1OzxhjbKr0M5oPFkeiQX654N8G9zBNUC-yJgMBEe_tW35iXYDVzVcuBXBgu5W4qZGLDBQ4rGq6ng0qWrKeWUumwpfHZvShzr3YveXiznWdEfQzjf22WLLqCJ7tPUvgF_cxeu7uQ7GusbC9UvxERWXYkTm9JuDh4P0dyGoMCYS9bO74FZmfSgk7Uklo2yDR460ClBh0mCHWpUIjsgtwYnAt_3b954p8OlpxJ_fyllAg-wy5BYtxzcgFnitNt90L4Jw"/>
+</div>
+<div class="flex flex-col gap-1 px-1">
+<h3 class="text-white text-lg font-bold leading-snug group-hover:text-primary transition-colors">高尾山ゆったりハイク</h3>
+<p class="text-text-secondary text-sm line-clamp-2">新鮮な空気でリフレッシュ。簡単なコースを歩いて、お蕎麦を食べましょう。</p>
+<div class="mt-3 flex flex-col gap-2 border-t border-white/5 pt-3">
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span>八王子 • 15km</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span>10月25日(日) • 9:00</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">group</span>
+<span>参加者 4/8人</span>
+</div>
+</div>
+</div>
+</article>
+<article class="group flex flex-col gap-3 rounded-2xl bg-[#1a2c2e] p-3 hover:bg-[#223638] transition-all hover:translate-y-[-2px] hover:shadow-xl cursor-pointer">
+<div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
+<img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="People cleaning up trash in a park with gloves" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0gmX29nEI1RwipXsu4G4XGuhzEYFhKYhHP7NkpBJ1phEHEGAXDRX6TQCcugdouGo9fzLMo78Yao910G3fu-R51uXlcdp_2fB_rEpG-AxXRsf9DoHPXBqfgwThwVDeMpdXqRavCa30FHySnxG-XKWS3nqmxedVGPhVmvN709j_ZMii8Sf92E1Wx7_4V_WJcI5Izk9WTbbb9-mPQPX3_MvA4DofRpEbQJfyQqp-eHlPNWqT9va0f8AXS3aLFCchibI1YQUy3bA-JSQ"/>
+</div>
+<div class="flex flex-col gap-1 px-1">
+<h3 class="text-white text-lg font-bold leading-snug group-hover:text-primary transition-colors">河川敷クリーンアップ</h3>
+<p class="text-text-secondary text-sm line-clamp-2">ボランティア活動。地元の川を一緒にきれいにしましょう。</p>
+<div class="mt-3 flex flex-col gap-2 border-t border-white/5 pt-3">
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span>二子玉川 • 5.5km</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span>10月25日(日) • 8:00</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">group</span>
+<span>参加者 8/20人</span>
+</div>
+</div>
+</div>
+</article>
+<article class="group flex flex-col gap-3 rounded-2xl bg-[#1a2c2e] p-3 hover:bg-[#223638] transition-all hover:translate-y-[-2px] hover:shadow-xl cursor-pointer">
+<div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
+<img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Retro game controllers and console on a table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS1Uf1T1KXLlGNryTgO7CQiFNLnVN2473p3Wh_st5j0C3J8suzu4OsDkWt0FBUd_eItgL3JFtbT6sou7UZp7BN0PDnrbsQ9iaFzw31kEk9ylrqQ_BP29JbzDpwDgwcm_c1ZPkwkJmSlIGmN3RCretmxLP0zHNGKsBWhROZq1EQBxffk8-3KK1Am1lQ5fOvF2NHDP8J1bgFJB3YkFouaafrFR5FsPvb-qS8ulkMK1obhgeKjUVEq1KyCjNpKspJaETMOGv_gHbUfrA"/>
+</div>
+<div class="flex flex-col gap-1 px-1">
+<h3 class="text-white text-lg font-bold leading-snug group-hover:text-primary transition-colors">レトロゲームナイト</h3>
+<p class="text-text-secondary text-sm line-clamp-2">スーファミやセガの名作をプレイ。お気に入りのカセットを持参してください！</p>
+<div class="mt-3 flex flex-col gap-2 border-t border-white/5 pt-3">
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span>中野 • 4.2km</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span>10月30日(金) • 20:00</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">group</span>
+<span>参加者 2/5人</span>
+</div>
+</div>
+</div>
+</article>
+</div>
+</main>
+<div class="fixed bottom-6 right-6 md:hidden z-40">
+<button class="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-content shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all">
+<span class="material-symbols-outlined text-2xl">add</span>
+</button>
+</div>
+<div class="hidden lg:block fixed bottom-8 right-8 z-30">
+<div class="bg-[#1a2c2e] p-2 rounded-2xl shadow-2xl border border-white/5 w-64 group cursor-pointer hover:scale-105 transition-all">
+<div class="relative w-full h-32 rounded-xl overflow-hidden">
+<img class="h-full w-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" data-alt="Map view of Tokyo streets with pins" data-location="Tokyo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD51pD_TjFBPoML3Lb7LfKl71AldjWDeo5h_7ba_S8PeC7zGB2szaEExIouejgGkG1B7Tq03DI-x6OuOG3fq2b91VdOQIUEjLNykteRB7kBGP2nBrOCuZrw-nhZIYxaE9R_zpYDf-hnHykeuBDkOWWQbfEzAqWUch8ZN99f4tYL8ZMSLFKImkBQmKGlnO6ke9lsoD9bSC723i8f1Mbjv4vyU5rWznfkvnRTgfeGgpoTdrVv6I7x4qwilboLUXNfBfx5YI_i5Ka7lms"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="bg-primary/90 text-primary-content font-bold px-4 py-2 rounded-full text-sm shadow-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">map</span>
+                        地図を表示
+                    </div>
+</div>
+</div>
+<div class="p-3">
+<p class="text-white text-sm font-bold">地図で探す</p>
+<p class="text-text-secondary text-xs">近くの12件を表示</p>
+</div>
+</div>
+</div>
+
+</body></html>
