@@ -12,6 +12,7 @@ import { CreateProfileStep2 } from './pages/profile/CreateProfileStep2';
 import { CreateProfileStep3 } from './pages/profile/CreateProfileStep3';
 import { CreateProfileSuccess } from './pages/profile/CreateProfileSuccess';
 import { EditProfile } from './pages/profile/EditProfile';
+import { CreateActivity } from './pages/activities/CreateActivity';
 
 function App() {
   return (
@@ -100,6 +101,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <EditProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Activity routes */}
+          <Route
+            path="/activities/create"
+            element={
+              <ProtectedRoute>
+                <CreateActivity />
               </ProtectedRoute>
             }
           />
