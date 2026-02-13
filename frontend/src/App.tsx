@@ -14,6 +14,7 @@ import { CreateProfileSuccess } from './pages/profile/CreateProfileSuccess';
 import { EditProfile } from './pages/profile/EditProfile';
 import { CreateActivity } from './pages/activities/CreateActivity';
 import { Activities } from './pages/activities/Activities';
+import { ActivityDetail } from './pages/activities/ActivityDetail';
 
 function App() {
   return (
@@ -120,6 +121,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <CreateActivity />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/activities/:activityId"
+            element={
+              <ProtectedRoute>
+                <ActivityDetail />
               </ProtectedRoute>
             }
           />
