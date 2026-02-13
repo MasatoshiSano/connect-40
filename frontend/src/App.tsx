@@ -8,6 +8,7 @@ import { VerifyEmail } from './pages/auth/VerifyEmail';
 import { Login } from './pages/auth/Login';
 import { Dashboard } from './pages/Dashboard';
 import { CreateProfileStep1 } from './pages/profile/CreateProfileStep1';
+import { CreateProfileStep2 } from './pages/profile/CreateProfileStep2';
 
 function App() {
   return (
@@ -64,6 +65,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <CreateProfileStep1 />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/create/step2"
+            element={
+              <ProtectedRoute>
+                <CreateProfileStep2 />
               </ProtectedRoute>
             }
           />
