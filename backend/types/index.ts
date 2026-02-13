@@ -15,25 +15,27 @@ export interface User {
 }
 
 export interface Location {
-  prefecture: string;
-  city: string;
-  lat: number;
-  lng: number;
-  geohash: string;
+  latitude: number;
+  longitude: number;
+  address: string;
 }
 
 export interface Activity {
   activityId: string;
+  hostUserId: string;
+  hostNickname: string; // Denormalized for display
   title: string;
   description: string;
-  category: string;
-  hostId: string;
+  category: 'sports' | 'outdoor' | 'hobby' | 'food' | 'culture' | 'business' | 'other';
   location: Location;
-  dateTime: string;
-  capacity: number;
+  dateTime: string; // ISO 8601
+  duration: number; // minutes
+  maxParticipants: number;
   currentParticipants: number;
-  participants: string[];
-  status: '募集中' | '募集終了' | 'キャンセル';
+  participants: string[]; // userIds
+  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
+  imageUrl?: string;
+  tags: string[];
   createdAt: string;
   updatedAt: string;
 }
