@@ -54,33 +54,69 @@ export class ApiStack extends cdk.Stack {
       cognitoUserPools: [props.userPool],
     });
 
-    // Placeholder Lambda functions (実装はPhase 2以降)
-    // UserFunction
-    const userFunction = new lambda.Function(this, 'UserFunction', {
+    // User management Lambda functions
+    const createUserFunction = new lambda.Function(this, 'CreateUserFunction', {
       runtime: lambda.Runtime.NODEJS_20_X,
-      handler: 'index.handler',
-      code: lambda.Code.fromInline(`
-        exports.handler = async (event) => {
-          return {
-            statusCode: 200,
-            body: JSON.stringify({ message: 'UserFunction placeholder' })
-          };
-        };
-      `),
+      handler: 'create.handler',
+      code: lambda.Code.fromAsset('../backend/functions/users'),
       environment: {
         TABLE_NAME: props.table.tableName,
         BUCKET_NAME: props.bucket.bucketName,
       },
       layers: [commonLayer],
+      timeout: cdk.Duration.seconds(10),
     });
 
-    props.table.grantReadWriteData(userFunction);
-    props.bucket.grantReadWrite(userFunction);
-    this.functions.push(userFunction);
+    const getUserFunction = new lambda.Function(this, 'GetUserFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'get.handler',
+      code: lambda.Code.fromAsset('../backend/functions/users'),
+      environment: {
+        TABLE_NAME: props.table.tableName,
+        BUCKET_NAME: props.bucket.bucketName,
+      },
+      layers: [commonLayer],
+      timeout: cdk.Duration.seconds(10),
+    });
+
+    const updateUserFunction = new lambda.Function(this, 'UpdateUserFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'update.handler',
+      code: lambda.Code.fromAsset('../backend/functions/users'),
+      environment: {
+        TABLE_NAME: props.table.tableName,
+        BUCKET_NAME: props.bucket.bucketName,
+      },
+      layers: [commonLayer],
+      timeout: cdk.Duration.seconds(10),
+    });
+
+    // Grant permissions
+    props.table.grantReadWriteData(createUserFunction);
+    props.table.grantReadWriteData(getUserFunction);
+    props.table.grantReadWriteData(updateUserFunction);
+    props.bucket.grantReadWrite(createUserFunction);
+    props.bucket.grantReadWrite(updateUserFunction);
+
+    this.functions.push(createUserFunction, getUserFunction, updateUserFunction);
 
     // API Routes
     const users = this.api.root.addResource('users');
-    users.addResource('me').addMethod('GET', new apigateway.LambdaIntegration(userFunction), {
+
+    // POST /users - Create user profile
+    users.addMethod('POST', new apigateway.LambdaIntegration(createUserFunction), {
+      authorizer,
+    });
+
+    const userMe = users.addResource('me');
+
+    // GET /users/me - Get current user profile
+    userMe.addMethod('GET', new apigateway.LambdaIntegration(getUserFunction), {
+      authorizer,
+    });
+
+    // PUT /users/me - Update current user profile
+    userMe.addMethod('PUT', new apigateway.LambdaIntegration(updateUserFunction), {
       authorizer,
     });
 

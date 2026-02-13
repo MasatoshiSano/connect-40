@@ -118,21 +118,22 @@ export const CreateProfileStep3 = () => {
     setError(null);
 
     try {
+      // Upload profile photo to S3
+      const { uploadProfilePhoto, createUserProfile } = await import('../../services/api');
+      const photoUrl = await uploadProfilePhoto(profilePhoto);
+
+      // Create user profile
+      await createUserProfile({
+        nickname: formData.nickname,
+        age: formData.age!,
+        bio: formData.bio,
+        interests: formData.interests,
+        profilePhoto: photoUrl,
+        location,
+      });
+
       // Update form data with final values
       updateFormData({ profilePhoto, location });
-
-      // TODO: Implement profile creation API call
-      // const response = await createProfile({
-      //   nickname: formData.nickname,
-      //   age: formData.age,
-      //   bio: formData.bio,
-      //   interests: formData.interests,
-      //   profilePhoto,
-      //   location,
-      // });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Reset form and navigate to success page
       resetForm();
