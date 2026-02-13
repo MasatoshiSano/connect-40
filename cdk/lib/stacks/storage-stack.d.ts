@@ -1,0 +1,10 @@
+import * as cdk from 'aws-cdk-lib';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import { Construct } from 'constructs';
+export interface StorageStackProps extends cdk.StackProps {
+    envName: string;
+}
+export declare class StorageStack extends cdk.Stack {
+    readonly bucket: s3.Bucket;
+    constructor(scope: Construct, id: string, props: StorageStackProps);
+}
