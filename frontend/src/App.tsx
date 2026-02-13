@@ -9,6 +9,8 @@ import { Login } from './pages/auth/Login';
 import { Dashboard } from './pages/Dashboard';
 import { CreateProfileStep1 } from './pages/profile/CreateProfileStep1';
 import { CreateProfileStep2 } from './pages/profile/CreateProfileStep2';
+import { CreateProfileStep3 } from './pages/profile/CreateProfileStep3';
+import { CreateProfileSuccess } from './pages/profile/CreateProfileSuccess';
 
 function App() {
   return (
@@ -73,6 +75,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <CreateProfileStep2 />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/create/step3"
+            element={
+              <ProtectedRoute>
+                <CreateProfileStep3 />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/create/success"
+            element={
+              <ProtectedRoute>
+                <CreateProfileSuccess />
               </ProtectedRoute>
             }
           />
