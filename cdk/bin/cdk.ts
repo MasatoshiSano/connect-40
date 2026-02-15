@@ -51,6 +51,8 @@ const apiStack = new ApiStack(app, `Connect40-Api-${env}`, {
   bucket: storageStack.bucket,
 });
 
+// TEMPORARILY DISABLED - Only deploying API stack
+/*
 // WebSocket Stack (API Gateway WebSocket + Lambda)
 const webSocketStack = new WebSocketStack(app, `Connect40-WebSocket-${env}`, {
   ...stackProps,
@@ -74,12 +76,14 @@ const monitoringStack = new MonitoringStack(app, `Connect40-Monitoring-${env}`, 
   apiGateway: apiStack.api,
   lambdaFunctions: [...apiStack.functions, ...webSocketStack.functions],
 });
+*/
 
 // Define stack dependencies
 apiStack.addDependency(authStack);
 apiStack.addDependency(databaseStack);
 apiStack.addDependency(storageStack);
 
+/*
 webSocketStack.addDependency(authStack);
 webSocketStack.addDependency(databaseStack);
 
@@ -88,5 +92,6 @@ frontendStack.addDependency(webSocketStack);
 
 monitoringStack.addDependency(apiStack);
 monitoringStack.addDependency(webSocketStack);
+*/
 
 app.synth();

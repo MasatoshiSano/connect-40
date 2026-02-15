@@ -77,6 +77,7 @@ export class ApiStack extends cdk.Stack {
         minify: true,
         sourceMap: true,
         externalModules: ['@aws-sdk/*'],
+        forceDockerBundling: false,
       },
       timeout: cdk.Duration.seconds(10),
     });
@@ -92,6 +93,7 @@ export class ApiStack extends cdk.Stack {
         minify: true,
         sourceMap: true,
         externalModules: ['@aws-sdk/*'],
+        forceDockerBundling: false,
       },
       timeout: cdk.Duration.seconds(10),
     });
@@ -107,6 +109,7 @@ export class ApiStack extends cdk.Stack {
         minify: true,
         sourceMap: true,
         externalModules: ['@aws-sdk/*'],
+        forceDockerBundling: false,
       },
       timeout: cdk.Duration.seconds(10),
     });
@@ -152,6 +155,7 @@ export class ApiStack extends cdk.Stack {
         minify: true,
         sourceMap: true,
         externalModules: ['@aws-sdk/*'],
+        forceDockerBundling: false,
       },
       timeout: cdk.Duration.seconds(10),
     });
@@ -166,6 +170,7 @@ export class ApiStack extends cdk.Stack {
         minify: true,
         sourceMap: true,
         externalModules: ['@aws-sdk/*'],
+        forceDockerBundling: false,
       },
       timeout: cdk.Duration.seconds(10),
     });
@@ -180,6 +185,7 @@ export class ApiStack extends cdk.Stack {
         minify: true,
         sourceMap: true,
         externalModules: ['@aws-sdk/*'],
+        forceDockerBundling: false,
       },
       timeout: cdk.Duration.seconds(10),
     });
@@ -194,6 +200,7 @@ export class ApiStack extends cdk.Stack {
         minify: true,
         sourceMap: true,
         externalModules: ['@aws-sdk/*'],
+        forceDockerBundling: false,
       },
       timeout: cdk.Duration.seconds(10),
     });
@@ -247,6 +254,7 @@ export class ApiStack extends cdk.Stack {
         minify: true,
         sourceMap: true,
         externalModules: ['@aws-sdk/*'],
+        forceDockerBundling: false,
       },
       timeout: cdk.Duration.seconds(10),
     });
@@ -261,6 +269,7 @@ export class ApiStack extends cdk.Stack {
         minify: true,
         sourceMap: true,
         externalModules: ['@aws-sdk/*'],
+        forceDockerBundling: false,
       },
       timeout: cdk.Duration.seconds(10),
     });
@@ -275,6 +284,7 @@ export class ApiStack extends cdk.Stack {
         minify: true,
         sourceMap: true,
         externalModules: ['@aws-sdk/*'],
+        forceDockerBundling: false,
       },
       timeout: cdk.Duration.seconds(10),
     });
@@ -306,7 +316,9 @@ export class ApiStack extends cdk.Stack {
       authorizer: this.authorizer,
     });
 
-    // Payment Lambda functions
+    // Payment Lambda functions - TEMPORARILY DISABLED FOR TESTING
+    // TODO: Re-enable after fixing bundling issue
+    /*
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     const paymentEnvironment = {
       TABLE_NAME: props.table.tableName,
@@ -339,6 +351,7 @@ export class ApiStack extends cdk.Stack {
         minify: true,
         sourceMap: true,
         externalModules: ['@aws-sdk/*'],
+        forceDockerBundling: false,
       },
       timeout: cdk.Duration.seconds(30),
     });
@@ -388,6 +401,7 @@ export class ApiStack extends cdk.Stack {
     portal.addMethod('POST', new apigateway.LambdaIntegration(createPortalSessionFunction), {
       authorizer: this.authorizer,
     });
+    */
 
     // Add CORS headers to all gateway responses (including errors)
     this.api.addGatewayResponse('Default4XX', {
