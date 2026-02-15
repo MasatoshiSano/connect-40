@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { Layout } from '../layout/Layout';
 import { Icon } from '../ui/Icon';
 import { useProfileCreation } from '../../contexts/ProfileCreationContext';

@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
 import { Icon } from '../../components/ui/Icon';
+import { useAuthStore } from '../../stores/auth';
+
+const API_BASE_URL = import.meta.env.VITE_API_ENDPOINT || 'http://localhost:3000/dev';
 
 interface ChatRoom {
   chatRoomId: string;
@@ -13,15 +16,25 @@ interface ChatRoom {
 
 export const ChatList = () => {
   const navigate = useNavigate();
+  const { accessToken } = useAuthStore();
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadChatRooms = async () => {
       try {
-        // TODO: Fetch chat rooms from API
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setChatRooms([]);
+        const response = await fetch(`${API_BASE_URL}/chat/rooms`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to load chat rooms');
+        }
+
+        const { data } = await response.json();
+        setChatRooms(data.rooms || []);
       } catch (error) {
         console.error('Failed to load chat rooms:', error);
       } finally {
@@ -30,7 +43,7 @@ export const ChatList = () => {
     };
 
     loadChatRooms();
-  }, []);
+  }, [accessToken]);
 
   return (
     <Layout isAuthenticated={true}>

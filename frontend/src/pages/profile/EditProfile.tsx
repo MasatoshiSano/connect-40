@@ -16,7 +16,7 @@ const editProfileSchema = z.object({
     .max(20, 'ニックネームは20文字以内である必要があります')
     .regex(/^[a-zA-Z0-9ぁ-んァ-ヶー一-龠]+$/, '特殊文字は使用できません'),
   age: z
-    .number({ invalid_type_error: '年齢を入力してください' })
+    .number()
     .int('整数で入力してください')
     .min(35, '35歳以上である必要があります')
     .max(49, '49歳以下である必要があります'),

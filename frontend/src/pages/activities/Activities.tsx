@@ -14,14 +14,9 @@ export const Activities = () => {
   useEffect(() => {
     const loadActivities = async () => {
       try {
-        // TODO: Fetch activities from API
-        // const { getActivities } = await import('../../services/api');
-        // const data = await getActivities();
-        // setActivities(data);
-
-        // Mock data for now
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setActivities([]);
+        const { getActivities } = await import('../../services/api');
+        const data = await getActivities();
+        setActivities(data.activities);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'アクティビティの読み込みに失敗しました');
       } finally {

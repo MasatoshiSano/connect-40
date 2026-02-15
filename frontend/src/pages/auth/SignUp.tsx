@@ -115,6 +115,7 @@ export const SignUp = () => {
             <input
               type="email"
               {...register('email')}
+              autoComplete="email"
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               placeholder="email@example.com"
             />
@@ -133,6 +134,7 @@ export const SignUp = () => {
             <input
               type="password"
               {...register('password')}
+              autoComplete="new-password"
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               placeholder="8文字以上、英大小文字・数字・記号を含む"
             />
@@ -151,6 +153,7 @@ export const SignUp = () => {
             <input
               type="password"
               {...register('confirmPassword')}
+              autoComplete="new-password"
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               placeholder="パスワードを再入力"
             />

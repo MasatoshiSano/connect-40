@@ -13,6 +13,7 @@ export interface FrontendStackProps extends cdk.StackProps {
 export class FrontendStack extends cdk.Stack {
   public readonly bucket: s3.Bucket;
   public readonly distribution: cloudfront.CloudFrontWebDistribution;
+  public readonly frontendUrl: string;
 
   constructor(scope: Construct, id: string, props: FrontendStackProps) {
     super(scope, id, props);
@@ -29,15 +30,45 @@ export class FrontendStack extends cdk.Stack {
       autoDeleteObjects: props.envName !== 'prod',
     });
 
-    // CloudFront Distribution (Phase 6で詳細設定)
-    // Placeholder: 基本的なCloudFront設定
+    // CloudFront Distribution
     const originAccessIdentity = new cloudfront.OriginAccessIdentity(this, 'OAI');
     this.bucket.grantRead(originAccessIdentity);
+
+    this.distribution = new cloudfront.CloudFrontWebDistribution(this, 'Distribution', {
+      originConfigs: [
+        {
+          s3OriginSource: {
+            s3BucketSource: this.bucket,
+            originAccessIdentity,
+          },
+          behaviors: [{ isDefaultBehavior: true }],
+        },
+      ],
+      errorConfigurations: [
+        {
+          errorCode: 404,
+          responseCode: 200,
+          responsePagePath: '/index.html',
+        },
+        {
+          errorCode: 403,
+          responseCode: 200,
+          responsePagePath: '/index.html',
+        },
+      ],
+    });
+
+    this.frontendUrl = `https://${this.distribution.distributionDomainName}`;
 
     // Outputs
     new cdk.CfnOutput(this, 'FrontendBucketName', {
       value: this.bucket.bucketName,
       exportName: `Connect40-FrontendBucketName-${props.envName}`,
+    });
+
+    new cdk.CfnOutput(this, 'FrontendUrl', {
+      value: `https://${this.distribution.distributionDomainName}`,
+      exportName: `Connect40-FrontendUrl-${props.envName}`,
     });
   }
 }

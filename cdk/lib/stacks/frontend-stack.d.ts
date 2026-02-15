@@ -10,5 +10,6 @@ export interface FrontendStackProps extends cdk.StackProps {
 export declare class FrontendStack extends cdk.Stack {
     readonly bucket: s3.Bucket;
     readonly distribution: cloudfront.CloudFrontWebDistribution;
+    readonly frontendUrl: string;
     constructor(scope: Construct, id: string, props: FrontendStackProps);
 }

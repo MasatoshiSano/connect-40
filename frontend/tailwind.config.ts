@@ -54,6 +54,21 @@ export default {
         popover: '1060',
         tooltip: '1070',
       },
+      animation: {
+        'spin-slow': 'spin 3s linear infinite',
+        'slide-in-right': 'slideInRight 0.3s ease-out',
+        shimmer: 'shimmer 2s infinite',
+      },
+      keyframes: {
+        slideInRight: {
+          from: { transform: 'translateX(100%)', opacity: '0' },
+          to: { transform: 'translateX(0)', opacity: '1' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+      },
     },
   },
   plugins: [],

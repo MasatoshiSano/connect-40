@@ -1,7 +1,9 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { PublicRoute } from './components/auth/PublicRoute';
 import { ProfileCreationProvider } from './contexts/ProfileCreationContext';
+import { ToastContainer } from './components/ui/ToastContainer';
+import { useToastStore } from './stores/toast';
 import { Home } from './pages/Home';
 import { SignUp } from './pages/auth/SignUp';
 import { VerifyEmail } from './pages/auth/VerifyEmail';
@@ -16,12 +18,18 @@ import { CreateActivity } from './pages/activities/CreateActivity';
 import { Activities } from './pages/activities/Activities';
 import { ActivityDetail } from './pages/activities/ActivityDetail';
 import { ChatList } from './pages/chat/ChatList';
+import { ChatRoom } from './pages/chat/ChatRoom';
 import { Plans } from './pages/subscription/Plans';
+import { Success as SubscriptionSuccess } from './pages/subscription/Success';
+import { NotFound } from './pages/NotFound';
 
 function App() {
+  const { toasts, removeToast } = useToastStore();
+
   return (
     <BrowserRouter>
       <ProfileCreationProvider>
+        <ToastContainer toasts={toasts} onClose={removeToast} />
         <Routes>
           {/* Public routes */}
           <Route
@@ -144,6 +152,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/chat/:chatRoomId"
+            element={
+              <ProtectedRoute>
+                <ChatRoom />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Subscription routes */}
           <Route
@@ -154,9 +170,17 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/subscription/success"
+            element={
+              <ProtectedRoute>
+                <SubscriptionSuccess />
+              </ProtectedRoute>
+            }
+          />
 
-          {/* Catch all - redirect to home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* Catch all - 404 Not Found */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </ProfileCreationProvider>
     </BrowserRouter>

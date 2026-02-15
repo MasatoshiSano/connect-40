@@ -9,7 +9,7 @@ import type { Activity } from '../../types/activity';
 export const ActivityDetail = () => {
   const { activityId } = useParams<{ activityId: string }>();
   const navigate = useNavigate();
-  const { user } = useAuthStore();
+  const { userId } = useAuthStore();
   const [activity, setActivity] = useState<Activity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,14 +24,9 @@ export const ActivityDetail = () => {
       }
 
       try {
-        // TODO: Fetch activity from API
-        // const { getActivity } = await import('../../services/api');
-        // const data = await getActivity(activityId);
-        // setActivity(data);
-
-        // Mock delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setError('アクティビティが見つかりません（API未実装）');
+        const { getActivity } = await import('../../services/api');
+        const data = await getActivity(activityId);
+        setActivity(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'アクティビティの読み込みに失敗しました');
       } finally {
@@ -43,16 +38,17 @@ export const ActivityDetail = () => {
   }, [activityId]);
 
   const handleJoin = async () => {
-    if (!activity) return;
+    if (!activity || !activityId) return;
 
     setIsJoining(true);
     try {
-      // TODO: Join activity API call
-      // const { joinActivity } = await import('../../services/api');
-      // await joinActivity(activity.activityId);
+      const { joinActivity, getActivity } = await import('../../services/api');
+      await joinActivity(activity.activityId);
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // Reload activity data
+      // Reload activity data to get updated participants
+      const updatedActivity = await getActivity(activityId);
+      setActivity(updatedActivity);
+      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : '参加申込に失敗しました');
     } finally {
@@ -99,8 +95,8 @@ export const ActivityDetail = () => {
 
   const category = ACTIVITY_CATEGORIES.find((c) => c.id === activity.category);
   const activityDate = new Date(activity.dateTime);
-  const isHost = user?.userId === activity.hostUserId;
-  const isParticipant = activity.participants.includes(user?.userId || '');
+  const isHost = userId === activity.hostUserId;
+  const isParticipant = activity.participants.includes(userId || '');
   const isFull = activity.currentParticipants >= activity.maxParticipants;
   const canJoin = !isHost && !isParticipant && !isFull && activity.status === 'upcoming';
 

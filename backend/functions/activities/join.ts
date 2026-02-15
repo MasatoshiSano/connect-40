@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { ddbDocClient } from '/opt/nodejs/dynamodb';
+import { ddbDocClient } from '../../layers/common/nodejs/dynamodb';
 import { GetCommand, UpdateCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
-import { successResponse, errorResponse } from '/opt/nodejs/utils';
+import { successResponse, errorResponse } from '../../layers/common/nodejs/utils';
 
 const TABLE_NAME = process.env.TABLE_NAME!;
 
@@ -13,7 +13,7 @@ export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   try {
-    const userId = event.requestContext.authorizer?.userId;
+    const userId = event.requestContext.authorizer?.claims?.sub;
     if (!userId) {
       return errorResponse(401, 'UNAUTHORIZED', 'User not authenticated');
     }

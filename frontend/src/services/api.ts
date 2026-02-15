@@ -1,6 +1,22 @@
 import { useAuthStore } from '../stores/auth';
+import type {
+  Activity,
+  CreateActivityInput,
+  ActivityCategory,
+  ActivityStatus,
+  Location,
+} from '../types/activity';
 
 const API_BASE_URL = import.meta.env.VITE_API_ENDPOINT || 'http://localhost:3000/dev';
+
+// Re-export activity types for convenience
+export type {
+  Activity,
+  CreateActivityInput,
+  ActivityCategory,
+  ActivityStatus,
+  Location,
+};
 
 /**
  * Make authenticated API request
@@ -9,9 +25,9 @@ async function fetchWithAuth<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const { accessToken } = useAuthStore.getState();
+  const { idToken } = useAuthStore.getState();
 
-  if (!accessToken) {
+  if (!idToken) {
     throw new Error('Not authenticated');
   }
 
@@ -19,7 +35,7 @@ async function fetchWithAuth<T>(
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${idToken}`,
       ...options.headers,
     },
   });
@@ -75,6 +91,7 @@ export interface UserProfile {
   email: string;
   nickname: string;
   age: number;
+  bio?: string;
   location: {
     latitude: number;
     longitude: number;
@@ -122,46 +139,6 @@ export async function updateUserProfile(
 }
 
 // Activity API
-
-export interface CreateActivityInput {
-  title: string;
-  description: string;
-  category: string;
-  location: {
-    latitude: number;
-    longitude: number;
-    address: string;
-  };
-  dateTime: string;
-  duration: number;
-  maxParticipants: number;
-  imageUrl?: string;
-  tags: string[];
-}
-
-export interface Activity {
-  activityId: string;
-  hostUserId: string;
-  hostNickname: string;
-  title: string;
-  description: string;
-  category: string;
-  location: {
-    latitude: number;
-    longitude: number;
-    address: string;
-  };
-  dateTime: string;
-  duration: number;
-  maxParticipants: number;
-  currentParticipants: number;
-  participants: string[];
-  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
-  imageUrl?: string;
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
-}
 
 /**
  * Upload activity image

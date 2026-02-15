@@ -5,6 +5,7 @@ export interface User {
   email: string;
   nickname: string;
   age: number;
+  bio: string;
   location: Location;
   profilePhoto: string;
   interests: string[];

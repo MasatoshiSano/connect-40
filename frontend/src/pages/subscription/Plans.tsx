@@ -1,12 +1,17 @@
 import { useState } from 'react';
 import { Layout } from '../../components/layout/Layout';
 import { Icon } from '../../components/ui/Icon';
+import { useAuthStore } from '../../stores/auth';
+import { createCheckoutSession } from '../../services/payment';
+
+const STRIPE_PREMIUM_PRICE_ID = import.meta.env.VITE_STRIPE_PREMIUM_PRICE_ID || '';
 
 const PLANS = [
   {
     id: 'free',
     name: '無料プラン',
     price: 0,
+    stripePriceId: '',
     features: [
       'アクティビティ参加: 月5回まで',
       'チャットルーム: 3件まで',
@@ -22,6 +27,7 @@ const PLANS = [
     id: 'premium',
     name: 'プレミアムプラン',
     price: 980,
+    stripePriceId: STRIPE_PREMIUM_PRICE_ID,
     features: [
       'アクティビティ参加: 無制限',
       'チャットルーム: 無制限',
@@ -34,24 +40,54 @@ const PLANS = [
   },
 ];
 
+// Helper to decode JWT token and extract email
+function getEmailFromToken(token: string | null): string | null {
+  if (!token) return null;
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.email || null;
+  } catch {
+    return null;
+  }
+}
+
 export const Plans = () => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { idToken } = useAuthStore();
 
   const handleSubscribe = async (planId: string) => {
     if (planId === 'free') return;
 
-    setIsProcessing(true);
-    try {
-      // TODO: Create Stripe checkout session
-      // const { createCheckoutSession } = await import('../../services/api');
-      // const session = await createCheckoutSession(planId);
-      // window.location.href = session.url;
+    const plan = PLANS.find((p) => p.id === planId);
+    if (!plan || !plan.stripePriceId) {
+      setError('Stripe Price IDが設定されていません');
+      return;
+    }
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      alert('Stripe統合は後ほど実装されます');
-    } catch (error) {
-      console.error('Subscription error:', error);
-    } finally {
+    const email = getEmailFromToken(idToken);
+    if (!email) {
+      setError('メールアドレスが見つかりません');
+      return;
+    }
+
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      const session = await createCheckoutSession({
+        priceId: plan.stripePriceId,
+        email,
+      });
+
+      // Redirect to Stripe Checkout
+      window.location.href = session.url;
+    } catch (err) {
+      console.error('Subscription error:', err);
+      setError(
+        err instanceof Error ? err.message : 'サブスクリプションの作成に失敗しました'
+      );
       setIsProcessing(false);
     }
   };
@@ -131,6 +167,15 @@ export const Plans = () => {
                 </div>
               ))}
             </div>
+
+            {error && (
+              <div className="mt-8 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Icon name="error" className="text-red-600 dark:text-red-400" />
+                  <p className="text-red-900 dark:text-red-100">{error}</p>
+                </div>
+              </div>
+            )}
 
             <div className="mt-12 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
               <div className="flex items-start gap-3">

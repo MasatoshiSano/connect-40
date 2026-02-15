@@ -24,7 +24,9 @@ export class DatabaseStack extends cdk.Stack {
         type: dynamodb.AttributeType.STRING,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      pointInTimeRecovery: props.envName === 'prod',
+      pointInTimeRecoverySpecification: {
+        pointInTimeRecoveryEnabled: props.envName === 'prod',
+      },
       timeToLiveAttribute: 'ttl',
       removalPolicy:
         props.envName === 'prod' ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY,

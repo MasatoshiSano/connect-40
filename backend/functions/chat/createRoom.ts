@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { ddbDocClient } from '/opt/nodejs/dynamodb';
+import { ddbDocClient } from '../../layers/common/nodejs/dynamodb';
 import { PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
-import { successResponse, errorResponse } from '/opt/nodejs/utils';
+import { successResponse, errorResponse } from '../../layers/common/nodejs/utils';
 import { v4 as uuidv4 } from 'uuid';
+import { checkChatRoomLimit } from '../common/usageLimits';
 
 const TABLE_NAME = process.env.TABLE_NAME!;
 
@@ -19,7 +20,7 @@ export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   try {
-    const userId = event.requestContext.authorizer?.userId;
+    const userId = event.requestContext.authorizer?.claims?.sub;
     if (!userId) {
       return errorResponse(401, 'UNAUTHORIZED', 'User not authenticated');
     }
@@ -33,6 +34,38 @@ export const handler = async (
     // Include current user in participants if not already
     if (!input.participantIds.includes(userId)) {
       input.participantIds.push(userId);
+    }
+
+    // Get user profile for subscription check
+    const userResult = await ddbDocClient.send(
+      new GetCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `USER#${userId}`,
+          SK: 'PROFILE',
+        },
+      })
+    );
+
+    if (!userResult.Item) {
+      return errorResponse(404, 'USER_NOT_FOUND', 'User profile not found');
+    }
+
+    // Check usage limits
+    const subscriptionPlan = (userResult.Item.subscriptionPlan as 'free' | 'premium') || 'free';
+    const usageCheck = await checkChatRoomLimit(
+      ddbDocClient,
+      TABLE_NAME,
+      userId,
+      subscriptionPlan
+    );
+
+    if (!usageCheck.allowed) {
+      return errorResponse(
+        403,
+        'USAGE_LIMIT_EXCEEDED',
+        `チャットルームの上限に達しました。現在のルーム数: ${usageCheck.current}/${usageCheck.limit}。プレミアムプランにアップグレードすると無制限に作成できます。`
+      );
     }
 
     const chatRoomId = uuidv4();
@@ -61,7 +94,7 @@ export const handler = async (
       })
     );
 
-    // Create participant records for easier querying
+    // Create participant records for easier querying and usage tracking
     for (const participantId of input.participantIds) {
       await ddbDocClient.send(
         new PutCommand({
@@ -69,6 +102,8 @@ export const handler = async (
           Item: {
             PK: `USER#${participantId}`,
             SK: `CHATROOM#${chatRoomId}`,
+            GSI1PK: `USERROOMS#${participantId}`,
+            GSI1SK: now,
             Type: 'ChatParticipation',
             chatRoomId,
             participantId,

@@ -4,12 +4,13 @@ import type { CognitoUser } from 'amazon-cognito-identity-js';
 
 interface AuthState {
   user: CognitoUser | null;
+  userId: string | null;
   accessToken: string | null;
   idToken: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
   setTokens: (tokens: { accessToken: string; idToken: string; refreshToken: string }) => void;
-  setUser: (user: CognitoUser | null) => void;
+  setUser: (user: CognitoUser | null, userId?: string | null) => void;
   clearAuth: () => void;
 }
 
@@ -17,6 +18,7 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
+      userId: null,
       accessToken: null,
       idToken: null,
       refreshToken: null,
@@ -28,10 +30,11 @@ export const useAuthStore = create<AuthState>()(
           refreshToken: tokens.refreshToken,
           isAuthenticated: true,
         }),
-      setUser: (user) => set({ user }),
+      setUser: (user, userId = null) => set({ user, userId }),
       clearAuth: () =>
         set({
           user: null,
+          userId: null,
           accessToken: null,
           idToken: null,
           refreshToken: null,
@@ -41,6 +44,7 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       partialize: (state) => ({
+        userId: state.userId,
         accessToken: state.accessToken,
         idToken: state.idToken,
         refreshToken: state.refreshToken,

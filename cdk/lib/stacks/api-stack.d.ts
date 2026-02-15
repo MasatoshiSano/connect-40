@@ -14,6 +14,7 @@ export interface ApiStackProps extends cdk.StackProps {
 export declare class ApiStack extends cdk.Stack {
     readonly api: apigateway.RestApi;
     readonly apiEndpoint: string;
+    readonly authorizer: apigateway.CognitoUserPoolsAuthorizer;
     readonly functions: lambda.Function[];
     constructor(scope: Construct, id: string, props: ApiStackProps);
 }

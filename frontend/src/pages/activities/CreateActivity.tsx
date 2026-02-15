@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { Layout } from '../../components/layout/Layout';
 import { Icon } from '../../components/ui/Icon';
 import { ACTIVITY_CATEGORIES, DURATION_OPTIONS, MAX_PARTICIPANTS_OPTIONS } from '../../constants/activities';
-import type { ActivityCategory, Location } from '../../types/activity';
+import type { Location } from '../../types/activity';
 
 const createActivitySchema = z.object({
   title: z
@@ -33,9 +33,11 @@ export const CreateActivity = () => {
   const [location, setLocation] = useState<Location | null>(null);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
-  const [activityImage, setActivityImage] = useState<File | null>(null);
+  const [_activityImage, setActivityImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [hasProfile, setHasProfile] = useState<boolean | null>(null);
+  const [isCheckingProfile, setIsCheckingProfile] = useState(true);
 
   const {
     register,
@@ -52,6 +54,24 @@ export const CreateActivity = () => {
   });
 
   const descriptionLength = watch('description')?.length || 0;
+
+  // Check if user has profile on mount
+  useEffect(() => {
+    const checkProfile = async () => {
+      try {
+        const { getUserProfile } = await import('../../services/api');
+        await getUserProfile();
+        setHasProfile(true);
+      } catch (err) {
+        console.error('Profile check failed:', err);
+        setHasProfile(false);
+      } finally {
+        setIsCheckingProfile(false);
+      }
+    };
+
+    checkProfile();
+  }, []);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -128,15 +148,13 @@ export const CreateActivity = () => {
     setError(null);
 
     try {
-      // TODO: Upload image if provided
-      // TODO: Create activity API call
-      /*
-      const { createActivity, uploadActivityImage } = await import('../../services/api');
+      const { createActivity } = await import('../../services/api');
 
-      let imageUrl: string | undefined;
-      if (activityImage) {
-        imageUrl = await uploadActivityImage(activityImage);
-      }
+      // TODO: Upload image if provided (uploadActivityImage is not yet implemented)
+      // let imageUrl: string | undefined;
+      // if (activityImage) {
+      //   imageUrl = await uploadActivityImage(activityImage);
+      // }
 
       const tags = data.tags
         ? data.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
@@ -150,13 +168,9 @@ export const CreateActivity = () => {
         duration: data.duration,
         maxParticipants: data.maxParticipants,
         location,
-        imageUrl,
+        imageUrl: undefined, // Image upload not yet implemented
         tags,
       });
-      */
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       navigate('/activities');
     } catch (err) {
@@ -168,6 +182,60 @@ export const CreateActivity = () => {
 
   // Get minimum datetime (current time + 1 hour)
   const minDateTime = new Date(Date.now() + 60 * 60 * 1000).toISOString().slice(0, 16);
+
+  // Loading state while checking profile
+  if (isCheckingProfile) {
+    return (
+      <Layout isAuthenticated={true}>
+        <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
+          <Icon name="sync" size="xl" className="text-primary animate-spin" />
+        </div>
+      </Layout>
+    );
+  }
+
+  // Profile required message
+  if (hasProfile === false) {
+    return (
+      <Layout isAuthenticated={true}>
+        <div className="min-h-screen bg-bg-light dark:bg-bg-dark py-8">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto">
+              <div className="bg-white dark:bg-surface-dark rounded-xl shadow-lg p-8">
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Icon name="person_add" size="xl" className="text-yellow-600 dark:text-yellow-400" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                    プロフィール登録が必要です
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-400 mb-8">
+                    アクティビティを作成するには、まずプロフィールを登録してください。<br />
+                    あなたの情報を他のユーザーと共有し、信頼できるコミュニティを作りましょう。
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button
+                      onClick={() => navigate('/profile/create/step1')}
+                      className="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition font-semibold flex items-center justify-center gap-2"
+                    >
+                      <Icon name="person_add" size="sm" />
+                      プロフィールを作成
+                    </button>
+                    <button
+                      onClick={() => navigate('/activities')}
+                      className="px-8 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition font-semibold"
+                    >
+                      アクティビティ一覧に戻る
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout isAuthenticated={true}>

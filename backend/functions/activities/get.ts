@@ -1,8 +1,8 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { ddbDocClient } from '/opt/nodejs/dynamodb';
+import { ddbDocClient } from '../../layers/common/nodejs/dynamodb';
 import { GetCommand } from '@aws-sdk/lib-dynamodb';
-import { successResponse, errorResponse } from '/opt/nodejs/utils';
-import type { Activity } from '../../../types';
+import { successResponse, errorResponse } from '../../layers/common/nodejs/utils';
+import type { Activity } from '../../types';
 
 const TABLE_NAME = process.env.TABLE_NAME!;
 

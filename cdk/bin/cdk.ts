@@ -75,4 +75,18 @@ const monitoringStack = new MonitoringStack(app, `Connect40-Monitoring-${env}`, 
   lambdaFunctions: [...apiStack.functions, ...webSocketStack.functions],
 });
 
+// Define stack dependencies
+apiStack.addDependency(authStack);
+apiStack.addDependency(databaseStack);
+apiStack.addDependency(storageStack);
+
+webSocketStack.addDependency(authStack);
+webSocketStack.addDependency(databaseStack);
+
+frontendStack.addDependency(apiStack);
+frontendStack.addDependency(webSocketStack);
+
+monitoringStack.addDependency(apiStack);
+monitoringStack.addDependency(webSocketStack);
+
 app.synth();

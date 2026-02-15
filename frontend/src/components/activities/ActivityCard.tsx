@@ -12,8 +12,6 @@ export const ActivityCard = ({ activity }: ActivityCardProps) => {
 
   const category = ACTIVITY_CATEGORIES.find((c) => c.id === activity.category);
   const activityDate = new Date(activity.dateTime);
-  const now = new Date();
-  const isUpcoming = activityDate > now;
   const isFull = activity.currentParticipants >= activity.maxParticipants;
 
   // Format date
