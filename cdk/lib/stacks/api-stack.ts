@@ -52,12 +52,13 @@ export class ApiStack extends cdk.Stack {
 
     this.apiEndpoint = this.api.url;
 
-    // Lambda Layer for common code
-    const commonLayer = new lambda.LayerVersion(this, 'CommonLayer', {
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../../backend/layers/common')),
-      compatibleRuntimes: [lambda.Runtime.NODEJS_20_X],
-      description: 'Common utilities and DynamoDB client',
-    });
+    // Lambda Layer for common code - TEMPORARILY DISABLED
+    // TODO: Fix layer structure to match Lambda requirements
+    // const commonLayer = new lambda.LayerVersion(this, 'CommonLayer', {
+    //   code: lambda.Code.fromAsset(path.join(__dirname, '../../../backend/layers/common')),
+    //   compatibleRuntimes: [lambda.Runtime.NODEJS_20_X],
+    //   description: 'Common utilities and DynamoDB client',
+    // });
 
     // Cognito Authorizer
     this.authorizer = new apigateway.CognitoUserPoolsAuthorizer(this, 'Authorizer', {
@@ -314,34 +315,46 @@ export class ApiStack extends cdk.Stack {
       FRONTEND_URL: frontendUrl,
     };
 
-    const createCheckoutSessionFunction = new lambda.Function(
+    const createCheckoutSessionFunction = new NodejsFunction(
       this,
       'CreateCheckoutSessionFunction',
       {
         runtime: lambda.Runtime.NODEJS_20_X,
-        handler: 'createCheckoutSession.handler',
-        code: lambda.Code.fromAsset('../backend/functions/payment'),
+        entry: path.join(__dirname, '../../../backend/functions/payment/createCheckoutSession.ts'),
         environment: paymentEnvironment,
+        bundling: {
+          minify: true,
+          sourceMap: true,
+          externalModules: ['@aws-sdk/*'],
+        },
         timeout: cdk.Duration.seconds(30),
       }
     );
 
-    const webhookFunction = new lambda.Function(this, 'WebhookFunction', {
+    const webhookFunction = new NodejsFunction(this, 'WebhookFunction', {
       runtime: lambda.Runtime.NODEJS_20_X,
-      handler: 'webhook.handler',
-      code: lambda.Code.fromAsset('../backend/functions/payment'),
+      entry: path.join(__dirname, '../../../backend/functions/payment/webhook.ts'),
       environment: paymentEnvironment,
+      bundling: {
+        minify: true,
+        sourceMap: true,
+        externalModules: ['@aws-sdk/*'],
+      },
       timeout: cdk.Duration.seconds(30),
     });
 
-    const createPortalSessionFunction = new lambda.Function(
+    const createPortalSessionFunction = new NodejsFunction(
       this,
       'CreatePortalSessionFunction',
       {
         runtime: lambda.Runtime.NODEJS_20_X,
-        handler: 'createPortalSession.handler',
-        code: lambda.Code.fromAsset('../backend/functions/payment'),
+        entry: path.join(__dirname, '../../../backend/functions/payment/createPortalSession.ts'),
         environment: paymentEnvironment,
+        bundling: {
+          minify: true,
+          sourceMap: true,
+          externalModules: ['@aws-sdk/*'],
+        },
         timeout: cdk.Duration.seconds(30),
       }
     );
