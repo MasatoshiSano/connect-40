@@ -37,7 +37,12 @@ export const handler = async (
     switch (stripeEvent.type) {
       case 'checkout.session.completed': {
         const session = stripeEvent.data.object as Stripe.Checkout.Session;
-        await handleCheckoutCompleted(session);
+        const sessionType = session.metadata?.type;
+        if (sessionType === 'verification') {
+          await handleVerificationCheckoutCompleted(session);
+        } else {
+          await handleCheckoutCompleted(session);
+        }
         break;
       }
 
@@ -201,4 +206,45 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice): Promise<void> {
 async function handlePaymentFailed(invoice: Stripe.Invoice): Promise<void> {
   console.log('Payment failed for invoice:', invoice.id);
   // Additional logic if needed (e.g., send payment failure notification)
+}
+
+async function handleVerificationCheckoutCompleted(
+  session: Stripe.Checkout.Session
+): Promise<void> {
+  const userId = session.metadata?.userId;
+  if (!userId) {
+    console.error('No userId in verification session metadata');
+    return;
+  }
+
+  const now = new Date().toISOString();
+
+  await Promise.all([
+    // VERIFICATION レコードを pending（admin審査待ち）に更新
+    ddbDocClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: { PK: `USER#${userId}`, SK: 'VERIFICATION' },
+        UpdateExpression: 'SET paymentStatus = :status, paidAt = :now',
+        ExpressionAttributeValues: {
+          ':status': 'pending',
+          ':now': now,
+        },
+      })
+    ),
+    // USER PROFILE の verificationStatus も 'pending' に
+    ddbDocClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: { PK: `USER#${userId}`, SK: 'PROFILE' },
+        UpdateExpression: 'SET verificationStatus = :status, updatedAt = :now',
+        ExpressionAttributeValues: {
+          ':status': 'pending',
+          ':now': now,
+        },
+      })
+    ),
+  ]);
+
+  console.log(`Verification payment received for user ${userId}, awaiting admin review`);
 }
