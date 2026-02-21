@@ -8,6 +8,8 @@ export type ActivityCategory = 'sports' | 'outdoor' | 'hobby' | 'food' | 'cultur
 
 export type ActivityStatus = 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
 
+export type Recurrence = 'none' | 'weekly' | 'biweekly' | 'monthly';
+
 export interface Activity {
   activityId: string;
   hostUserId: string;
@@ -22,8 +24,10 @@ export interface Activity {
   currentParticipants: number;
   participants: string[]; // userIds
   status: ActivityStatus;
+  recurrence?: Recurrence;
   imageUrl?: string;
   tags: string[];
+  entryFee?: number; // 円単位。0 または undefined = 無料
   createdAt: string;
   updatedAt: string;
 }
@@ -36,8 +40,10 @@ export interface CreateActivityInput {
   dateTime: string;
   duration: number;
   maxParticipants: number;
+  recurrence?: Recurrence;
   imageUrl?: string;
   tags: string[];
+  entryFee?: number;
 }
 
 export interface UpdateActivityInput {
@@ -48,9 +54,21 @@ export interface UpdateActivityInput {
   dateTime?: string;
   duration?: number;
   maxParticipants?: number;
+  recurrence?: Recurrence;
   imageUrl?: string;
   tags?: string[];
   status?: ActivityStatus;
+  entryFee?: number;
+}
+
+export interface Review {
+  reviewId: string;
+  activityId: string;
+  userId: string;
+  nickname: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
 }
 
 export interface ActivityFilter {

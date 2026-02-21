@@ -26,6 +26,9 @@ const CreateActivity = lazy(() => import('./pages/activities/CreateActivity').th
 const Activities = lazy(() => import('./pages/activities/Activities').then(m => ({ default: m.Activities })));
 const ActivityDetail = lazy(() => import('./pages/activities/ActivityDetail').then(m => ({ default: m.ActivityDetail })));
 const EditActivity = lazy(() => import('./pages/activities/EditActivity').then(m => ({ default: m.EditActivity })));
+const ActivityPaymentSuccess = lazy(() =>
+  import('./pages/activities/ActivityPaymentSuccess').then(m => ({ default: m.ActivityPaymentSuccess }))
+);
 const ChatList = lazy(() => import('./pages/chat/ChatList').then(m => ({ default: m.ChatList })));
 const ChatRoom = lazy(() => import('./pages/chat/ChatRoom').then(m => ({ default: m.ChatRoom })));
 const Plans = lazy(() => import('./pages/subscription/Plans').then(m => ({ default: m.Plans })));
@@ -246,6 +249,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <EditActivity />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/activities/:activityId/payment/success"
+            element={
+              <ProtectedRoute>
+                <ActivityPaymentSuccess />
               </ProtectedRoute>
             }
           />

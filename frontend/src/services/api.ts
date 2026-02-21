@@ -436,6 +436,19 @@ export async function createVerificationCheckout(data: {
   });
 }
 
+export async function createActivityJoinCheckout(
+  activityId: string,
+  email: string
+): Promise<{ sessionId: string; url: string }> {
+  return fetchWithAuth<{ sessionId: string; url: string }>(
+    `/activities/${activityId}/join-checkout`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }
+  );
+}
+
 // Recommendations API
 
 interface RecommendedActivity {

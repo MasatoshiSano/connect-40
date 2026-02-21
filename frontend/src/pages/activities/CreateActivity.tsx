@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Layout } from '../../components/layout/Layout';
 import { Icon } from '../../components/ui/Icon';
-import { ACTIVITY_CATEGORIES, DURATION_OPTIONS, MAX_PARTICIPANTS_OPTIONS } from '../../constants/activities';
+import { ACTIVITY_CATEGORIES, DURATION_OPTIONS, MAX_PARTICIPANTS_OPTIONS, RECURRENCE_OPTIONS } from '../../constants/activities';
 import type { Location } from '../../types/activity';
 
 const createActivitySchema = z.object({
@@ -21,7 +21,14 @@ const createActivitySchema = z.object({
   dateTime: z.string().min(1, '日時を選択してください'),
   duration: z.number().min(30, '期間を選択してください'),
   maxParticipants: z.number().min(2, '最大参加者数を選択してください'),
+  recurrence: z.enum(['none', 'weekly', 'biweekly', 'monthly']),
   tags: z.string().optional(),
+  entryFee: z
+    .number()
+    .min(0, '入場料は0以上の金額を入力してください')
+    .max(100000, '入場料は100,000円以下にしてください')
+    .int('入場料は整数で入力してください')
+    .optional(),
 });
 
 type CreateActivityFormData = z.infer<typeof createActivitySchema>;
@@ -33,7 +40,7 @@ export const CreateActivity = () => {
   const [location, setLocation] = useState<Location | null>(null);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
-  const [_activityImage, setActivityImage] = useState<File | null>(null);
+  const [activityImage, setActivityImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
@@ -50,6 +57,7 @@ export const CreateActivity = () => {
     defaultValues: {
       duration: 120,
       maxParticipants: 5,
+      recurrence: 'none',
     },
   });
 
@@ -148,13 +156,13 @@ export const CreateActivity = () => {
     setError(null);
 
     try {
-      const { createActivity } = await import('../../services/api');
+      const { createActivity, uploadActivityImage } = await import('../../services/api');
 
-      // TODO: Upload image if provided (uploadActivityImage is not yet implemented)
-      // let imageUrl: string | undefined;
-      // if (activityImage) {
-      //   imageUrl = await uploadActivityImage(activityImage);
-      // }
+      // Upload image if provided
+      let imageUrl: string | undefined;
+      if (activityImage) {
+        imageUrl = await uploadActivityImage(activityImage);
+      }
 
       const tags = data.tags
         ? data.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
@@ -167,9 +175,11 @@ export const CreateActivity = () => {
         dateTime: data.dateTime,
         duration: data.duration,
         maxParticipants: data.maxParticipants,
+        recurrence: data.recurrence,
+        imageUrl,
         location,
-        imageUrl: undefined, // Image upload not yet implemented
         tags,
+        ...(data.entryFee !== undefined && data.entryFee > 0 ? { entryFee: data.entryFee } : {}),
       });
 
       navigate('/activities');
@@ -188,7 +198,7 @@ export const CreateActivity = () => {
     return (
       <Layout isAuthenticated={true}>
         <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
-          <Icon name="sync" size="xl" className="text-primary animate-spin" />
+          <Icon name="sync" size="xl" className="text-gold animate-spin" />
         </div>
       </Layout>
     );
@@ -201,29 +211,29 @@ export const CreateActivity = () => {
         <div className="min-h-screen bg-bg-light dark:bg-bg-dark py-8">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
-              <div className="bg-white dark:bg-surface-dark rounded-xl shadow-lg p-8">
+              <div className="bg-surface-dark border border-border-dark p-8">
                 <div className="text-center py-12">
-                  <div className="w-20 h-20 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Icon name="person_add" size="xl" className="text-yellow-600 dark:text-yellow-400" />
+                  <div className="w-20 h-20 bg-gold/10 flex items-center justify-center mx-auto mb-6">
+                    <Icon name="person_add" size="xl" className="text-gold" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                  <h2 className="text-xl font-light tracking-ryokan text-text-primary dark:text-text-dark-primary mb-3">
                     プロフィール登録が必要です
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-400 mb-8">
+                  <p className="text-text-secondary dark:text-text-dark-secondary mb-8">
                     アクティビティを作成するには、まずプロフィールを登録してください。<br />
                     あなたの情報を他のユーザーと共有し、信頼できるコミュニティを作りましょう。
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button
                       onClick={() => navigate('/profile/create/step1')}
-                      className="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition font-semibold flex items-center justify-center gap-2"
+                      className="px-8 py-3 border border-gold text-gold hover:bg-gold/10 transition-all duration-base ease-elegant font-light flex items-center justify-center gap-2"
                     >
                       <Icon name="person_add" size="sm" />
                       プロフィールを作成
                     </button>
                     <button
                       onClick={() => navigate('/activities')}
-                      className="px-8 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition font-semibold"
+                      className="px-8 py-3 border border-border-dark text-text-secondary dark:text-text-dark-secondary hover:border-gold/40 transition-all duration-base ease-elegant font-light"
                     >
                       アクティビティ一覧に戻る
                     </button>
@@ -239,21 +249,22 @@ export const CreateActivity = () => {
 
   return (
     <Layout isAuthenticated={true}>
-      <div className="min-h-screen bg-bg-light dark:bg-bg-dark py-8">
+      <div className="min-h-screen bg-bg-light dark:bg-bg-dark py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <div className="mb-12">
+              <p className="text-xs tracking-ryokan-wide text-gold uppercase mb-2">CREATE</p>
+              <h1 className="text-3xl font-serif font-light tracking-ryokan text-text-primary dark:text-text-dark-primary mb-2">
                 アクティビティを作成
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-text-secondary dark:text-text-dark-secondary">
                 仲間と楽しむアクティビティを企画しましょう
               </p>
             </div>
 
-            <div className="bg-white dark:bg-surface-dark rounded-xl shadow-lg p-8">
+            <div className="bg-surface-dark border border-border-dark p-8">
               {error && (
-                <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <div className="mb-6 p-4 bg-red-900/10 border border-red-800/30">
                   <div className="flex items-start gap-3">
                     <Icon name="error" className="text-red-600 dark:text-red-400" />
                     <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
@@ -264,19 +275,19 @@ export const CreateActivity = () => {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                 {/* Image Upload */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    アクティビティ画像 <span className="text-gray-400">(任意)</span>
+                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
+                    アクティビティ画像 <span className="text-text-dark-muted normal-case tracking-normal">(任意)</span>
                   </label>
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full h-48 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center cursor-pointer hover:border-primary transition bg-gray-50 dark:bg-gray-800 overflow-hidden"
+                    className="w-full h-48 border border-dashed border-border-dark flex items-center justify-center cursor-pointer hover:border-gold/40 transition-all duration-base ease-elegant bg-transparent overflow-hidden"
                   >
                     {imagePreview ? (
                       <img src={imagePreview} alt="Activity" className="w-full h-full object-cover" />
                     ) : (
                       <div className="text-center">
-                        <Icon name="add_photo_alternate" size="xl" className="text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <Icon name="add_photo_alternate" size="xl" className="text-text-dark-muted mx-auto mb-2" />
+                        <p className="text-sm text-text-dark-muted">
                           クリックして画像を選択
                         </p>
                       </div>
@@ -293,13 +304,13 @@ export const CreateActivity = () => {
 
                 {/* Title */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
                     タイトル <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     {...register('title')}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
                     placeholder="例: 週末ランニング仲間募集！"
                   />
                   {errors.title && (
@@ -311,7 +322,7 @@ export const CreateActivity = () => {
 
                 {/* Category */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-3">
                     カテゴリー <span className="text-red-500">*</span>
                   </label>
                   <Controller
@@ -325,16 +336,16 @@ export const CreateActivity = () => {
                             type="button"
                             onClick={() => field.onChange(cat.id)}
                             className={`
-                              p-4 rounded-lg border-2 transition text-center
+                              p-4 border transition-all duration-base ease-elegant text-center
                               ${
                                 field.value === cat.id
-                                  ? 'border-primary bg-primary-50 dark:bg-primary-900/20'
-                                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                                  ? 'border-gold bg-gold/10'
+                                  : 'border-border-dark hover:border-gold/40'
                               }
                             `}
                           >
-                            <Icon name={cat.icon} size="lg" className={field.value === cat.id ? 'text-primary' : 'text-gray-500'} />
-                            <p className={`text-sm font-medium mt-2 ${field.value === cat.id ? 'text-primary' : 'text-gray-700 dark:text-gray-300'}`}>
+                            <Icon name={cat.icon} size="lg" className={field.value === cat.id ? 'text-gold' : 'text-text-dark-muted'} />
+                            <p className={`text-sm font-light mt-2 ${field.value === cat.id ? 'text-gold' : 'text-text-secondary dark:text-text-dark-secondary'}`}>
                               {cat.name}
                             </p>
                           </button>
@@ -351,13 +362,13 @@ export const CreateActivity = () => {
 
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
                     詳細説明 <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     {...register('description')}
                     rows={6}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none"
+                    className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary resize-none"
                     placeholder="どんなアクティビティか、参加者に何を持ってきてほしいかなど、詳しく書いてください"
                   />
                   <div className="flex justify-between items-center mt-1">
@@ -366,7 +377,7 @@ export const CreateActivity = () => {
                         {errors.description.message}
                       </p>
                     )}
-                    <p className={`text-xs ml-auto ${descriptionLength > 1000 ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                    <p className={`text-xs ml-auto ${descriptionLength > 1000 ? 'text-red-500' : 'text-text-dark-muted'}`}>
                       {descriptionLength} / 1000
                     </p>
                   </div>
@@ -375,14 +386,14 @@ export const CreateActivity = () => {
                 {/* Date Time */}
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
                       開催日時 <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="datetime-local"
                       {...register('dateTime')}
                       min={minDateTime}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
                     />
                     {errors.dateTime && (
                       <p className="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -392,7 +403,7 @@ export const CreateActivity = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
                       所要時間 <span className="text-red-500">*</span>
                     </label>
                     <Controller
@@ -402,7 +413,7 @@ export const CreateActivity = () => {
                         <select
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
-                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                          className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
                         >
                           {DURATION_OPTIONS.map((option) => (
                             <option key={option.value} value={option.value}>
@@ -415,26 +426,49 @@ export const CreateActivity = () => {
                   </div>
                 </div>
 
+                {/* Recurrence */}
+                <div>
+                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
+                    繰り返し
+                  </label>
+                  <Controller
+                    name="recurrence"
+                    control={control}
+                    render={({ field }) => (
+                      <select
+                        {...field}
+                        className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
+                      >
+                        {RECURRENCE_OPTIONS.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  />
+                </div>
+
                 {/* Location */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
                     開催場所 <span className="text-red-500">*</span>
                   </label>
-                  <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="p-4 border border-border-dark">
                     {location ? (
                       <div className="flex items-start gap-3">
-                        <Icon name="location_on" className="text-primary flex-shrink-0 mt-1" />
+                        <Icon name="location_on" className="text-gold flex-shrink-0 mt-1" />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                          <p className="text-sm font-light text-text-primary dark:text-text-dark-primary mb-1">
                             位置情報を取得しました
                           </p>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">{location.address}</p>
+                          <p className="text-xs text-text-secondary dark:text-text-dark-secondary">{location.address}</p>
                         </div>
                         <button
                           type="button"
                           onClick={handleGetLocation}
                           disabled={isGettingLocation}
-                          className="text-sm text-primary hover:underline"
+                          className="text-sm text-gold hover:text-gold/80 transition-all duration-base ease-elegant"
                         >
                           再取得
                         </button>
@@ -445,7 +479,7 @@ export const CreateActivity = () => {
                           type="button"
                           onClick={handleGetLocation}
                           disabled={isGettingLocation}
-                          className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
+                          className="w-full py-3 border border-gold text-gold hover:bg-gold/10 transition-all duration-base ease-elegant font-light flex items-center justify-center gap-2 disabled:opacity-50"
                         >
                           {isGettingLocation ? (
                             <>
@@ -469,7 +503,7 @@ export const CreateActivity = () => {
 
                 {/* Max Participants */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
                     最大参加者数 <span className="text-red-500">*</span>
                   </label>
                   <Controller
@@ -479,7 +513,7 @@ export const CreateActivity = () => {
                       <select
                         {...field}
                         onChange={(e) => field.onChange(Number(e.target.value))}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
                       >
                         {MAX_PARTICIPANTS_OPTIONS.map((option) => (
                           <option key={option.value} value={option.value}>
@@ -491,18 +525,51 @@ export const CreateActivity = () => {
                   />
                 </div>
 
+                {/* Entry Fee */}
+                <div>
+                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
+                    入場料 <span className="text-text-dark-muted normal-case tracking-normal">(任意・円)</span>
+                  </label>
+                  <Controller
+                    name="entryFee"
+                    control={control}
+                    render={({ field }) => (
+                      <input
+                        type="number"
+                        min={0}
+                        max={100000}
+                        step={100}
+                        value={field.value ?? ''}
+                        onChange={(e) =>
+                          field.onChange(e.target.value === '' ? undefined : parseInt(e.target.value, 10))
+                        }
+                        className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
+                        placeholder="例: 1000（0または空欄 = 無料）"
+                      />
+                    )}
+                  />
+                  {errors.entryFee && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      {errors.entryFee.message}
+                    </p>
+                  )}
+                  <p className="mt-1 text-xs text-text-dark-muted">
+                    入場料を設定すると、参加者はStripe決済で支払いを行います
+                  </p>
+                </div>
+
                 {/* Tags */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    タグ <span className="text-gray-400">(任意)</span>
+                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
+                    タグ <span className="text-text-dark-muted normal-case tracking-normal">(任意)</span>
                   </label>
                   <input
                     type="text"
                     {...register('tags')}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
                     placeholder="例: 初心者歓迎, 雨天中止, カジュアル（カンマ区切り）"
                   />
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  <p className="mt-1 text-xs text-text-dark-muted">
                     カンマ（,）で区切って複数のタグを入力できます
                   </p>
                 </div>
@@ -513,14 +580,14 @@ export const CreateActivity = () => {
                     type="button"
                     onClick={() => navigate('/activities')}
                     disabled={isSubmitting}
-                    className="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition font-semibold disabled:opacity-50"
+                    className="px-6 py-3 border border-border-dark text-text-secondary dark:text-text-dark-secondary hover:border-gold/40 transition-all duration-base ease-elegant font-light disabled:opacity-50"
                   >
                     キャンセル
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting || !location}
-                    className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-6 py-3 border border-gold text-gold hover:bg-gold/10 transition-all duration-base ease-elegant font-light flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? (
                       <>

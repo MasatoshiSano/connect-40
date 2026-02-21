@@ -697,6 +697,27 @@ export class ApiStack extends cdk.Stack {
       authorizer: this.authorizer,
     });
 
+    // Activity Join Checkout Lambda function
+    const joinActivityCheckoutFunction = new NodejsFunction(this, 'JoinActivityCheckoutFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      entry: path.join(__dirname, '../../../backend/functions/activities/joinCheckout.ts'),
+      environment: {
+        TABLE_NAME: props.table.tableName,
+        STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || '',
+        FRONTEND_URL: frontendUrl,
+      },
+      bundling: { minify: true, sourceMap: true, externalModules: ['@aws-sdk/*'], forceDockerBundling: false },
+      timeout: cdk.Duration.seconds(30),
+    });
+    props.table.grantReadWriteData(joinActivityCheckoutFunction);
+    this.functions.push(joinActivityCheckoutFunction);
+
+    // POST /activities/{id}/join-checkout
+    const activityJoinCheckout = activityById.addResource('join-checkout');
+    activityJoinCheckout.addMethod('POST', new apigateway.LambdaIntegration(joinActivityCheckoutFunction), {
+      authorizer: this.authorizer,
+    });
+
     // Verification Lambda functions
     const verificationCheckoutFunction = new NodejsFunction(this, 'VerificationCheckout', {
       runtime: lambda.Runtime.NODEJS_20_X,
