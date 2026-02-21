@@ -102,7 +102,7 @@ export const Plans = () => {
 
   return (
     <Layout isAuthenticated={isAuthenticated}>
-      <div className="min-h-screen bg-base dark:bg-base py-12">
+      <div className="min-h-screen bg-base-50 dark:bg-base py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
@@ -152,7 +152,7 @@ export const Plans = () => {
                     ))}
                     {plan.limitations?.map((limitation, index) => (
                       <li key={`limit-${index}`} className="flex items-start gap-3">
-                        <Icon name="cancel" className="text-text-dark-muted flex-shrink-0 mt-0.5" />
+                        <Icon name="cancel" className="text-text-secondary dark:text-text-dark-muted flex-shrink-0 mt-0.5" />
                         <span className="text-text-muted dark:text-text-dark-muted font-light">{limitation}</span>
                       </li>
                     ))}
@@ -188,7 +188,7 @@ export const Plans = () => {
             <div className="mt-12 p-6 bg-gold/5 border border-gold/20">
               <div className="flex items-start gap-3">
                 <Icon name="info" className="text-gold flex-shrink-0" />
-                <div className="text-sm text-text-dark-secondary font-light">
+                <div className="text-sm text-text-secondary dark:text-text-dark-secondary font-light">
                   <p className="font-light mb-2 text-text-primary dark:text-text-dark-primary">お支払いについて</p>
                   <ul className="list-disc list-inside space-y-1">
                     <li>クレジットカード決済（Stripe）</li>

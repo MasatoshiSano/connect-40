@@ -53,16 +53,16 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-base px-4">
-      <div className="max-w-md w-full bg-surface-dark border border-border-dark p-10 md:p-12">
+    <div className="min-h-screen flex items-center justify-center bg-base-50 dark:bg-base px-4">
+      <div className="max-w-md w-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-10 md:p-12">
         <div className="text-center mb-8">
           <div className="mb-4">
             <h1 className="text-3xl font-serif font-light text-gold tracking-ryokan-brand">Connect40</h1>
           </div>
-          <h2 className="text-xl font-light text-text-dark-primary tracking-ryokan mb-2">
+          <h2 className="text-xl font-light text-text-primary dark:text-text-dark-primary tracking-ryokan mb-2">
             ログイン
           </h2>
-          <p className="text-text-dark-secondary">
+          <p className="text-text-secondary dark:text-text-dark-secondary">
             おかえりなさい！
           </p>
         </div>
@@ -78,14 +78,14 @@ export const Login = () => {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
-            <label className="block text-xs text-text-dark-secondary tracking-ryokan-wide uppercase mb-2">
+            <label className="block text-xs text-text-secondary dark:text-text-dark-secondary tracking-ryokan-wide uppercase mb-2">
               メールアドレス
             </label>
             <input
               type="email"
               {...register('email')}
               autoComplete="email"
-              className="w-full py-3 bg-transparent border-b border-border-dark focus:border-b-gold focus:outline-none text-text-dark-primary placeholder:text-text-dark-muted transition-colors duration-fast"
+              className="w-full py-3 bg-transparent border-b border-border-light dark:border-border-dark focus:border-b-gold focus:outline-none text-text-primary dark:text-text-dark-primary placeholder:text-text-secondary dark:text-text-dark-muted transition-colors duration-fast"
               placeholder="email@example.com"
             />
             {errors.email && (
@@ -96,7 +96,7 @@ export const Login = () => {
           </div>
 
           <div>
-            <label className="block text-xs text-text-dark-secondary tracking-ryokan-wide uppercase mb-2">
+            <label className="block text-xs text-text-secondary dark:text-text-dark-secondary tracking-ryokan-wide uppercase mb-2">
               パスワード
             </label>
             <div className="relative">
@@ -104,13 +104,13 @@ export const Login = () => {
                 type={showPassword ? 'text' : 'password'}
                 {...register('password')}
                 autoComplete="current-password"
-                className="w-full py-3 pr-12 bg-transparent border-b border-border-dark focus:border-b-gold focus:outline-none text-text-dark-primary placeholder:text-text-dark-muted transition-colors duration-fast"
+                className="w-full py-3 pr-12 bg-transparent border-b border-border-light dark:border-border-dark focus:border-b-gold focus:outline-none text-text-primary dark:text-text-dark-primary placeholder:text-text-secondary dark:text-text-dark-muted transition-colors duration-fast"
                 placeholder="パスワード"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-dark-muted hover:text-gold transition-colors duration-base"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base"
                 aria-label={showPassword ? 'パスワードを隠す' : 'パスワードを表示'}
               >
                 <Icon name={showPassword ? 'visibility_off' : 'visibility'} size="sm" />
@@ -139,7 +139,7 @@ export const Login = () => {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-text-dark-secondary">
+          <p className="text-text-secondary dark:text-text-dark-secondary">
             アカウントをお持ちでないですか？
             <a href="/signup" className="ml-1 text-gold hover:text-gold/80 transition-colors duration-base">
               新規登録
@@ -148,7 +148,7 @@ export const Login = () => {
         </div>
 
         <div className="mt-4 text-center">
-          <a href="/" className="text-sm text-text-secondary dark:text-text-dark-secondary hover:text-gold transition-colors">
+          <a href="/" className="text-sm text-text-secondary dark:text-text-secondary dark:text-text-dark-secondary hover:text-gold transition-colors">
             ← ホームへ
           </a>
         </div>

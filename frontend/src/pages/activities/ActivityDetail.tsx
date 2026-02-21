@@ -67,6 +67,9 @@ export const ActivityDetail = () => {
         const data = await getActivity(activityId);
         setActivity(data);
         setReminderEnabled(getReminderPreference(activityId));
+        if ('chatRoomId' in data && typeof (data as Activity & { chatRoomId?: string }).chatRoomId === 'string') {
+          setChatRoomId((data as Activity & { chatRoomId?: string }).chatRoomId!);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'アクティビティの読み込みに失敗しました');
       } finally {
@@ -204,7 +207,7 @@ export const ActivityDetail = () => {
   if (error && !activity) {
     return (
       <Layout isAuthenticated={true}>
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark py-8">
+        <div className="min-h-screen bg-base-50 dark:bg-base py-8">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center py-20">
@@ -265,7 +268,7 @@ export const ActivityDetail = () => {
 
   return (
     <Layout isAuthenticated={true}>
-      <div className="min-h-screen bg-bg-light dark:bg-bg-dark py-8">
+      <div className="min-h-screen bg-base-50 dark:bg-base py-8">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             {/* Back Button */}
@@ -289,7 +292,7 @@ export const ActivityDetail = () => {
                   />
                 </div>
               ) : (
-                <div className="h-64 md:h-96 bg-elevated-dark flex items-center justify-center">
+                <div className="h-64 md:h-96 bg-elevated-light dark:bg-elevated-dark flex items-center justify-center">
                   <Icon name={category?.icon || 'event'} size="xl" className="text-gold/30" />
                 </div>
               )}
@@ -340,8 +343,8 @@ export const ActivityDetail = () => {
                 </div>
 
                 {/* RSVP Status Section (Feature 5) */}
-                <div className="mb-8 p-6 border border-border-dark">
-                  <h3 className="text-xs tracking-ryokan-wide text-text-dark-muted uppercase mb-3">
+                <div className="mb-8 p-6 border border-border-light dark:border-border-dark">
+                  <h3 className="text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-muted uppercase mb-3">
                     参加状況
                   </h3>
                   <div className="flex items-center gap-4 mb-3">
@@ -351,19 +354,19 @@ export const ActivityDetail = () => {
                         <span className="text-2xl font-serif font-light text-gold">
                           {activity.currentParticipants}
                         </span>
-                        <span className="text-text-dark-muted">
+                        <span className="text-text-secondary dark:text-text-dark-muted">
                           / {activity.maxParticipants}人
                         </span>
                       </div>
                       {/* Progress bar */}
-                      <div className="w-full h-1.5 bg-border-dark mt-2">
+                      <div className="w-full h-1.5 bg-border-light dark:bg-border-dark mt-2">
                         <div
                           className="h-full bg-gold transition-all duration-base ease-elegant"
                           style={{ width: `${Math.min(rsvpPercentage, 100)}%` }}
                         />
                       </div>
                     </div>
-                    <span className="text-sm text-text-dark-muted">
+                    <span className="text-sm text-text-secondary dark:text-text-dark-muted">
                       {isFull ? '満員' : `残り${activity.maxParticipants - activity.currentParticipants}席`}
                     </span>
                   </div>
@@ -383,7 +386,7 @@ export const ActivityDetail = () => {
                 <div className="grid md:grid-cols-2 gap-6 mb-8">
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-xs tracking-ryokan-wide text-text-dark-muted uppercase mb-2">
+                      <h3 className="text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-muted uppercase mb-2">
                         日時
                       </h3>
                       <div className="flex items-start gap-2">
@@ -396,7 +399,7 @@ export const ActivityDetail = () => {
                     </div>
 
                     <div>
-                      <h3 className="text-xs tracking-ryokan-wide text-text-dark-muted uppercase mb-2">
+                      <h3 className="text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-muted uppercase mb-2">
                         場所
                       </h3>
                       <div className="flex items-start gap-2">
@@ -408,7 +411,7 @@ export const ActivityDetail = () => {
 
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-xs tracking-ryokan-wide text-text-dark-muted uppercase mb-2">
+                      <h3 className="text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-muted uppercase mb-2">
                         主催者
                       </h3>
                       <div className="flex items-center gap-2">
@@ -423,7 +426,7 @@ export const ActivityDetail = () => {
 
                     {activity.recurrence && activity.recurrence !== 'none' && (
                       <div>
-                        <h3 className="text-xs tracking-ryokan-wide text-text-dark-muted uppercase mb-2">
+                        <h3 className="text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-muted uppercase mb-2">
                           繰り返し
                         </h3>
                         <div className="flex items-center gap-2">
@@ -440,7 +443,7 @@ export const ActivityDetail = () => {
                 {/* Tags */}
                 {activity.tags && activity.tags.length > 0 && (
                   <div className="mb-8">
-                    <h3 className="text-xs tracking-ryokan-wide text-text-dark-muted uppercase mb-3">
+                    <h3 className="text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-muted uppercase mb-3">
                       タグ
                     </h3>
                     <div className="flex flex-wrap gap-2">
@@ -458,13 +461,13 @@ export const ActivityDetail = () => {
 
                 {/* Map (Feature 9) */}
                 <div className="mb-8">
-                  <h3 className="text-xs tracking-ryokan-wide text-text-dark-muted uppercase mb-3">
+                  <h3 className="text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-muted uppercase mb-3">
                     地図
                   </h3>
                   {activity.location && activity.location.latitude && activity.location.longitude ? (
                     <ActivityMap location={activity.location} title={activity.title} />
                   ) : (
-                    <div className="h-64 bg-elevated-dark flex items-center justify-center">
+                    <div className="h-64 bg-elevated-light dark:bg-elevated-dark flex items-center justify-center">
                       <div className="text-center">
                         <Icon name="map" size="xl" className="text-text-muted mx-auto mb-2" />
                         <p className="text-sm text-text-muted dark:text-text-dark-muted">
@@ -485,17 +488,17 @@ export const ActivityDetail = () => {
 
                 {/* Reminder Toggle (Feature 5) */}
                 {isJoinedOrHost && activity.status === 'upcoming' && (
-                  <div className="mb-8 p-4 border border-border-dark flex items-center justify-between">
+                  <div className="mb-8 p-4 border border-border-light dark:border-border-dark flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <Icon
                         name={reminderEnabled ? 'notifications_active' : 'notifications_none'}
-                        className={reminderEnabled ? 'text-gold' : 'text-text-dark-muted'}
+                        className={reminderEnabled ? 'text-gold' : 'text-text-secondary dark:text-text-dark-muted'}
                       />
                       <div>
-                        <p className="text-sm text-text-dark-primary font-light">
+                        <p className="text-sm text-text-primary dark:text-text-dark-primary font-light">
                           リマインダー設定
                         </p>
-                        <p className="text-xs text-text-dark-muted">
+                        <p className="text-xs text-text-secondary dark:text-text-dark-muted">
                           開催24時間前にダッシュボードで通知します
                         </p>
                       </div>
@@ -503,7 +506,7 @@ export const ActivityDetail = () => {
                     <button
                       onClick={handleToggleReminder}
                       className={`relative w-12 h-6 transition-colors duration-base ease-elegant ${
-                        reminderEnabled ? 'bg-gold' : 'bg-border-dark'
+                        reminderEnabled ? 'bg-gold' : 'bg-border-light dark:bg-border-dark'
                       }`}
                     >
                       <span
@@ -529,7 +532,7 @@ export const ActivityDetail = () => {
                         </p>
                       </div>
                       <button
-                        onClick={() => navigate('/chat')}
+                        onClick={() => navigate(chatRoomId ? `/chat/${chatRoomId}` : '/chat')}
                         className="px-3 py-1 border border-green-subtle text-green-subtle text-sm hover:bg-green-subtle/10 transition-all duration-base ease-elegant"
                       >
                         チャットへ
@@ -616,14 +619,14 @@ export const ActivityDetail = () => {
                 )}
 
                 {/* Reviews Section (Feature 8) */}
-                <div className="mt-8 pt-8 border-t border-border-dark">
+                <div className="mt-8 pt-8 border-t border-border-light dark:border-border-dark">
                   <h2 className="text-lg font-light text-text-primary dark:text-text-dark-primary mb-6">
                     レビュー
                   </h2>
 
                   {canReview && (
-                    <div className="mb-8 p-6 border border-border-dark">
-                      <h3 className="text-sm font-light text-text-dark-primary mb-4">
+                    <div className="mb-8 p-6 border border-border-light dark:border-border-dark">
+                      <h3 className="text-sm font-light text-text-primary dark:text-text-dark-primary mb-4">
                         レビューを投稿
                       </h3>
                       <ReviewForm

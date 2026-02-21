@@ -59,23 +59,23 @@ export const CreateProfileStep1 = () => {
     <ProfileCreationLayout>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h2 className="text-2xl font-serif font-light tracking-ryokan text-text-primary dark:text-text-dark-primary mb-2">
             基本情報
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-text-secondary dark:text-text-dark-secondary font-light">
             まずは基本的な情報を教えてください
           </p>
         </div>
 
         {/* Nickname */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-xs font-light tracking-ryokan-wide uppercase text-text-secondary dark:text-text-dark-secondary mb-2">
             ニックネーム <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             {...register('nickname')}
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+            className="w-full px-0 py-3 border-b border-border-light dark:border-border-dark bg-transparent focus:border-b-gold focus:outline-none text-text-primary dark:text-text-dark-primary font-light transition duration-base"
             placeholder="例: タロウ"
           />
           {errors.nickname && (
@@ -83,20 +83,20 @@ export const CreateProfileStep1 = () => {
               {errors.nickname.message}
             </p>
           )}
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-xs text-text-muted dark:text-text-dark-muted font-light">
             他のユーザーに表示される名前です
           </p>
         </div>
 
         {/* Age */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-xs font-light tracking-ryokan-wide uppercase text-text-secondary dark:text-text-dark-secondary mb-2">
             年齢 <span className="text-red-500">*</span>
           </label>
           <input
             type="number"
             {...register('age', { valueAsNumber: true })}
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+            className="w-full px-0 py-3 border-b border-border-light dark:border-border-dark bg-transparent focus:border-b-gold focus:outline-none text-text-primary dark:text-text-dark-primary font-light transition duration-base"
             placeholder="例: 40"
             min={35}
             max={49}
@@ -106,20 +106,20 @@ export const CreateProfileStep1 = () => {
               {errors.age.message}
             </p>
           )}
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-xs text-text-muted dark:text-text-dark-muted font-light">
             35〜49歳の方がご利用いただけます
           </p>
         </div>
 
         {/* Bio */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-xs font-light tracking-ryokan-wide uppercase text-text-secondary dark:text-text-dark-secondary mb-2">
             自己紹介 <span className="text-red-500">*</span>
           </label>
           <textarea
             {...register('bio')}
             rows={5}
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none"
+            className="w-full px-0 py-3 border-b border-border-light dark:border-border-dark bg-transparent focus:border-b-gold focus:outline-none text-text-primary dark:text-text-dark-primary font-light resize-none transition duration-base"
             placeholder="あなたの趣味や興味、どんな仲間と出会いたいかなどを書いてください"
           />
           <div className="flex justify-between items-center mt-1">
@@ -128,19 +128,19 @@ export const CreateProfileStep1 = () => {
                 {errors.bio.message}
               </p>
             )}
-            <p className={`text-xs ml-auto ${bioLength > 500 ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}>
+            <p className={`text-xs ml-auto font-light ${bioLength > 500 ? 'text-red-500' : 'text-text-muted dark:text-text-dark-muted'}`}>
               {bioLength} / 500
             </p>
           </div>
         </div>
 
         {/* Info Box */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <div className="bg-gold/5 border border-gold/20 p-4">
           <div className="flex items-start gap-3">
-            <Icon name="info" className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
-            <div className="text-sm text-blue-900 dark:text-blue-100">
-              <p className="font-semibold mb-1">プロフィールのヒント</p>
-              <ul className="list-disc list-inside space-y-1 text-blue-800 dark:text-blue-200">
+            <Icon name="info" className="text-gold flex-shrink-0" />
+            <div className="text-sm text-text-dark-secondary font-light">
+              <p className="font-light mb-1 text-text-primary dark:text-text-dark-primary">プロフィールのヒント</p>
+              <ul className="list-disc list-inside space-y-1">
                 <li>具体的な趣味や興味を書くと、共通点のある人と出会いやすくなります</li>
                 <li>前向きで親しみやすい文章を心がけましょう</li>
               </ul>
@@ -153,13 +153,13 @@ export const CreateProfileStep1 = () => {
           <button
             type="button"
             onClick={() => navigate('/dashboard')}
-            className="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition font-semibold"
+            className="px-6 py-3 border border-border-light dark:border-border-dark text-text-secondary dark:text-text-dark-secondary hover:bg-gold/5 transition duration-base font-light"
           >
             後で作成
           </button>
           <button
             type="submit"
-            className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition font-semibold flex items-center justify-center gap-2"
+            className="flex-1 px-6 py-3 border border-gold text-gold hover:bg-gold/10 transition duration-base font-light flex items-center justify-center gap-2"
           >
             次へ進む
             <Icon name="arrow_forward" size="sm" />

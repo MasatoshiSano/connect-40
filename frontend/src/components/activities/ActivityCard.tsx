@@ -1,13 +1,14 @@
+import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '../ui/Icon';
-import { ACTIVITY_CATEGORIES } from '../../constants/activities';
+import { ACTIVITY_CATEGORIES, RECURRENCE_LABELS } from '../../constants/activities';
 import type { Activity } from '../../types/activity';
 
 interface ActivityCardProps {
   activity: Activity;
 }
 
-export const ActivityCard = ({ activity }: ActivityCardProps) => {
+export const ActivityCard = memo(({ activity }: ActivityCardProps) => {
   const navigate = useNavigate();
 
   const category = ACTIVITY_CATEGORIES.find((c) => c.id === activity.category);
@@ -37,7 +38,7 @@ export const ActivityCard = ({ activity }: ActivityCardProps) => {
   return (
     <div
       onClick={handleClick}
-      className="bg-white dark:bg-surface-dark rounded-xl shadow-sm hover:shadow-md transition cursor-pointer overflow-hidden"
+      className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:border-gold/40 hover:-translate-y-0.5 transition-all duration-base ease-elegant cursor-pointer overflow-hidden"
     >
       {/* Image */}
       {activity.imageUrl ? (
@@ -45,55 +46,61 @@ export const ActivityCard = ({ activity }: ActivityCardProps) => {
           <img
             src={activity.imageUrl}
             alt={activity.title}
+            loading="lazy"
             className="w-full h-full object-cover"
           />
         </div>
       ) : (
-        <div className={`h-48 ${category?.color || 'bg-gray-400'} flex items-center justify-center`}>
-          <Icon name={category?.icon || 'event'} size="xl" className="text-white opacity-50" />
+        <div className="h-48 bg-elevated-light dark:bg-elevated-dark flex items-center justify-center">
+          <Icon name={category?.icon || 'event'} size="xl" className="text-gold/30" />
         </div>
       )}
 
       {/* Content */}
-      <div className="p-6">
+      <div className="p-8">
         {/* Category Badge */}
         <div className="flex items-center gap-2 mb-3">
-          <span className={`px-3 py-1 rounded-full text-xs font-medium text-white ${category?.color || 'bg-gray-500'}`}>
+          <span className="border border-gold/30 text-gold text-xs px-3 py-1">
             {category?.name || activity.category}
           </span>
+          {activity.recurrence && activity.recurrence !== 'none' && (
+            <span className="border border-green-subtle/30 text-green-subtle text-xs px-3 py-1">
+              {RECURRENCE_LABELS[activity.recurrence]}
+            </span>
+          )}
           {isFull && (
-            <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">
+            <span className="border border-warm/30 text-warm text-xs px-3 py-1">
               満員
             </span>
           )}
           {activity.status === 'cancelled' && (
-            <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+            <span className="border border-text-secondary/30 text-text-secondary dark:border-text-dark-muted/30 dark:text-text-dark-muted text-xs px-3 py-1">
               キャンセル
             </span>
           )}
         </div>
 
         {/* Title */}
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
+        <h3 className="text-xl font-serif font-light tracking-wide text-text-primary dark:text-text-dark-primary mb-2 line-clamp-2">
           {activity.title}
         </h3>
 
         {/* Description */}
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+        <p className="text-sm text-text-secondary dark:text-text-dark-secondary mb-4 line-clamp-2">
           {activity.description}
         </p>
 
         {/* Meta Info */}
         <div className="space-y-2 mb-4">
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-text-secondary dark:text-text-dark-secondary">
             <Icon name="schedule" size="sm" />
             <span>{dateStr} {timeStr} ({durationStr})</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-text-secondary dark:text-text-dark-secondary">
             <Icon name="location_on" size="sm" />
-            <span className="truncate">{activity.location.address}</span>
+            <span className="truncate">{activity.location?.address || '場所未設定'}</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-text-secondary dark:text-text-dark-secondary">
             <Icon name="group" size="sm" />
             <span>
               {activity.currentParticipants}/{activity.maxParticipants}人
@@ -102,11 +109,11 @@ export const ActivityCard = ({ activity }: ActivityCardProps) => {
         </div>
 
         {/* Host */}
-        <div className="flex items-center gap-2 pt-4 border-t border-gray-100 dark:border-gray-700">
-          <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
-            <Icon name="person" size="sm" className="text-primary" />
+        <div className="flex items-center gap-2 pt-4 border-t border-border-light dark:border-border-dark">
+          <div className="w-8 h-8 rounded-full bg-gold/10 flex items-center justify-center">
+            <Icon name="person" size="sm" className="text-gold" />
           </div>
-          <span className="text-sm text-gray-700 dark:text-gray-300">
+          <span className="text-sm text-text-secondary dark:text-text-dark-secondary">
             主催: {activity.hostNickname}
           </span>
         </div>
@@ -117,7 +124,7 @@ export const ActivityCard = ({ activity }: ActivityCardProps) => {
             {activity.tags.slice(0, 3).map((tag, index) => (
               <span
                 key={index}
-                className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-xs text-gray-600 dark:text-gray-400 rounded"
+                className="border border-border-light dark:border-border-dark text-xs px-2 py-1 text-text-secondary dark:text-text-dark-secondary"
               >
                 {tag}
               </span>
@@ -127,4 +134,4 @@ export const ActivityCard = ({ activity }: ActivityCardProps) => {
       </div>
     </div>
   );
-};
+});

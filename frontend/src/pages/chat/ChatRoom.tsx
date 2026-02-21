@@ -216,7 +216,7 @@ export const ChatRoom = () => {
   if (isLoading) {
     return (
       <Layout isAuthenticated={true}>
-        <div className="min-h-screen bg-base flex items-center justify-center">
+        <div className="min-h-screen bg-base-50 dark:bg-base flex items-center justify-center">
           <Icon name="sync" size="xl" className="text-gold animate-spin" />
         </div>
       </Layout>
@@ -226,7 +226,7 @@ export const ChatRoom = () => {
   if (error) {
     return (
       <Layout isAuthenticated={true}>
-        <div className="min-h-screen bg-base flex items-center justify-center">
+        <div className="min-h-screen bg-base-50 dark:bg-base flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-600 dark:text-red-400 mb-4 font-light">{error}</p>
             <button
@@ -244,8 +244,8 @@ export const ChatRoom = () => {
   if (!currentRoom) {
     return (
       <Layout isAuthenticated={true}>
-        <div className="min-h-screen bg-base flex items-center justify-center">
-          <p className="text-text-dark-secondary font-light">チャットルームが見つかりません</p>
+        <div className="min-h-screen bg-base-50 dark:bg-base flex items-center justify-center">
+          <p className="text-text-secondary dark:text-text-dark-secondary font-light">チャットルームが見つかりません</p>
         </div>
       </Layout>
     );
@@ -253,23 +253,23 @@ export const ChatRoom = () => {
 
   return (
     <Layout isAuthenticated={true} hideFooter>
-      <div className="flex-1 flex flex-col min-h-0 bg-base">
+      <div className="flex-1 flex flex-col min-h-0 bg-base-50 dark:bg-base">
         {/* Header */}
-        <div className="shrink-0 border-b border-border-dark bg-surface-dark p-4">
+        <div className="shrink-0 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-4">
           <div className="container mx-auto flex items-center gap-4">
             <button
               onClick={() => navigate('/chat')}
-              className="p-2 text-text-dark-muted hover:text-gold transition duration-base"
+              className="p-2 text-text-secondary dark:text-text-dark-muted hover:text-gold transition duration-base"
             >
               <Icon name="arrow_back" size="md" />
             </button>
             <div className="flex-1">
-              <h1 className="text-lg font-serif font-light tracking-wide text-text-dark-primary">
+              <h1 className="text-lg font-serif font-light tracking-wide text-text-primary dark:text-text-dark-primary">
                 {currentRoom.name || (currentRoom.type === 'direct'
                   ? 'ダイレクトメッセージ'
                   : 'グループチャット')}
               </h1>
-              <p className="text-sm text-text-dark-secondary font-light">
+              <p className="text-sm text-text-secondary dark:text-text-dark-secondary font-light">
                 {currentRoom.participantIds.length}人のメンバー
               </p>
             </div>
@@ -305,7 +305,7 @@ export const ChatRoom = () => {
               <ConversationStarters onSelect={handleConversationStarterSelect} />
             )}
             {messages.length === 0 ? (
-              <div className="text-center text-text-dark-muted mt-8">
+              <div className="text-center text-text-secondary dark:text-text-dark-muted mt-8">
                 <p className="font-light">メッセージはまだありません</p>
                 <p className="text-sm mt-2 font-light">最初のメッセージを送信してみましょう</p>
               </div>

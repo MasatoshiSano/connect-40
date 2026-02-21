@@ -68,13 +68,50 @@ export const CreateProfileStep3 = () => {
       async (position) => {
         const { latitude, longitude } = position.coords;
 
-        // Get address from reverse geocoding
-        // TODO: Implement reverse geocoding API call
-        // For now, just store coordinates
+        // Get address from reverse geocoding using Nominatim API
+        let address = `緯度: ${latitude.toFixed(4)}, 経度: ${longitude.toFixed(4)}`;
+
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=ja`,
+            {
+              headers: {
+                'User-Agent': 'Connect40 App',
+              },
+            }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            // Extract human-readable address from response
+            if (data.address) {
+              const parts = [];
+              if (data.address.city || data.address.town || data.address.village) {
+                parts.push(data.address.city || data.address.town || data.address.village);
+              }
+              if (data.address.suburb || data.address.neighbourhood) {
+                parts.push(data.address.suburb || data.address.neighbourhood);
+              }
+              if (data.address.state) {
+                parts.push(data.address.state);
+              }
+              if (parts.length > 0) {
+                address = parts.join(', ');
+              } else if (data.display_name) {
+                // Fallback to display_name
+                address = data.display_name;
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Reverse geocoding failed:', error);
+          // Continue with coordinates as fallback
+        }
+
         const locationData = {
           latitude,
           longitude,
-          address: `緯度: ${latitude.toFixed(4)}, 経度: ${longitude.toFixed(4)}`,
+          address,
         };
 
         setLocation(locationData);
@@ -149,38 +186,38 @@ export const CreateProfileStep3 = () => {
     <ProfileCreationLayout>
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h2 className="text-2xl font-serif font-light tracking-ryokan text-text-primary dark:text-text-dark-primary mb-2">
             本人確認
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-text-secondary dark:text-text-dark-secondary font-light">
             プロフィール写真と位置情報を設定してください
           </p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <div className="p-4 bg-red-900/20 border border-red-800">
             <div className="flex items-start gap-3">
-              <Icon name="error" className="text-red-600 dark:text-red-400" />
-              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+              <Icon name="error" className="text-red-400" />
+              <p className="text-sm text-red-400 font-light">{error}</p>
             </div>
           </div>
         )}
 
         {/* Profile Photo */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-xs font-light tracking-ryokan-wide uppercase text-text-secondary dark:text-text-dark-secondary mb-2">
             プロフィール写真 <span className="text-red-500">*</span>
           </label>
           <div className="flex flex-col items-center gap-4">
             <div
               onClick={handlePhotoClick}
-              className="w-40 h-40 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition border-4 border-gray-200 dark:border-gray-600"
+              className="w-40 h-40 rounded-full overflow-hidden bg-elevated-light dark:bg-elevated-dark flex items-center justify-center cursor-pointer hover:bg-gold/5 transition duration-base border-4 border-border-light dark:border-border-dark"
             >
               {photoPreview ? (
                 <img src={photoPreview} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <Icon name="add_a_photo" size="xl" className="text-gray-400" />
+                <Icon name="add_a_photo" size="xl" className="text-text-secondary dark:text-text-dark-muted" />
               )}
             </div>
             <input
@@ -193,36 +230,36 @@ export const CreateProfileStep3 = () => {
             <button
               type="button"
               onClick={handlePhotoClick}
-              className="px-6 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition font-medium"
+              className="px-6 py-2 border border-border-light dark:border-border-dark text-text-secondary dark:text-text-dark-secondary hover:border-gold/40 hover:text-gold transition duration-base font-light"
             >
               {profilePhoto ? '写真を変更' : '写真を選択'}
             </button>
           </div>
-          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center">
+          <p className="mt-2 text-xs text-text-muted dark:text-text-dark-muted text-center font-light">
             最大5MB、JPEG/PNG形式
           </p>
         </div>
 
         {/* Location */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-xs font-light tracking-ryokan-wide uppercase text-text-secondary dark:text-text-dark-secondary mb-2">
             位置情報 <span className="text-red-500">*</span>
           </label>
-          <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <div className="p-4 bg-elevated-light dark:bg-elevated-dark border border-border-light dark:border-border-dark">
             {location ? (
               <div className="flex items-start gap-3">
-                <Icon name="location_on" className="text-primary flex-shrink-0 mt-1" />
+                <Icon name="location_on" className="text-gold flex-shrink-0 mt-1" />
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                  <p className="text-sm font-light text-text-primary dark:text-text-dark-primary mb-1">
                     位置情報を取得しました
                   </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">{location.address}</p>
+                  <p className="text-xs text-text-secondary dark:text-text-dark-secondary font-light">{location.address}</p>
                 </div>
                 <button
                   type="button"
                   onClick={handleGetLocation}
                   disabled={isGettingLocation}
-                  className="text-sm text-primary hover:underline"
+                  className="text-sm text-gold hover:text-gold/80 font-light"
                 >
                   再取得
                 </button>
@@ -233,7 +270,7 @@ export const CreateProfileStep3 = () => {
                   type="button"
                   onClick={handleGetLocation}
                   disabled={isGettingLocation}
-                  className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full py-3 border border-gold text-gold hover:bg-gold/10 transition duration-base font-light flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {isGettingLocation ? (
                     <>
@@ -248,23 +285,23 @@ export const CreateProfileStep3 = () => {
                   )}
                 </button>
                 {locationError && (
-                  <p className="mt-2 text-sm text-red-600 dark:text-red-400">{locationError}</p>
+                  <p className="mt-2 text-sm text-red-400 font-light">{locationError}</p>
                 )}
               </div>
             )}
           </div>
-          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-2 text-xs text-text-muted dark:text-text-dark-muted font-light">
             位置情報は市区町村レベルでのみ表示され、近くのユーザーとマッチングする際に使用されます
           </p>
         </div>
 
         {/* Info Box */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <div className="bg-gold/5 border border-gold/20 p-4">
           <div className="flex items-start gap-3">
-            <Icon name="info" className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
-            <div className="text-sm text-blue-900 dark:text-blue-100">
-              <p className="font-semibold mb-1">プライバシーについて</p>
-              <ul className="list-disc list-inside space-y-1 text-blue-800 dark:text-blue-200">
+            <Icon name="info" className="text-gold flex-shrink-0" />
+            <div className="text-sm text-text-secondary dark:text-text-dark-secondary font-light">
+              <p className="font-light mb-1 text-text-primary dark:text-text-dark-primary">プライバシーについて</p>
+              <ul className="list-disc list-inside space-y-1">
                 <li>写真は他のユーザーに公開されます</li>
                 <li>詳細な位置情報は非公開で、市区町村レベルでのみ表示されます</li>
                 <li>本人確認後、安全にマッチングを開始できます</li>
@@ -279,7 +316,7 @@ export const CreateProfileStep3 = () => {
             type="button"
             onClick={handleBack}
             disabled={isSubmitting}
-            className="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition font-semibold flex items-center gap-2 disabled:opacity-50"
+            className="px-6 py-3 border border-border-light dark:border-border-dark text-text-secondary dark:text-text-dark-secondary hover:bg-gold/5 transition duration-base font-light flex items-center gap-2 disabled:opacity-50"
           >
             <Icon name="arrow_back" size="sm" />
             戻る
@@ -288,7 +325,7 @@ export const CreateProfileStep3 = () => {
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting || !profilePhoto || !location}
-            className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-6 py-3 border border-gold text-gold hover:bg-gold/10 transition duration-base font-light flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>

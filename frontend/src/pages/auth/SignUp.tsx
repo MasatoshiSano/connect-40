@@ -29,6 +29,8 @@ export const SignUp = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -57,20 +59,20 @@ export const SignUp = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg-light dark:bg-bg-dark px-4">
-        <div className="max-w-md w-full bg-white dark:bg-surface-dark rounded-xl shadow-lg p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Icon name="check_circle" size="xl" className="text-green-600 dark:text-green-400" />
+      <div className="min-h-screen flex items-center justify-center bg-base-50 dark:bg-base px-4">
+        <div className="max-w-md w-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-10 md:p-12 text-center">
+          <div className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Icon name="check_circle" size="xl" className="text-gold" />
           </div>
-          <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+          <h2 className="text-2xl font-light tracking-ryokan mb-4 text-text-primary dark:text-text-dark-primary">
             登録完了！
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-text-secondary dark:text-text-dark-secondary mb-6">
             確認メールを送信しました。メール内のリンクをクリックして、アカウントを有効化してください。
           </p>
           <a
             href="/verify-email"
-            className="inline-block px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition font-semibold"
+            className="inline-block px-6 py-3 border border-gold text-gold hover:bg-gold/10 transition-all duration-base font-light tracking-wide"
           >
             確認コードを入力
           </a>
@@ -80,28 +82,25 @@ export const SignUp = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg-light dark:bg-bg-dark px-4">
-      <div className="max-w-md w-full bg-white dark:bg-surface-dark rounded-xl shadow-lg p-8">
+    <div className="min-h-screen flex items-center justify-center bg-base-50 dark:bg-base px-4">
+      <div className="max-w-md w-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-10 md:p-12">
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-              <Icon name="diversity_3" className="text-white" size="lg" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Connect40</h1>
+          <div className="mb-4">
+            <h1 className="text-3xl font-serif font-light text-gold tracking-ryokan-brand">Connect40</h1>
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          <h2 className="text-xl font-light text-text-primary dark:text-text-dark-primary tracking-ryokan mb-2">
             アカウント作成
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-text-secondary dark:text-text-dark-secondary">
             第3の居場所を見つけましょう
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <div className="mb-6 p-4 bg-red-900/20 border border-red-800">
             <div className="flex items-start gap-3">
-              <Icon name="error" className="text-red-600 dark:text-red-400" />
-              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+              <Icon name="error" className="text-red-400" />
+              <p className="text-sm text-red-400">{error}</p>
             </div>
           </div>
         )}
@@ -109,18 +108,18 @@ export const SignUp = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-xs text-text-secondary dark:text-text-dark-secondary tracking-ryokan-wide uppercase mb-2">
               メールアドレス
             </label>
             <input
               type="email"
               {...register('email')}
               autoComplete="email"
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              className="w-full py-3 bg-transparent border-b border-border-light dark:border-border-dark focus:border-b-gold focus:outline-none text-text-primary dark:text-text-dark-primary placeholder:text-text-secondary dark:text-text-dark-muted transition-colors duration-fast"
               placeholder="email@example.com"
             />
             {errors.email && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+              <p className="mt-1 text-sm text-red-400">
                 {errors.email.message}
               </p>
             )}
@@ -128,18 +127,28 @@ export const SignUp = () => {
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-xs text-text-secondary dark:text-text-dark-secondary tracking-ryokan-wide uppercase mb-2">
               パスワード
             </label>
-            <input
-              type="password"
-              {...register('password')}
-              autoComplete="new-password"
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-              placeholder="8文字以上、英大小文字・数字・記号を含む"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                {...register('password')}
+                autoComplete="new-password"
+                className="w-full py-3 pr-12 bg-transparent border-b border-border-light dark:border-border-dark focus:border-b-gold focus:outline-none text-text-primary dark:text-text-dark-primary placeholder:text-text-secondary dark:text-text-dark-muted transition-colors duration-fast"
+                placeholder="8文字以上、英大小文字・数字・記号を含む"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base"
+                aria-label={showPassword ? 'パスワードを隠す' : 'パスワードを表示'}
+              >
+                <Icon name={showPassword ? 'visibility_off' : 'visibility'} size="sm" />
+              </button>
+            </div>
             {errors.password && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+              <p className="mt-1 text-sm text-red-400">
                 {errors.password.message}
               </p>
             )}
@@ -147,18 +156,28 @@ export const SignUp = () => {
 
           {/* Confirm Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-xs text-text-secondary dark:text-text-dark-secondary tracking-ryokan-wide uppercase mb-2">
               パスワード（確認）
             </label>
-            <input
-              type="password"
-              {...register('confirmPassword')}
-              autoComplete="new-password"
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-              placeholder="パスワードを再入力"
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                {...register('confirmPassword')}
+                autoComplete="new-password"
+                className="w-full py-3 pr-12 bg-transparent border-b border-border-light dark:border-border-dark focus:border-b-gold focus:outline-none text-text-primary dark:text-text-dark-primary placeholder:text-text-secondary dark:text-text-dark-muted transition-colors duration-fast"
+                placeholder="パスワードを再入力"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base"
+                aria-label={showConfirmPassword ? 'パスワードを隠す' : 'パスワードを表示'}
+              >
+                <Icon name={showConfirmPassword ? 'visibility_off' : 'visibility'} size="sm" />
+              </button>
+            </div>
             {errors.confirmPassword && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+              <p className="mt-1 text-sm text-red-400">
                 {errors.confirmPassword.message}
               </p>
             )}
@@ -169,17 +188,17 @@ export const SignUp = () => {
             <input
               type="checkbox"
               {...register('agreeToTerms')}
-              className="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+              className="mt-1 w-4 h-4 text-gold border-border-light dark:border-border-dark focus:ring-gold"
             />
-            <label className="text-sm text-gray-700 dark:text-gray-300">
-              <a href="/terms" className="text-primary hover:underline">利用規約</a>
+            <label className="text-sm text-text-secondary dark:text-text-dark-secondary">
+              <a href="/terms" className="text-gold hover:text-gold/80 transition-colors duration-base">利用規約</a>
               および
-              <a href="/privacy" className="text-primary hover:underline">プライバシーポリシー</a>
+              <a href="/privacy" className="text-gold hover:text-gold/80 transition-colors duration-base">プライバシーポリシー</a>
               に同意します
             </label>
           </div>
           {errors.agreeToTerms && (
-            <p className="text-sm text-red-600 dark:text-red-400">
+            <p className="text-sm text-red-400">
               {errors.agreeToTerms.message}
             </p>
           )}
@@ -188,16 +207,16 @@ export const SignUp = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 border border-gold text-gold hover:bg-gold/10 transition-all duration-base font-light tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? '登録中...' : 'アカウントを作成'}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-text-secondary dark:text-text-dark-secondary">
             すでにアカウントをお持ちですか？
-            <a href="/login" className="ml-1 text-primary hover:underline font-semibold">
+            <a href="/login" className="ml-1 text-gold hover:text-gold/80 transition-colors duration-base">
               ログイン
             </a>
           </p>

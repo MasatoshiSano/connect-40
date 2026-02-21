@@ -16,18 +16,18 @@ export const Success = () => {
 
   return (
     <Layout isAuthenticated={true}>
-      <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center py-12">
+      <div className="min-h-screen bg-base-50 dark:bg-base flex items-center justify-center py-12">
         <div className="max-w-md w-full mx-auto px-4">
-          <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-lg p-8 text-center">
-            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Icon name="check_circle" size="xl" className="text-green-600 dark:text-green-400" />
+          <div className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-8 text-center">
+            <div className="w-20 h-20 bg-gold/10 flex items-center justify-center mx-auto mb-6">
+              <Icon name="check_circle" size="xl" className="text-gold" />
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h1 className="text-3xl font-serif font-light tracking-ryokan text-text-primary dark:text-text-dark-primary mb-4">
               登録完了！
             </h1>
 
-            <p className="text-gray-600 dark:text-gray-400 mb-8">
+            <p className="text-text-secondary dark:text-text-dark-secondary font-light mb-8">
               プレミアムプランへの登録が完了しました。
               <br />
               これからConnect40をフルに活用して、素敵な仲間を見つけましょう！
@@ -36,20 +36,20 @@ export const Success = () => {
             <div className="space-y-3">
               <button
                 onClick={() => navigate('/dashboard')}
-                className="w-full px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition font-semibold"
+                className="w-full px-6 py-3 border border-gold text-gold hover:bg-gold/10 transition duration-base font-light"
               >
                 ダッシュボードへ
               </button>
 
               <button
                 onClick={() => navigate('/activities')}
-                className="w-full px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition font-semibold"
+                className="w-full px-6 py-3 border border-border-dark text-text-secondary dark:text-text-dark-secondary hover:border-gold/40 hover:text-gold transition duration-base font-light"
               >
                 アクティビティを探す
               </button>
             </div>
 
-            <p className="mt-6 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-6 text-sm text-text-secondary dark:text-text-dark-muted font-light">
               登録内容の確認やプランの変更は、プロフィール設定から行えます。
             </p>
           </div>

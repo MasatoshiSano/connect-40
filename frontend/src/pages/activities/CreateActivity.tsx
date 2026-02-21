@@ -197,7 +197,7 @@ export const CreateActivity = () => {
   if (isCheckingProfile) {
     return (
       <Layout isAuthenticated={true}>
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
+        <div className="min-h-screen bg-base-50 dark:bg-base flex items-center justify-center">
           <Icon name="sync" size="xl" className="text-gold animate-spin" />
         </div>
       </Layout>
@@ -208,10 +208,10 @@ export const CreateActivity = () => {
   if (hasProfile === false) {
     return (
       <Layout isAuthenticated={true}>
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark py-8">
+        <div className="min-h-screen bg-base-50 dark:bg-base py-8">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
-              <div className="bg-surface-dark border border-border-dark p-8">
+              <div className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-8">
                 <div className="text-center py-12">
                   <div className="w-20 h-20 bg-gold/10 flex items-center justify-center mx-auto mb-6">
                     <Icon name="person_add" size="xl" className="text-gold" />
@@ -233,7 +233,7 @@ export const CreateActivity = () => {
                     </button>
                     <button
                       onClick={() => navigate('/activities')}
-                      className="px-8 py-3 border border-border-dark text-text-secondary dark:text-text-dark-secondary hover:border-gold/40 transition-all duration-base ease-elegant font-light"
+                      className="px-8 py-3 border border-border-light dark:border-border-dark text-text-secondary dark:text-text-dark-secondary hover:border-gold/40 transition-all duration-base ease-elegant font-light"
                     >
                       アクティビティ一覧に戻る
                     </button>
@@ -249,7 +249,7 @@ export const CreateActivity = () => {
 
   return (
     <Layout isAuthenticated={true}>
-      <div className="min-h-screen bg-bg-light dark:bg-bg-dark py-12">
+      <div className="min-h-screen bg-base-50 dark:bg-base py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
             <div className="mb-12">
@@ -262,7 +262,7 @@ export const CreateActivity = () => {
               </p>
             </div>
 
-            <div className="bg-surface-dark border border-border-dark p-8">
+            <div className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-8">
               {error && (
                 <div className="mb-6 p-4 bg-red-900/10 border border-red-800/30">
                   <div className="flex items-start gap-3">
@@ -275,19 +275,19 @@ export const CreateActivity = () => {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                 {/* Image Upload */}
                 <div>
-                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
-                    アクティビティ画像 <span className="text-text-dark-muted normal-case tracking-normal">(任意)</span>
+                  <label className="block text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase mb-2">
+                    アクティビティ画像 <span className="text-text-secondary dark:text-text-dark-muted normal-case tracking-normal">(任意)</span>
                   </label>
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full h-48 border border-dashed border-border-dark flex items-center justify-center cursor-pointer hover:border-gold/40 transition-all duration-base ease-elegant bg-transparent overflow-hidden"
+                    className="w-full h-48 border border-dashed border-border-light dark:border-border-dark flex items-center justify-center cursor-pointer hover:border-gold/40 transition-all duration-base ease-elegant bg-transparent overflow-hidden"
                   >
                     {imagePreview ? (
                       <img src={imagePreview} alt="Activity" className="w-full h-full object-cover" />
                     ) : (
                       <div className="text-center">
-                        <Icon name="add_photo_alternate" size="xl" className="text-text-dark-muted mx-auto mb-2" />
-                        <p className="text-sm text-text-dark-muted">
+                        <Icon name="add_photo_alternate" size="xl" className="text-text-secondary dark:text-text-dark-muted mx-auto mb-2" />
+                        <p className="text-sm text-text-secondary dark:text-text-dark-muted">
                           クリックして画像を選択
                         </p>
                       </div>
@@ -304,13 +304,13 @@ export const CreateActivity = () => {
 
                 {/* Title */}
                 <div>
-                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
+                  <label className="block text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase mb-2">
                     タイトル <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     {...register('title')}
-                    className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
+                    className="w-full px-4 py-3 border-b border-border-light dark:border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
                     placeholder="例: 週末ランニング仲間募集！"
                   />
                   {errors.title && (
@@ -322,7 +322,7 @@ export const CreateActivity = () => {
 
                 {/* Category */}
                 <div>
-                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-3">
+                  <label className="block text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase mb-3">
                     カテゴリー <span className="text-red-500">*</span>
                   </label>
                   <Controller
@@ -340,11 +340,11 @@ export const CreateActivity = () => {
                               ${
                                 field.value === cat.id
                                   ? 'border-gold bg-gold/10'
-                                  : 'border-border-dark hover:border-gold/40'
+                                  : 'border-border-light dark:border-border-dark hover:border-gold/40'
                               }
                             `}
                           >
-                            <Icon name={cat.icon} size="lg" className={field.value === cat.id ? 'text-gold' : 'text-text-dark-muted'} />
+                            <Icon name={cat.icon} size="lg" className={field.value === cat.id ? 'text-gold' : 'text-text-secondary dark:text-text-dark-muted'} />
                             <p className={`text-sm font-light mt-2 ${field.value === cat.id ? 'text-gold' : 'text-text-secondary dark:text-text-dark-secondary'}`}>
                               {cat.name}
                             </p>
@@ -362,13 +362,13 @@ export const CreateActivity = () => {
 
                 {/* Description */}
                 <div>
-                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
+                  <label className="block text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase mb-2">
                     詳細説明 <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     {...register('description')}
                     rows={6}
-                    className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary resize-none"
+                    className="w-full px-4 py-3 border-b border-border-light dark:border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary resize-none"
                     placeholder="どんなアクティビティか、参加者に何を持ってきてほしいかなど、詳しく書いてください"
                   />
                   <div className="flex justify-between items-center mt-1">
@@ -377,7 +377,7 @@ export const CreateActivity = () => {
                         {errors.description.message}
                       </p>
                     )}
-                    <p className={`text-xs ml-auto ${descriptionLength > 1000 ? 'text-red-500' : 'text-text-dark-muted'}`}>
+                    <p className={`text-xs ml-auto ${descriptionLength > 1000 ? 'text-red-500' : 'text-text-secondary dark:text-text-dark-muted'}`}>
                       {descriptionLength} / 1000
                     </p>
                   </div>
@@ -386,14 +386,14 @@ export const CreateActivity = () => {
                 {/* Date Time */}
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
+                    <label className="block text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase mb-2">
                       開催日時 <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="datetime-local"
                       {...register('dateTime')}
                       min={minDateTime}
-                      className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
+                      className="w-full px-4 py-3 border-b border-border-light dark:border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
                     />
                     {errors.dateTime && (
                       <p className="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -403,7 +403,7 @@ export const CreateActivity = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
+                    <label className="block text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase mb-2">
                       所要時間 <span className="text-red-500">*</span>
                     </label>
                     <Controller
@@ -413,7 +413,7 @@ export const CreateActivity = () => {
                         <select
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
-                          className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
+                          className="w-full px-4 py-3 border-b border-border-light dark:border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
                         >
                           {DURATION_OPTIONS.map((option) => (
                             <option key={option.value} value={option.value}>
@@ -428,7 +428,7 @@ export const CreateActivity = () => {
 
                 {/* Recurrence */}
                 <div>
-                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
+                  <label className="block text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase mb-2">
                     繰り返し
                   </label>
                   <Controller
@@ -437,7 +437,7 @@ export const CreateActivity = () => {
                     render={({ field }) => (
                       <select
                         {...field}
-                        className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
+                        className="w-full px-4 py-3 border-b border-border-light dark:border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
                       >
                         {RECURRENCE_OPTIONS.map((option) => (
                           <option key={option.value} value={option.value}>
@@ -451,10 +451,10 @@ export const CreateActivity = () => {
 
                 {/* Location */}
                 <div>
-                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
+                  <label className="block text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase mb-2">
                     開催場所 <span className="text-red-500">*</span>
                   </label>
-                  <div className="p-4 border border-border-dark">
+                  <div className="p-4 border border-border-light dark:border-border-dark">
                     {location ? (
                       <div className="flex items-start gap-3">
                         <Icon name="location_on" className="text-gold flex-shrink-0 mt-1" />
@@ -503,7 +503,7 @@ export const CreateActivity = () => {
 
                 {/* Max Participants */}
                 <div>
-                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
+                  <label className="block text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase mb-2">
                     最大参加者数 <span className="text-red-500">*</span>
                   </label>
                   <Controller
@@ -513,7 +513,7 @@ export const CreateActivity = () => {
                       <select
                         {...field}
                         onChange={(e) => field.onChange(Number(e.target.value))}
-                        className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
+                        className="w-full px-4 py-3 border-b border-border-light dark:border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
                       >
                         {MAX_PARTICIPANTS_OPTIONS.map((option) => (
                           <option key={option.value} value={option.value}>
@@ -527,8 +527,8 @@ export const CreateActivity = () => {
 
                 {/* Entry Fee */}
                 <div>
-                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
-                    入場料 <span className="text-text-dark-muted normal-case tracking-normal">(任意・円)</span>
+                  <label className="block text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase mb-2">
+                    入場料 <span className="text-text-secondary dark:text-text-dark-muted normal-case tracking-normal">(任意・円)</span>
                   </label>
                   <Controller
                     name="entryFee"
@@ -548,7 +548,7 @@ export const CreateActivity = () => {
                           const parsed = parseInt(e.target.value, 10);
                           field.onChange(isNaN(parsed) ? undefined : parsed);
                         }}
-                        className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
+                        className="w-full px-4 py-3 border-b border-border-light dark:border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
                         placeholder="例: 1000（0または空欄 = 無料）"
                       />
                     )}
@@ -558,23 +558,23 @@ export const CreateActivity = () => {
                       {errors.entryFee.message}
                     </p>
                   )}
-                  <p className="mt-1 text-xs text-text-dark-muted">
+                  <p className="mt-1 text-xs text-text-secondary dark:text-text-dark-muted">
                     入場料を設定すると、参加者はStripe決済で支払いを行います
                   </p>
                 </div>
 
                 {/* Tags */}
                 <div>
-                  <label className="block text-xs tracking-ryokan-wide text-text-dark-secondary uppercase mb-2">
-                    タグ <span className="text-text-dark-muted normal-case tracking-normal">(任意)</span>
+                  <label className="block text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase mb-2">
+                    タグ <span className="text-text-secondary dark:text-text-dark-muted normal-case tracking-normal">(任意)</span>
                   </label>
                   <input
                     type="text"
                     {...register('tags')}
-                    className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
+                    className="w-full px-4 py-3 border-b border-border-light dark:border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
                     placeholder="例: 初心者歓迎, 雨天中止, カジュアル（カンマ区切り）"
                   />
-                  <p className="mt-1 text-xs text-text-dark-muted">
+                  <p className="mt-1 text-xs text-text-secondary dark:text-text-dark-muted">
                     カンマ（,）で区切って複数のタグを入力できます
                   </p>
                 </div>
@@ -585,7 +585,7 @@ export const CreateActivity = () => {
                     type="button"
                     onClick={() => navigate('/activities')}
                     disabled={isSubmitting}
-                    className="px-6 py-3 border border-border-dark text-text-secondary dark:text-text-dark-secondary hover:border-gold/40 transition-all duration-base ease-elegant font-light disabled:opacity-50"
+                    className="px-6 py-3 border border-border-light dark:border-border-dark text-text-secondary dark:text-text-dark-secondary hover:border-gold/40 transition-all duration-base ease-elegant font-light disabled:opacity-50"
                   >
                     キャンセル
                   </button>

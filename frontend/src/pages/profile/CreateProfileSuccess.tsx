@@ -10,15 +10,15 @@ export const CreateProfileSuccess = () => {
 
   return (
     <Layout isAuthenticated={true}>
-      <div className="min-h-screen flex items-center justify-center bg-bg-light dark:bg-bg-dark px-4">
-        <div className="max-w-md w-full bg-white dark:bg-surface-dark rounded-xl shadow-lg p-8 text-center">
-          <div className="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Icon name="check_circle" size="xl" className="text-green-600 dark:text-green-400" />
+      <div className="min-h-screen flex items-center justify-center bg-base-50 dark:bg-base px-4">
+        <div className="max-w-md w-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-8 text-center">
+          <div className="w-20 h-20 bg-gold/10 flex items-center justify-center mx-auto mb-6">
+            <Icon name="check_circle" size="xl" className="text-gold" />
           </div>
-          <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
+          <h2 className="text-3xl font-serif font-light tracking-ryokan mb-4 text-text-primary dark:text-text-dark-primary">
             プロフィール作成完了！
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-8">
+          <p className="text-text-secondary dark:text-text-dark-secondary font-light mb-8">
             おめでとうございます！プロフィールが作成されました。
             <br />
             さっそく近くの仲間を探してみましょう。
@@ -27,24 +27,24 @@ export const CreateProfileSuccess = () => {
           <div className="space-y-3">
             <button
               onClick={() => navigate('/dashboard')}
-              className="w-full px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition font-semibold"
+              className="w-full px-6 py-3 border border-gold text-gold hover:bg-gold/10 transition duration-base font-light"
             >
               ダッシュボードへ
             </button>
             <button
               onClick={() => navigate('/activities')}
-              className="w-full px-6 py-3 border-2 border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition font-semibold"
+              className="w-full px-6 py-3 border border-border-dark text-text-secondary dark:text-text-dark-secondary hover:border-gold/40 hover:text-gold transition duration-base font-light"
             >
               アクティビティを探す
             </button>
           </div>
 
-          <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="mt-8 p-4 bg-gold/5 border border-gold/20">
             <div className="flex items-start gap-3 text-left">
-              <Icon name="lightbulb" className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
-              <div className="text-sm text-blue-900 dark:text-blue-100">
-                <p className="font-semibold mb-1">次のステップ</p>
-                <ul className="list-disc list-inside space-y-1 text-blue-800 dark:text-blue-200">
+              <Icon name="lightbulb" className="text-gold flex-shrink-0" />
+              <div className="text-sm text-text-secondary dark:text-text-dark-secondary font-light">
+                <p className="font-light mb-1 text-text-primary dark:text-text-dark-primary">次のステップ</p>
+                <ul className="list-disc list-inside space-y-1">
                   <li>近くのアクティビティをチェック</li>
                   <li>興味のあるユーザーをフォロー</li>
                   <li>メッセージで交流を始める</li>

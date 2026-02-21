@@ -1,77 +1,29 @@
+import { useNavigate } from 'react-router-dom';
+
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const navigate = useNavigate();
 
   return (
-    <footer className="bg-gray-900 text-gray-300">
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* About */}
-          <div>
-            <h3 className="font-bold text-white mb-4">Connect40について</h3>
-            <p className="text-sm">
-              40代男性向けの孤独解消マッチングプラットフォーム。
-              第3の居場所を見つけましょう。
-            </p>
-          </div>
-
-          {/* Links */}
-          <div>
-            <h3 className="font-bold text-white mb-4">リンク</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <a href="/about" className="hover:text-primary transition">
-                  コンセプト
-                </a>
-              </li>
-              <li>
-                <a href="/activities" className="hover:text-primary transition">
-                  アクティビティ
-                </a>
-              </li>
-              <li>
-                <a href="/pricing" className="hover:text-primary transition">
-                  料金プラン
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Support */}
-          <div>
-            <h3 className="font-bold text-white mb-4">サポート</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <a href="/contact" className="hover:text-primary transition">
-                  お問い合わせ
-                </a>
-              </li>
-              <li>
-                <a href="/faq" className="hover:text-primary transition">
-                  よくある質問
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div>
-            <h3 className="font-bold text-white mb-4">法的情報</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <a href="/terms" className="hover:text-primary transition">
-                  利用規約
-                </a>
-              </li>
-              <li>
-                <a href="/privacy" className="hover:text-primary transition">
-                  プライバシーポリシー
-                </a>
-              </li>
-            </ul>
-          </div>
+    <footer className="bg-base-100 dark:bg-base text-text-secondary dark:text-text-dark-muted">
+      <div className="max-w-ryokan mx-auto px-4 py-20">
+        {/* Logo */}
+        <div className="text-center mb-12">
+          <h3 className="font-serif text-gold tracking-ryokan-brand text-lg">Connect40</h3>
+          <p className="text-sm mt-3 text-text-secondary dark:text-text-dark-muted">40代のための、第3の居場所</p>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
+        {/* Links - horizontal */}
+        <nav className="flex flex-wrap justify-center gap-8 text-sm mb-12">
+          <button onClick={() => navigate('/about')} className="text-text-secondary dark:text-text-dark-muted hover:text-gold transition-all duration-base">コンセプト</button>
+          <button onClick={() => navigate('/activities')} className="text-text-secondary dark:text-text-dark-muted hover:text-gold transition-all duration-base">アクティビティ</button>
+          <button onClick={() => navigate('/pricing')} className="text-text-secondary dark:text-text-dark-muted hover:text-gold transition-all duration-base">料金プラン</button>
+          <button onClick={() => navigate('/terms')} className="text-text-secondary dark:text-text-dark-muted hover:text-gold transition-all duration-base">利用規約</button>
+          <button onClick={() => navigate('/privacy')} className="text-text-secondary dark:text-text-dark-muted hover:text-gold transition-all duration-base">プライバシーポリシー</button>
+        </nav>
+
+        {/* Divider + Copyright */}
+        <div className="border-t border-border-light dark:border-border-dark pt-8 text-center text-xs text-text-secondary dark:text-text-dark-muted">
           <p>&copy; {currentYear} Connect40. All rights reserved.</p>
         </div>
       </div>

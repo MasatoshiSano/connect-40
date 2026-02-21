@@ -159,8 +159,8 @@ export const EditProfile = () => {
   if (isLoading) {
     return (
       <Layout isAuthenticated={true}>
-        <div className="min-h-screen flex items-center justify-center">
-          <Icon name="sync" size="xl" className="text-primary animate-spin" />
+        <div className="min-h-screen bg-base-50 dark:bg-base flex items-center justify-center">
+          <Icon name="sync" size="xl" className="text-gold animate-spin" />
         </div>
       </Layout>
     );
@@ -168,26 +168,26 @@ export const EditProfile = () => {
 
   return (
     <Layout isAuthenticated={true}>
-      <div className="min-h-screen bg-bg-light dark:bg-bg-dark py-8">
+      <div className="min-h-screen bg-base-50 dark:bg-base py-8">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto">
             {/* Header */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              <h1 className="text-3xl font-serif font-light tracking-ryokan text-text-primary dark:text-text-dark-primary mb-2">
                 プロフィール編集
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-text-secondary dark:text-text-dark-secondary font-light">
                 あなたのプロフィールを更新しましょう
               </p>
             </div>
 
-            <div className="bg-white dark:bg-surface-dark rounded-xl shadow-lg p-8">
+            <div className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-8">
               {/* Success Message */}
               {success && (
-                <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                <div className="mb-6 p-4 bg-gold/10 border border-gold/30">
                   <div className="flex items-start gap-3">
-                    <Icon name="check_circle" className="text-green-600 dark:text-green-400" />
-                    <p className="text-sm text-green-600 dark:text-green-400">
+                    <Icon name="check_circle" className="text-gold" />
+                    <p className="text-sm text-gold font-light">
                       プロフィールが更新されました
                     </p>
                   </div>
@@ -196,10 +196,10 @@ export const EditProfile = () => {
 
               {/* Error Message */}
               {error && (
-                <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <div className="mb-6 p-4 bg-red-900/20 border border-red-800">
                   <div className="flex items-start gap-3">
-                    <Icon name="error" className="text-red-600 dark:text-red-400" />
-                    <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                    <Icon name="error" className="text-red-400" />
+                    <p className="text-sm text-red-400 font-light">{error}</p>
                   </div>
                 </div>
               )}
@@ -207,18 +207,18 @@ export const EditProfile = () => {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                 {/* Profile Photo */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+                  <label className="block text-xs font-light tracking-ryokan-wide uppercase text-text-secondary dark:text-text-dark-secondary mb-4">
                     プロフィール写真
                   </label>
                   <div className="flex flex-col items-center gap-4">
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-32 h-32 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition border-4 border-gray-200 dark:border-gray-600"
+                      className="w-32 h-32 rounded-full overflow-hidden bg-elevated-light dark:bg-elevated-dark flex items-center justify-center cursor-pointer hover:bg-gold/5 transition duration-base border-4 border-border-light dark:border-border-dark"
                     >
                       {photoPreview ? (
                         <img src={photoPreview} alt="Profile" className="w-full h-full object-cover" />
                       ) : (
-                        <Icon name="add_a_photo" size="xl" className="text-gray-400" />
+                        <Icon name="add_a_photo" size="xl" className="text-text-secondary dark:text-text-dark-muted" />
                       )}
                     </div>
                     <input
@@ -231,7 +231,7 @@ export const EditProfile = () => {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="px-6 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition font-medium"
+                      className="px-6 py-2 border border-border-light dark:border-border-dark text-text-secondary dark:text-text-dark-secondary hover:border-gold/40 hover:text-gold transition duration-base font-light"
                     >
                       写真を変更
                     </button>
@@ -240,17 +240,17 @@ export const EditProfile = () => {
 
                 {/* Basic Info */}
                 <div className="space-y-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">基本情報</h3>
+                  <h3 className="text-lg font-serif font-light tracking-wide text-text-primary dark:text-text-dark-primary">基本情報</h3>
 
                   {/* Nickname */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs font-light tracking-ryokan-wide uppercase text-text-secondary dark:text-text-dark-secondary mb-2">
                       ニックネーム <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       {...register('nickname')}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      className="w-full px-0 py-3 border-b border-border-light dark:border-border-dark bg-transparent focus:border-b-gold focus:outline-none text-text-primary dark:text-text-dark-primary font-light transition duration-base"
                     />
                     {errors.nickname && (
                       <p className="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -261,13 +261,13 @@ export const EditProfile = () => {
 
                   {/* Age */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs font-light tracking-ryokan-wide uppercase text-text-secondary dark:text-text-dark-secondary mb-2">
                       年齢 <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"
                       {...register('age', { valueAsNumber: true })}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      className="w-full px-0 py-3 border-b border-border-light dark:border-border-dark bg-transparent focus:border-b-gold focus:outline-none text-text-primary dark:text-text-dark-primary font-light transition duration-base"
                       min={35}
                       max={49}
                     />
@@ -280,13 +280,13 @@ export const EditProfile = () => {
 
                   {/* Bio */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs font-light tracking-ryokan-wide uppercase text-text-secondary dark:text-text-dark-secondary mb-2">
                       自己紹介 <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       {...register('bio')}
                       rows={5}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none"
+                      className="w-full px-0 py-3 border-b border-border-light dark:border-border-dark bg-transparent focus:border-b-gold focus:outline-none text-text-primary dark:text-text-dark-primary font-light resize-none transition duration-base"
                     />
                     <div className="flex justify-between items-center mt-1">
                       {errors.bio && (
@@ -294,7 +294,7 @@ export const EditProfile = () => {
                           {errors.bio.message}
                         </p>
                       )}
-                      <p className={`text-xs ml-auto ${bioLength > 500 ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                      <p className={`text-xs ml-auto font-light ${bioLength > 500 ? 'text-red-500' : 'text-text-muted dark:text-text-dark-muted'}`}>
                         {bioLength} / 500
                       </p>
                     </div>
@@ -304,17 +304,17 @@ export const EditProfile = () => {
                 {/* Interests */}
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-lg font-serif font-light tracking-wide text-text-primary dark:text-text-dark-primary">
                       興味・趣味 <span className="text-red-500">*</span>
                     </h3>
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                    <span className="text-sm text-text-secondary dark:text-text-dark-secondary font-light">
                       {selectedInterests.length} / 10
                     </span>
                   </div>
 
                   {INTEREST_CATEGORIES.map((category) => (
                     <div key={category.id}>
-                      <h4 className="text-md font-medium text-gray-900 dark:text-white mb-3">
+                      <h4 className="text-md font-light tracking-wide text-text-primary dark:text-text-dark-primary mb-3">
                         {category.name}
                       </h4>
                       <div className="flex flex-wrap gap-2">
@@ -326,11 +326,11 @@ export const EditProfile = () => {
                               type="button"
                               onClick={() => toggleInterest(interest)}
                               className={`
-                                px-4 py-2 rounded-full font-medium transition-all
+                                px-4 py-2 font-light transition-all duration-base
                                 ${
                                   isSelected
-                                    ? 'bg-primary text-white shadow-md'
-                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                    ? 'bg-gold/10 text-gold border border-gold'
+                                    : 'bg-transparent text-text-secondary dark:text-text-dark-secondary border border-border-light dark:border-border-dark hover:border-gold/40'
                                 }
                               `}
                             >
@@ -350,14 +350,14 @@ export const EditProfile = () => {
                     type="button"
                     onClick={() => navigate('/dashboard')}
                     disabled={isSubmitting}
-                    className="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition font-semibold disabled:opacity-50"
+                    className="px-6 py-3 border border-border-light dark:border-border-dark text-text-secondary dark:text-text-dark-secondary hover:bg-gold/5 transition duration-base font-light disabled:opacity-50"
                   >
                     キャンセル
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting || selectedInterests.length < 3}
-                    className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-6 py-3 border border-gold text-gold hover:bg-gold/10 transition duration-base font-light flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? (
                       <>

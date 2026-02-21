@@ -1,73 +1,365 @@
+import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
 import { Icon } from '../components/ui/Icon';
+import { ActivityCard } from '../components/activities/ActivityCard';
+import { BadgeGrid } from '../components/badges/BadgeGrid';
+import { RecommendedActivities } from '../components/recommendations/RecommendedActivities';
+import { RecommendedUsers } from '../components/recommendations/RecommendedUsers';
+import { useAuthStore } from '../stores/auth';
+import { useChatStore } from '../stores/chat';
+import type { Activity } from '../types/activity';
+import type { UserProfile } from '../services/api';
+import type { UserStats } from '../constants/badges';
 
-/**
- * Dashboard page - placeholder for authenticated users
- * TODO: Implement actual dashboard features in later phases
- */
 export const Dashboard = () => {
+  const navigate = useNavigate();
+  const { userId, nickname } = useAuthStore();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [hostedActivities, setHostedActivities] = useState<Activity[]>([]);
+  const [joinedActivities, setJoinedActivities] = useState<Activity[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [recommendedActivities, setRecommendedActivities] = useState<{
+    activityId: string; title: string; category: string; dateTime: string;
+    location: { latitude: number; longitude: number; address: string };
+    hostNickname: string; imageUrl?: string; tags: string[];
+    currentParticipants: number; maxParticipants: number; score: number;
+  }[]>([]);
+  const [recommendedUsers, setRecommendedUsers] = useState<{
+    userId: string; nickname: string; profilePhoto: string;
+    interests: string[]; matchScore: number;
+  }[]>([]);
+  const [isRecommendationsLoading, setIsRecommendationsLoading] = useState(true);
+  const [isPortalLoading, setIsPortalLoading] = useState(false);
+
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        const { getUserProfile, getActivities } = await import('../services/api');
+
+        // Load profile
+        try {
+          const userProfile = await getUserProfile();
+          setProfile(userProfile);
+        } catch (err) {
+          console.error('Failed to load profile:', err);
+        }
+
+        // Load activities
+        if (userId) {
+          const { activities } = await getActivities();
+
+          // Filter hosted activities
+          const hosted = activities.filter((a) => a.hostUserId === userId);
+          setHostedActivities(hosted);
+
+          // Filter joined activities (excluding hosted ones)
+          const joined = activities.filter(
+            (a) => a.participants.includes(userId) && a.hostUserId !== userId
+          );
+          setJoinedActivities(joined);
+        }
+      } catch (err) {
+        console.error('Failed to load dashboard data:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, [userId]);
+
+  // Load recommendations separately
+  useEffect(() => {
+    const loadRecommendations = async () => {
+      try {
+        const { getRecommendations } = await import('../services/api');
+        const data = await getRecommendations();
+        setRecommendedActivities(data.recommendedActivities);
+        setRecommendedUsers(data.recommendedUsers);
+      } catch (err) {
+        console.error('Failed to load recommendations:', err);
+      } finally {
+        setIsRecommendationsLoading(false);
+      }
+    };
+    loadRecommendations();
+  }, []);
+
+  const handleOpenPortal = async () => {
+    setIsPortalLoading(true);
+    try {
+      const { createPortalSession } = await import('../services/payment');
+      const { url } = await createPortalSession();
+      window.location.href = url;
+    } catch (err) {
+      console.error('Failed to open portal:', err);
+      setIsPortalLoading(false);
+    }
+  };
+
+  const chatRooms = useChatStore((state) => state.rooms);
+
+  const userStats: UserStats = useMemo(() => {
+    const daysSinceRegistration = profile?.createdAt
+      ? Math.floor(
+          (Date.now() - new Date(profile.createdAt).getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
+      : 0;
+
+    const totalParticipants = hostedActivities.reduce(
+      (sum, a) => sum + (a.participants?.length || 0),
+      0
+    );
+
+    return {
+      activitiesJoined: joinedActivities.length,
+      activitiesHosted: hostedActivities.length,
+      totalParticipants,
+      reviewsWritten: 0,
+      chatRooms: chatRooms.length,
+      daysSinceRegistration,
+    };
+  }, [joinedActivities, hostedActivities, chatRooms, profile]);
+
+  const reminderActivities = useMemo(() => {
+    const REMINDER_STORAGE_KEY = 'connect40_reminders';
+    try {
+      const stored = localStorage.getItem(REMINDER_STORAGE_KEY);
+      const reminders: Record<string, boolean> = stored ? JSON.parse(stored) : {};
+      const enabledIds = Object.keys(reminders).filter((id) => reminders[id]);
+      if (enabledIds.length === 0) return [];
+      const now = new Date();
+      const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+      const allActivities = [...hostedActivities, ...joinedActivities];
+      return allActivities.filter(
+        (a) =>
+          enabledIds.includes(a.activityId) &&
+          new Date(a.dateTime) > now &&
+          new Date(a.dateTime) <= in24h
+      );
+    } catch {
+      return [];
+    }
+  }, [hostedActivities, joinedActivities]);
+
+  if (isLoading) {
+    return (
+      <Layout isAuthenticated={true}>
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center py-20">
+            <Icon name="sync" size="xl" className="text-gold animate-spin" />
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout isAuthenticated={true}>
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              ダッシュボード
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              ようこそ、Connect40へ！
-            </p>
+      <div className="container mx-auto px-4 py-20">
+        <div className="max-w-ryokan mx-auto">
+          {/* Header */}
+          <div className="mb-12">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-3xl font-serif font-light tracking-ryokan text-text-primary dark:text-text-dark-primary">
+                    ダッシュボード
+                  </h1>
+                  {profile?.membershipTier === 'premium' ? (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-gold/10 border border-gold/30 text-gold text-sm">
+                      <Icon name="workspace_premium" size="sm" />
+                      プレミアム
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 border border-border-light dark:border-border-dark text-text-secondary dark:text-text-dark-muted text-sm">
+                      無料プラン
+                    </span>
+                  )}
+                </div>
+                <p className="text-text-secondary dark:text-text-dark-secondary">
+                  {nickname}さん、お帰りなさい
+                </p>
+              </div>
+              <button
+                onClick={handleOpenPortal}
+                disabled={isPortalLoading}
+                className="px-4 py-2 border border-gold/30 text-gold text-sm hover:bg-gold/10 transition-all duration-base ease-elegant flex items-center gap-2 disabled:opacity-50"
+              >
+                {isPortalLoading ? (
+                  <Icon name="sync" size="sm" className="animate-spin" />
+                ) : (
+                  <Icon name="credit_card" size="sm" />
+                )}
+                プラン管理
+              </button>
+            </div>
           </div>
 
-          {/* Placeholder content */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white dark:bg-surface-dark rounded-xl shadow-sm p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Icon name="person" size="lg" className="text-primary" />
-                </div>
+          {/* Activity Reminder Banner (Feature 5) */}
+          {reminderActivities.length > 0 && (
+            <div className="mb-8 space-y-3">
+              {reminderActivities.map((a) => {
+                const time = new Date(a.dateTime).toLocaleTimeString('ja-JP', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                });
+                return (
+                  <div
+                    key={a.activityId}
+                    onClick={() => navigate(`/activities/${a.activityId}`)}
+                    className="p-4 bg-gold/10 border border-gold/30 cursor-pointer hover:bg-gold/15 transition-all duration-base ease-elegant"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon name="notifications_active" className="text-gold" />
+                      <div className="flex-1">
+                        <p className="text-sm font-light text-text-primary dark:text-text-dark-primary">
+                          明日のアクティビティ: {a.title} @ {time}
+                        </p>
+                      </div>
+                      <Icon name="chevron_right" size="sm" className="text-gold" />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Stats Cards */}
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-6">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    プロフィール
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    プロフィールを作成して、マッチングを始めましょう
+                  <p className="text-sm text-text-secondary dark:text-text-dark-secondary mb-1">主催中</p>
+                  <p className="text-3xl font-serif font-light text-gold">
+                    {hostedActivities.length}
                   </p>
+                </div>
+                <div className="w-12 h-12 bg-gold/10 flex items-center justify-center">
+                  <Icon name="event" size="lg" className="text-gold" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-surface-dark rounded-xl shadow-sm p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Icon name="event" size="lg" className="text-primary" />
-                </div>
+            <div className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-6">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    アクティビティ
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    近くのイベントやアクティビティを探す
+                  <p className="text-sm text-text-secondary dark:text-text-dark-secondary mb-1">参加予定</p>
+                  <p className="text-3xl font-serif font-light text-gold">
+                    {joinedActivities.length}
                   </p>
+                </div>
+                <div className="w-12 h-12 bg-gold/10 flex items-center justify-center">
+                  <Icon name="group" size="lg" className="text-gold" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-surface-dark rounded-xl shadow-sm p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Icon name="chat" size="lg" className="text-primary" />
-                </div>
+            <div className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-6">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    チャット
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    マッチした仲間とチャットする
+                  <p className="text-sm text-text-secondary dark:text-text-dark-secondary mb-1">興味・関心</p>
+                  <p className="text-3xl font-serif font-light text-gold">
+                    {profile?.interests.length || 0}
                   </p>
+                </div>
+                <div className="w-12 h-12 bg-gold/10 flex items-center justify-center">
+                  <Icon name="favorite" size="lg" className="text-gold" />
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Hosted Activities */}
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-light tracking-ryokan text-text-primary dark:text-text-dark-primary">
+                主催中のアクティビティ
+              </h2>
+              <button
+                onClick={() => navigate('/activities/create')}
+                className="px-4 py-2 text-gold hover:bg-gold/10 transition-all duration-base ease-elegant font-light flex items-center gap-2"
+              >
+                <Icon name="add" size="sm" />
+                新規作成
+              </button>
+            </div>
+
+            {hostedActivities.length > 0 ? (
+              <div className="grid md:grid-cols-2 gap-8">
+                {hostedActivities.slice(0, 4).map((activity) => (
+                  <ActivityCard key={activity.activityId} activity={activity} />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-12 text-center">
+                <Icon name="event_busy" size="xl" className="text-text-muted mb-4 mx-auto" />
+                <p className="text-text-secondary dark:text-text-dark-secondary mb-4">
+                  まだアクティビティを主催していません
+                </p>
+                <button
+                  onClick={() => navigate('/activities/create')}
+                  className="px-6 py-3 border border-gold text-gold hover:bg-gold/10 transition-all duration-base ease-elegant font-light inline-flex items-center gap-2"
+                >
+                  <Icon name="add" size="sm" />
+                  アクティビティを作成
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Joined Activities */}
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-light tracking-ryokan text-text-primary dark:text-text-dark-primary">参加予定</h2>
+              <button
+                onClick={() => navigate('/activities')}
+                className="px-4 py-2 text-gold hover:bg-gold/10 transition-all duration-base ease-elegant font-light"
+              >
+                すべて見る
+              </button>
+            </div>
+
+            {joinedActivities.length > 0 ? (
+              <div className="grid md:grid-cols-2 gap-8">
+                {joinedActivities.slice(0, 4).map((activity) => (
+                  <ActivityCard key={activity.activityId} activity={activity} />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-12 text-center">
+                <Icon name="search" size="xl" className="text-text-muted mb-4 mx-auto" />
+                <p className="text-text-secondary dark:text-text-dark-secondary mb-4">
+                  まだアクティビティに参加していません
+                </p>
+                <button
+                  onClick={() => navigate('/activities')}
+                  className="px-6 py-3 border border-gold text-gold hover:bg-gold/10 transition-all duration-base ease-elegant font-light inline-flex items-center gap-2"
+                >
+                  <Icon name="search" size="sm" />
+                  アクティビティを探す
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Recommendations */}
+          <div className="mb-12">
+            <RecommendedActivities activities={recommendedActivities} isLoading={isRecommendationsLoading} />
+          </div>
+
+          <div className="mb-12">
+            <RecommendedUsers users={recommendedUsers} isLoading={isRecommendationsLoading} />
+          </div>
+
+          {/* Badges */}
+          <div>
+            <h2 className="text-xl font-light tracking-ryokan text-text-primary dark:text-text-dark-primary mb-4">
+              バッジ
+            </h2>
+            <BadgeGrid stats={userStats} />
           </div>
         </div>
       </div>
