@@ -176,6 +176,7 @@ export interface UserProfile {
   interests: string[];
   verificationStatus: 'pending' | 'approved' | 'rejected';
   membershipTier: 'free' | 'premium';
+  chatCredits?: number;
   createdAt: string;
   updatedAt: string;
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
 import { Icon } from '../../components/ui/Icon';
 import { MessageBubble } from '../../components/chat/MessageBubble';
@@ -9,6 +9,7 @@ import { useChatStore } from '../../stores/chat';
 import { useAuthStore } from '../../stores/auth';
 import { notify } from '../../stores/notification';
 import { getWebSocketService } from '../../services/websocket';
+import { getPublicProfile, markRoomAsRead } from '../../services/api';
 
 const API_BASE_URL = import.meta.env.VITE_API_ENDPOINT || 'http://localhost:3000/dev';
 const WS_URL = import.meta.env.VITE_WEBSOCKET_ENDPOINT || 'ws://localhost:3001';
@@ -16,7 +17,7 @@ const WS_URL = import.meta.env.VITE_WEBSOCKET_ENDPOINT || 'ws://localhost:3001';
 export const ChatRoom = () => {
   const { chatRoomId } = useParams<{ chatRoomId: string }>();
   const navigate = useNavigate();
-  const { idToken } = useAuthStore();
+  const { idToken, userId: currentUserId } = useAuthStore();
   const { currentRoom, messages, setCurrentRoom, setMessages, addMessage, removeMessage, setConnected } =
     useChatStore();
   const [isLoading, setIsLoading] = useState(true);
@@ -24,6 +25,7 @@ export const ChatRoom = () => {
   const [sendError, setSendError] = useState<string | null>(null);
   const [isReconnecting, setIsReconnecting] = useState(false);
   const [pendingMessage, setPendingMessage] = useState<string | undefined>(undefined);
+  const [senderProfiles, setSenderProfiles] = useState<Map<string, { nickname: string; profilePhoto: string }>>(new Map());
   const [showStarters, setShowStarters] = useState<boolean>(() => {
     const saved = localStorage.getItem('showConversationStarters');
     return saved !== null ? JSON.parse(saved) : false;
@@ -57,6 +59,7 @@ export const ChatRoom = () => {
         const { data } = await response.json();
         setCurrentRoom(data);
         setMessages(data.messages || []);
+        markRoomAsRead(chatRoomId).catch(() => {});
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load chat room');
       } finally {
@@ -66,6 +69,26 @@ export const ChatRoom = () => {
 
     loadChatRoom();
   }, [chatRoomId, idToken, setCurrentRoom, setMessages]);
+
+  // Fetch sender profiles for other participants
+  useEffect(() => {
+    if (!currentRoom?.participantIds || !currentUserId) return;
+    const otherIds = currentRoom.participantIds.filter((id) => id !== currentUserId);
+    Promise.all(
+      otherIds.map(async (id) => {
+        try {
+          const profile = await getPublicProfile(id);
+          return { id, nickname: profile.nickname, profilePhoto: profile.profilePhoto };
+        } catch {
+          return { id, nickname: '不明なユーザー', profilePhoto: '' };
+        }
+      })
+    ).then((profiles) => {
+      const map = new Map<string, { nickname: string; profilePhoto: string }>();
+      profiles.forEach((p) => map.set(p.id, { nickname: p.nickname, profilePhoto: p.profilePhoto }));
+      setSenderProfiles(map);
+    });
+  }, [currentRoom?.participantIds, currentUserId]);
 
   useEffect(() => {
     if (!chatRoomId) return;
@@ -272,6 +295,15 @@ export const ChatRoom = () => {
               <p className="text-sm text-text-secondary dark:text-text-dark-secondary font-light">
                 {currentRoom.participantIds.length}人のメンバー
               </p>
+              {currentRoom.activityId && (
+                <Link
+                  to={`/activities/${currentRoom.activityId}`}
+                  className="flex items-center gap-1 text-xs text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors"
+                >
+                  <Icon name="arrow_back_ios" className="!text-[12px]" />
+                  アクティビティに戻る
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -310,8 +342,14 @@ export const ChatRoom = () => {
                 <p className="text-sm mt-2 font-light">最初のメッセージを送信してみましょう</p>
               </div>
             ) : (
-              messages.map((message) => (
-                <MessageBubble key={message.messageId} message={message} />
+              messages.map((msg) => (
+                <MessageBubble
+                  key={msg.messageId}
+                  message={msg}
+                  isMine={msg.senderId === currentUserId}
+                  senderNickname={msg.senderId !== currentUserId ? (senderProfiles.get(msg.senderId)?.nickname ?? '') : undefined}
+                  senderPhoto={msg.senderId !== currentUserId ? (senderProfiles.get(msg.senderId)?.profilePhoto ?? '') : undefined}
+                />
               ))
             )}
             <div ref={messagesEndRef} />
