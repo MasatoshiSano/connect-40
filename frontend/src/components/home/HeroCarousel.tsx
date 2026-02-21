@@ -89,10 +89,10 @@ const FALLBACK_GRADIENTS = [
 const VIDEO_DURATION = 8000;
 const IMAGE_DURATION = 6000;
 
-const KEN_BURNS_CLASS: Record<'a' | 'b' | 'c', string> = {
-  a: 'animate-ken-burns-a',
-  b: 'animate-ken-burns-b',
-  c: 'animate-ken-burns-c',
+const KEN_BURNS_KEYFRAME: Record<'a' | 'b' | 'c', string> = {
+  a: 'kenBurnsA',
+  b: 'kenBurnsB',
+  c: 'kenBurnsC',
 };
 
 async function fetchPexelsVideo(): Promise<{
@@ -181,12 +181,13 @@ function buildSlides(
   }
 
   images.forEach((img, i) => {
+    const content = SLIDE_CONTENT[i + 1] ?? { title: '', subtitle: '' };
     slides.push({
       type: 'image',
       imageUrl: img.imageUrl,
       kenBurns: KEN_BURNS[(i + 1) % KEN_BURNS.length],
-      title: SLIDE_CONTENT[i + 1].title,
-      subtitle: SLIDE_CONTENT[i + 1].subtitle,
+      title: content.title,
+      subtitle: content.subtitle,
       duration: IMAGE_DURATION,
       photographer: img.photographer,
       photographerUrl: img.photographerUrl,
@@ -204,11 +205,15 @@ export const HeroCarousel = () => {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
     Promise.all([fetchPexelsVideo(), fetchUnsplashImages()])
       .then(([pexels, images]) => {
-        setSlides(buildSlides(pexels, images));
+        if (!cancelled) setSlides(buildSlides(pexels, images));
       })
-      .finally(() => setIsLoading(false));
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => { cancelled = true; };
   }, []);
 
   const goToSlide = useCallback(
@@ -280,9 +285,12 @@ export const HeroCarousel = () => {
             <img
               src={slide.imageUrl}
               alt=""
-              className={`absolute inset-0 w-full h-full object-cover ${
-                idx === currentIndex ? KEN_BURNS_CLASS[slide.kenBurns] : ''
-              }`}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={
+                idx === currentIndex
+                  ? { animation: `${KEN_BURNS_KEYFRAME[slide.kenBurns]} 12s ease-in-out forwards` }
+                  : { animation: 'none' }
+              }
               loading={idx === 0 ? 'eager' : 'lazy'}
             />
           ) : (
