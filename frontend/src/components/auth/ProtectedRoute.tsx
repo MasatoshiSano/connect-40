@@ -1,5 +1,5 @@
-import { useEffect, type ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState, type ReactNode } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/auth';
 import { getCurrentUser } from '../../services/auth';
 
@@ -13,9 +13,11 @@ interface ProtectedRouteProps {
  * - Redirects to /login if not authenticated
  * - Optionally requires profile completion
  */
-export const ProtectedRoute = ({ children, requireProfile = false }: ProtectedRouteProps) => {
+export const ProtectedRoute = ({ children, requireProfile = true }: ProtectedRouteProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, setUser, clearAuth } = useAuthStore();
+  const [isCheckingProfile, setIsCheckingProfile] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -35,8 +37,37 @@ export const ProtectedRoute = ({ children, requireProfile = false }: ProtectedRo
         }
         setUser(user);
 
-        // TODO: If requireProfile is true, check if user has completed profile
-        // and redirect to /profile/create if not
+        // Check if user has completed profile (if required)
+        if (requireProfile) {
+          // Don't check profile if already on profile creation pages
+          const isOnProfilePage = location.pathname.startsWith('/profile/create');
+
+          if (!isOnProfilePage) {
+            try {
+              const { getUserProfile } = await import('../../services/api');
+              await getUserProfile();
+              // Profile exists, continue
+              setIsCheckingProfile(false);
+            } catch (error) {
+              // Profile doesn't exist (404) or other error
+              const errorMessage = error instanceof Error ? error.message : String(error);
+              if (errorMessage.toLowerCase().includes('profile not found') ||
+                  errorMessage.toLowerCase().includes('not found') ||
+                  errorMessage.includes('404')) {
+                console.log('Profile not found, redirecting to profile creation');
+                navigate('/profile/create/step1', { replace: true });
+                return;
+              }
+              // Other errors, let user continue but log the error
+              console.error('Profile check failed:', error);
+              setIsCheckingProfile(false);
+            }
+          } else {
+            setIsCheckingProfile(false);
+          }
+        } else {
+          setIsCheckingProfile(false);
+        }
       } catch (error) {
         console.error('Auth verification failed:', error);
         clearAuth();
@@ -45,10 +76,10 @@ export const ProtectedRoute = ({ children, requireProfile = false }: ProtectedRo
     };
 
     checkAuth();
-  }, [isAuthenticated, navigate, setUser, clearAuth, requireProfile]);
+  }, [isAuthenticated, navigate, setUser, clearAuth, requireProfile, location.pathname]);
 
-  // Show nothing while checking auth (avoid flash of protected content)
-  if (!isAuthenticated) {
+  // Show nothing while checking auth or profile (avoid flash of protected content)
+  if (!isAuthenticated || isCheckingProfile) {
     return null;
   }
 

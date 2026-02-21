@@ -24,5 +24,9 @@ export const PublicRoute = ({
     }
   }, [isAuthenticated, navigate, redirectIfAuthenticated]);
 
+  if (isAuthenticated) {
+    return null;
+  }
+
   return <>{children}</>;
 };

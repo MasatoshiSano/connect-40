@@ -1,16 +1,33 @@
 /**
  * Connect40 Design System Constants
+ * Theme: モダン旅館 — 強羅花壇 × 翠嵐 inspired
  */
 
 export const COLORS = {
-  primary: '#19d4e6',
-  bgDark: '#112021',
-  surfaceDark: '#1a2c2e',
-  bgLight: '#f6f8f8',
+  base: '#121110',
+  baseSurface: '#1e1c1a',
+  baseElevated: '#2a2725',
+  gold: '#c4a56e',
+  goldLight: '#8a6d3b',
+  goldMuted: '#c4a56e40',
+  warm: '#a3785a',
+  greenSubtle: '#5a7a6a',
+  bgLight: '#f5f0ea',
+  surfaceLight: '#ffffff',
+  elevatedLight: '#ebe5dd',
+  textPrimary: '#2d2a26',
+  textSecondary: '#6b6560',
+  textMuted: '#78726c',
+  textDarkPrimary: '#e8e2db',
+  textDarkSecondary: '#bab4ac',
+  textDarkMuted: '#958e85',
+  borderLight: '#d4cdc4',
+  borderDark: '#4d4740',
 } as const;
 
 export const FONTS = {
-  sans: ['Plus Jakarta Sans', 'Noto Sans JP', 'sans-serif'],
+  serif: ['Noto Serif JP', 'serif'],
+  sans: ['Noto Sans JP', 'sans-serif'],
 } as const;
 
 export const BREAKPOINTS = {
@@ -22,27 +39,20 @@ export const BREAKPOINTS = {
 } as const;
 
 export const SPACING = {
-  xs: '0.25rem',   // 4px
-  sm: '0.5rem',    // 8px
-  md: '1rem',      // 16px
-  lg: '1.5rem',    // 24px
-  xl: '2rem',      // 32px
-  '2xl': '3rem',   // 48px
-  '3xl': '4rem',   // 64px
-} as const;
-
-export const BORDER_RADIUS = {
-  sm: '0.25rem',   // 4px
-  md: '0.5rem',    // 8px
-  lg: '0.75rem',   // 12px
-  xl: '1rem',      // 16px
-  full: '9999px',
+  xs: '0.25rem',
+  sm: '0.5rem',
+  md: '1rem',
+  lg: '1.5rem',
+  xl: '2rem',
+  '2xl': '3rem',
+  '3xl': '4rem',
+  '4xl': '6rem',
 } as const;
 
 export const TRANSITIONS = {
   fast: '150ms',
-  base: '200ms',
-  slow: '300ms',
+  base: '400ms',
+  slow: '600ms',
 } as const;
 
 export const Z_INDEX = {

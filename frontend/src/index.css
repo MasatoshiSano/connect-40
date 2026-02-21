@@ -4,18 +4,131 @@
 
 @layer base {
   :root {
-    --primary: #19d4e6;
-    --bg-dark: #112021;
-    --surface-dark: #1a2c2e;
-    --bg-light: #f6f8f8;
+    --gold: #c4a56e;
+    --gold-light: #8a6d3b;
+    --gold-muted: #c4a56e40;
+    --base: #121110;
+    --base-surface: #1e1c1a;
+    --base-elevated: #2a2725;
+    --warm: #a3785a;
+    --green-subtle: #5a7a6a;
+    --bg-light: #f5f0ea;
+    --surface-light: #ffffff;
+    --elevated-light: #ebe5dd;
+    --text-primary: #2d2a26;
+    --text-secondary: #6b6560;
+    --border-light: #d4cdc4;
+    --border-dark: #4d4740;
   }
 
   * {
-    @apply border-gray-200 dark:border-gray-700;
+    @apply border-border-light dark:border-border-dark;
   }
 
   body {
-    @apply bg-bg-light dark:bg-bg-dark text-gray-900 dark:text-gray-100;
+    @apply bg-base-50 dark:bg-base text-text-primary dark:text-text-dark-primary;
     @apply font-sans antialiased;
+    letter-spacing: 0.04em;
+    line-height: 1.9;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif font-light;
+    letter-spacing: 0.12em;
+    line-height: 1.6;
+  }
+
+  /* Elegant scrollbar */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #4d4740;
+    border-radius: 0;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #504a44;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: #4d4740;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #504a44;
+  }
+}
+
+@layer components {
+  /* Ryokan card style */
+  .card {
+    @apply bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark;
+    @apply transition-all duration-base ease-elegant;
+  }
+
+  .card-hover {
+    @apply hover:border-gold/40 dark:hover:border-gold/40;
+    @apply hover:-translate-y-0.5;
+  }
+
+  /* Ryokan input style - bottom border only */
+  .input {
+    @apply w-full py-3 bg-transparent;
+    @apply border-b border-border-light dark:border-border-dark border-t-0 border-l-0 border-r-0;
+    @apply focus:border-b-gold focus:outline-none;
+    @apply text-text-primary dark:text-text-dark-primary;
+    @apply placeholder:text-text-muted dark:placeholder:text-text-dark-muted;
+    @apply transition-all duration-fast;
+  }
+
+  /* Ryokan primary button - gold outline */
+  .btn-primary {
+    @apply px-8 py-3 bg-transparent text-gold border border-gold;
+    @apply hover:bg-gold/10 active:bg-gold/20;
+    @apply transition-all duration-base ease-elegant;
+    @apply font-light tracking-ryokan;
+  }
+
+  /* Ghost/text button */
+  .btn-ghost {
+    @apply px-4 py-2 text-text-secondary dark:text-text-dark-secondary;
+    @apply hover:text-text-primary dark:hover:text-text-dark-primary;
+    @apply transition-all duration-base ease-elegant;
+    @apply font-light tracking-wide underline-offset-4;
+  }
+
+  /* Section divider */
+  .divider {
+    @apply border-t border-border-light dark:border-border-dark;
+  }
+
+  /* Section label (CONCEPT, FEATURES, etc.) */
+  .section-label {
+    @apply text-xs tracking-ryokan-wide text-gold uppercase font-light;
+  }
+
+  /* Page title */
+  .page-title {
+    @apply font-serif font-light text-3xl md:text-4xl tracking-ryokan;
+    @apply text-text-primary dark:text-text-dark-primary;
+  }
+
+  /* Scroll fade-in animation helper */
+  .scroll-fade-in {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.6s cubic-bezier(0.25, 0.1, 0.25, 1.0),
+                transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+  }
+
+  .scroll-fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

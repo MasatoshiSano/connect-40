@@ -81,3 +81,17 @@ export const MAX_PARTICIPANTS_OPTIONS = [
   { value: 15, label: '15人' },
   { value: 20, label: '20人' },
 ];
+
+export const RECURRENCE_OPTIONS = [
+  { value: 'none', label: 'なし' },
+  { value: 'weekly', label: '毎週' },
+  { value: 'biweekly', label: '隔週' },
+  { value: 'monthly', label: '毎月' },
+] as const;
+
+export const RECURRENCE_LABELS: Record<string, string> = {
+  none: 'なし',
+  weekly: '毎週開催',
+  biweekly: '隔週開催',
+  monthly: '毎月開催',
+};

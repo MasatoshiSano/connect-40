@@ -17,9 +17,9 @@ export interface PortalSessionResponse {
 }
 
 async function fetchWithAuth<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const { accessToken } = useAuthStore.getState();
+  const { idToken } = useAuthStore.getState();
 
-  if (!accessToken) {
+  if (!idToken) {
     throw new Error('Not authenticated');
   }
 
@@ -27,7 +27,7 @@ async function fetchWithAuth<T>(endpoint: string, options: RequestInit = {}): Pr
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${idToken}`,
       ...options.headers,
     },
   });

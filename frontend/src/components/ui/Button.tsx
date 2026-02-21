@@ -11,11 +11,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-primary text-white hover:bg-primary-600',
-  secondary: 'bg-gray-600 text-white hover:bg-gray-700',
-  outline: 'border-2 border-primary text-primary hover:bg-primary hover:text-white',
-  ghost: 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800',
-  danger: 'bg-red-600 text-white hover:bg-red-700',
+  primary: 'bg-transparent border border-gold text-gold hover:bg-gold/10 active:bg-gold/20',
+  secondary: 'text-text-secondary dark:text-text-dark-secondary hover:text-text-primary dark:hover:text-text-dark-primary underline underline-offset-4',
+  outline: 'border border-border-light dark:border-border-dark text-text-primary dark:text-text-dark-primary hover:border-gold/40',
+  ghost: 'text-text-secondary dark:text-text-dark-secondary hover:text-gold',
+  danger: 'text-warm hover:text-warm/80',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -40,7 +40,7 @@ export const Button = ({
         ${variantClasses[variant]}
         ${sizeClasses[size]}
         ${fullWidth ? 'w-full' : ''}
-        rounded-lg font-semibold transition
+        font-light tracking-ryokan transition-all duration-base ease-elegant
         disabled:opacity-50 disabled:cursor-not-allowed
         ${className}
       `}
