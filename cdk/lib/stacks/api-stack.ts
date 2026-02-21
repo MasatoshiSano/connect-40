@@ -482,12 +482,28 @@ export class ApiStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(10),
     });
 
+    const markRoomReadFunction = new NodejsFunction(this, 'MarkRoomReadFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      entry: path.join(__dirname, '../../../backend/functions/chat/markRoomRead.ts'),
+      environment: {
+        TABLE_NAME: props.table.tableName,
+      },
+      bundling: {
+        minify: true,
+        sourceMap: true,
+        externalModules: ['@aws-sdk/*'],
+        forceDockerBundling: false,
+      },
+      timeout: cdk.Duration.seconds(10),
+    });
+
     // Grant permissions
     props.table.grantReadWriteData(createChatRoomFunction);
     props.table.grantReadWriteData(getChatRoomsFunction);
     props.table.grantReadWriteData(getChatRoomFunction);
+    props.table.grantReadWriteData(markRoomReadFunction);
 
-    this.functions.push(createChatRoomFunction, getChatRoomsFunction, getChatRoomFunction);
+    this.functions.push(createChatRoomFunction, getChatRoomsFunction, getChatRoomFunction, markRoomReadFunction);
 
     // Chat API Routes
     const chat = this.api.root.addResource('chat');
@@ -506,6 +522,12 @@ export class ApiStack extends cdk.Stack {
     // GET /chat/rooms/{chatRoomId} - Get chat room details
     const chatRoomDetail = chatRooms.addResource('{chatRoomId}');
     chatRoomDetail.addMethod('GET', new apigateway.LambdaIntegration(getChatRoomFunction), {
+      authorizer: this.authorizer,
+    });
+
+    // POST /chat/rooms/{chatRoomId}/read - Mark room as read
+    const chatRoomRead = chatRoomDetail.addResource('read');
+    chatRoomRead.addMethod('POST', new apigateway.LambdaIntegration(markRoomReadFunction), {
       authorizer: this.authorizer,
     });
 
@@ -815,7 +837,10 @@ export class ApiStack extends cdk.Stack {
     refineTextFunction.addToRolePolicy(
       new iam.PolicyStatement({
         actions: ['bedrock:InvokeModel'],
-        resources: ['arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0'],
+        resources: [
+          'arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0',
+          'arn:aws:bedrock:us-east-1:*:inference-profile/us.anthropic.claude-haiku-4-5-20251001-v1:0',
+        ],
       })
     );
 

@@ -17,7 +17,7 @@ const WS_URL = import.meta.env.VITE_WEBSOCKET_ENDPOINT || 'ws://localhost:3001';
 export const ChatRoom = () => {
   const { chatRoomId } = useParams<{ chatRoomId: string }>();
   const navigate = useNavigate();
-  const { idToken, userId: currentUserId } = useAuthStore();
+  const { idToken, userId: currentUserId, chatCredits, setChatCredits } = useAuthStore();
   const { currentRoom, messages, setCurrentRoom, setMessages, addMessage, removeMessage, setConnected } =
     useChatStore();
   const [isLoading, setIsLoading] = useState(true);
@@ -222,6 +222,11 @@ export const ChatRoom = () => {
       timestamp: Date.now(),
     });
 
+    // Decrement chat credits locally for free plan users
+    if (chatCredits !== null && chatCredits > 0) {
+      setChatCredits(chatCredits - 1);
+    }
+
     try {
       // Send via WebSocket
       wsService.sendMessage('sendMessage', {
@@ -305,6 +310,12 @@ export const ChatRoom = () => {
                 </Link>
               )}
             </div>
+            {chatCredits !== null && (
+              <div className="shrink-0 flex items-center gap-1 px-2 py-1 border border-gold/30 bg-gold/5">
+                <Icon name="chat_bubble_outline" className="!text-[14px] text-gold" />
+                <span className="text-xs text-gold font-light">{chatCredits}回</span>
+              </div>
+            )}
           </div>
         </div>
 
