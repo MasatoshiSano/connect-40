@@ -73,7 +73,7 @@ function App() {
   // Fetch user profile to get nickname
   useEffect(() => {
     const fetchProfile = async () => {
-      if (userId && (!nickname || verificationStatus === 'unverified')) {
+      if (userId && (!nickname || verificationStatus !== 'approved')) {
         try {
           const { getUserProfile } = await import('./services/api');
           const profile = await getUserProfile();
