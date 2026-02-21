@@ -38,6 +38,9 @@ export const EditActivity = () => {
   const [location, setLocation] = useState<Location | null>(null);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [addressInput, setAddressInput] = useState('');
+  const [isGeocoding, setIsGeocoding] = useState(false);
+  const [geocodeError, setGeocodeError] = useState<string | null>(null);
   const [activityImage, setActivityImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [originalActivity, setOriginalActivity] = useState<Activity | null>(null);
@@ -127,6 +130,38 @@ export const EditActivity = () => {
     reader.readAsDataURL(file);
   };
 
+  const geocodeAddress = async (address: string): Promise<{ latitude: number; longitude: number; address: string } | null> => {
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=jp`;
+      const res = await fetch(url, {
+        headers: { 'User-Agent': 'Connect40App/1.0' },
+      });
+      if (!res.ok) return null;
+      const data = await res.json() as Array<{ lat: string; lon: string; display_name: string }>;
+      if (data.length === 0) return null;
+      return {
+        latitude: parseFloat(data[0].lat),
+        longitude: parseFloat(data[0].lon),
+        address: data[0].display_name,
+      };
+    } catch {
+      return null;
+    }
+  };
+
+  const handleAddressSearch = async () => {
+    if (!addressInput.trim()) return;
+    setIsGeocoding(true);
+    setGeocodeError(null);
+    const result = await geocodeAddress(addressInput);
+    if (result) {
+      setLocation(result);
+    } else {
+      setGeocodeError('住所が見つかりませんでした。別の住所をお試しください。');
+    }
+    setIsGeocoding(false);
+  };
+
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
       setLocationError('お使いのブラウザは位置情報に対応していません');
@@ -161,7 +196,7 @@ export const EditActivity = () => {
 
   const onSubmit = async (data: EditActivityFormData) => {
     if (!location) {
-      setError('開催場所を設定してください');
+      setError('集合場所を設定してください');
       return;
     }
 
@@ -414,51 +449,64 @@ export const EditActivity = () => {
                 {/* Location */}
                 <div>
                   <label className="block text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase mb-2">
-                    開催場所 <span className="text-red-500">*</span>
+                    集合場所 <span className="text-red-500">*</span>
                   </label>
                   <div className="p-4 border border-border-light dark:border-border-dark">
-                    {location ? (
-                      <div className="flex items-start gap-3">
-                        <Icon name="location_on" className="text-gold flex-shrink-0 mt-1" />
-                        <div className="flex-1">
-                          <p className="text-sm font-light text-text-primary dark:text-text-dark-primary mb-1">
-                            位置情報を取得しました
-                          </p>
-                          <p className="text-xs text-text-secondary dark:text-text-dark-secondary">
-                            {location.address}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={handleGetLocation}
-                          disabled={isGettingLocation}
-                          className="text-sm text-gold hover:text-gold/80 transition-all duration-base ease-elegant"
-                        >
-                          再取得
-                        </button>
-                      </div>
-                    ) : (
+                    {/* 住所入力 */}
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={addressInput}
+                        onChange={(e) => setAddressInput(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddressSearch())}
+                        placeholder="例: 渋谷駅, 代々木公園, 東京都渋谷区..."
+                        className="flex-1 px-3 py-2 border border-border-light dark:border-border-dark bg-transparent text-sm focus:outline-none focus:border-gold text-text-primary dark:text-text-dark-primary"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddressSearch}
+                        disabled={isGeocoding || !addressInput.trim()}
+                        className="px-4 py-2 border border-gold/50 text-gold text-sm hover:bg-gold/10 transition-all disabled:opacity-50"
+                      >
+                        {isGeocoding ? '検索中...' : '検索'}
+                      </button>
+                    </div>
+
+                    {geocodeError && (
+                      <p className="text-xs text-red-400 mt-1">{geocodeError}</p>
+                    )}
+
+                    {/* または現在地を使う */}
+                    <div className="mt-2">
                       <button
                         type="button"
                         onClick={handleGetLocation}
                         disabled={isGettingLocation}
-                        className="w-full py-3 border border-gold text-gold hover:bg-gold/10 transition-all duration-base ease-elegant font-light flex items-center justify-center gap-2 disabled:opacity-50"
+                        className="text-xs text-text-secondary dark:text-text-dark-muted hover:text-gold flex items-center gap-1"
                       >
-                        {isGettingLocation ? (
-                          <>
-                            <Icon name="sync" className="animate-spin" />
-                            位置情報を取得中...
-                          </>
-                        ) : (
-                          <>
-                            <Icon name="my_location" />
-                            現在地を取得
-                          </>
-                        )}
+                        <Icon name="my_location" className="!text-[14px]" />
+                        {isGettingLocation ? '位置情報取得中...' : '現在地を使う'}
                       </button>
-                    )}
-                    {locationError && (
-                      <p className="mt-2 text-sm text-red-600 dark:text-red-400">{locationError}</p>
+                      {locationError && (
+                        <p className="mt-1 text-xs text-red-400">{locationError}</p>
+                      )}
+                    </div>
+
+                    {/* 取得結果表示 */}
+                    {location && (
+                      <div className="mt-3 flex items-start gap-2 p-3 bg-gold/5 border border-gold/20">
+                        <Icon name="location_on" className="text-gold flex-shrink-0 !text-[16px] mt-0.5" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-text-secondary dark:text-text-dark-muted truncate">{location.address}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setLocation(null)}
+                          className="text-xs text-text-secondary dark:text-text-dark-muted hover:text-red-400"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
