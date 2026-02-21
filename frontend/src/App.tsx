@@ -1,45 +1,100 @@
+import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { PublicRoute } from './components/auth/PublicRoute';
 import { ProfileCreationProvider } from './contexts/ProfileCreationContext';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { useToastStore } from './stores/toast';
+import { useAuthStore } from './stores/auth';
+import { Icon } from './components/ui/Icon';
+
+// Eagerly load the Home page (landing page)
 import { Home } from './pages/Home';
-import { SignUp } from './pages/auth/SignUp';
-import { VerifyEmail } from './pages/auth/VerifyEmail';
-import { Login } from './pages/auth/Login';
-import { Dashboard } from './pages/Dashboard';
-import { CreateProfileStep1 } from './pages/profile/CreateProfileStep1';
-import { CreateProfileStep2 } from './pages/profile/CreateProfileStep2';
-import { CreateProfileStep3 } from './pages/profile/CreateProfileStep3';
-import { CreateProfileSuccess } from './pages/profile/CreateProfileSuccess';
-import { EditProfile } from './pages/profile/EditProfile';
-import { CreateActivity } from './pages/activities/CreateActivity';
-import { Activities } from './pages/activities/Activities';
-import { ActivityDetail } from './pages/activities/ActivityDetail';
-import { ChatList } from './pages/chat/ChatList';
-import { ChatRoom } from './pages/chat/ChatRoom';
-import { Plans } from './pages/subscription/Plans';
-import { Success as SubscriptionSuccess } from './pages/subscription/Success';
-import { NotFound } from './pages/NotFound';
+
+// Lazy load all other pages for code splitting
+const SignUp = lazy(() => import('./pages/auth/SignUp').then(m => ({ default: m.SignUp })));
+const VerifyEmail = lazy(() => import('./pages/auth/VerifyEmail').then(m => ({ default: m.VerifyEmail })));
+const Login = lazy(() => import('./pages/auth/Login').then(m => ({ default: m.Login })));
+const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword').then(m => ({ default: m.ForgotPassword })));
+const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
+const CreateProfileStep1 = lazy(() => import('./pages/profile/CreateProfileStep1').then(m => ({ default: m.CreateProfileStep1 })));
+const CreateProfileStep2 = lazy(() => import('./pages/profile/CreateProfileStep2').then(m => ({ default: m.CreateProfileStep2 })));
+const CreateProfileStep3 = lazy(() => import('./pages/profile/CreateProfileStep3').then(m => ({ default: m.CreateProfileStep3 })));
+const CreateProfileSuccess = lazy(() => import('./pages/profile/CreateProfileSuccess').then(m => ({ default: m.CreateProfileSuccess })));
+const EditProfile = lazy(() => import('./pages/profile/EditProfile').then(m => ({ default: m.EditProfile })));
+const CreateActivity = lazy(() => import('./pages/activities/CreateActivity').then(m => ({ default: m.CreateActivity })));
+const Activities = lazy(() => import('./pages/activities/Activities').then(m => ({ default: m.Activities })));
+const ActivityDetail = lazy(() => import('./pages/activities/ActivityDetail').then(m => ({ default: m.ActivityDetail })));
+const EditActivity = lazy(() => import('./pages/activities/EditActivity').then(m => ({ default: m.EditActivity })));
+const ChatList = lazy(() => import('./pages/chat/ChatList').then(m => ({ default: m.ChatList })));
+const ChatRoom = lazy(() => import('./pages/chat/ChatRoom').then(m => ({ default: m.ChatRoom })));
+const Plans = lazy(() => import('./pages/subscription/Plans').then(m => ({ default: m.Plans })));
+const SubscriptionSuccess = lazy(() => import('./pages/subscription/Success').then(m => ({ default: m.Success })));
+const UserProfile = lazy(() => import('./pages/profile/UserProfile').then(m => ({ default: m.UserProfile })));
+const Discover = lazy(() => import('./pages/discover/Discover').then(m => ({ default: m.Discover })));
+const Calendar = lazy(() => import('./pages/calendar/Calendar').then(m => ({ default: m.Calendar })));
+const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
+const VerificationPage = lazy(() =>
+  import('./pages/profile/VerificationPage').then(m => ({ default: m.VerificationPage }))
+);
+const VerificationSuccess = lazy(() =>
+  import('./pages/profile/VerificationSuccess').then(m => ({ default: m.VerificationSuccess }))
+);
+
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <Icon name="sync" size="xl" className="text-gold animate-spin" />
+  </div>
+);
 
 function App() {
   const { toasts, removeToast } = useToastStore();
+  const { idToken, userId, nickname, setUser, setNickname } = useAuthStore();
+
+  // Extract and set userId from idToken on app initialization
+  useEffect(() => {
+    if (idToken && !userId) {
+      try {
+        const payload = JSON.parse(atob(idToken.split('.')[1]));
+        const extractedUserId = payload.sub;
+        if (extractedUserId) {
+          setUser(null, extractedUserId);
+          console.log('UserId extracted from token:', extractedUserId);
+        }
+      } catch (e) {
+        console.error('Failed to extract userId from idToken:', e);
+      }
+    }
+  }, [idToken, userId, setUser]);
+
+  // Fetch user profile to get nickname
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (userId && !nickname) {
+        try {
+          const { getUserProfile } = await import('./services/api');
+          const profile = await getUserProfile();
+          if (profile.nickname) {
+            setNickname(profile.nickname);
+            console.log('Nickname loaded:', profile.nickname);
+          }
+        } catch (e) {
+          console.error('Failed to fetch user profile:', e);
+        }
+      }
+    };
+
+    fetchProfile();
+  }, [userId, nickname, setNickname]);
 
   return (
     <BrowserRouter>
       <ProfileCreationProvider>
         <ToastContainer toasts={toasts} onClose={removeToast} />
+        <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* Public routes */}
-          <Route
-            path="/"
-            element={
-              <PublicRoute redirectIfAuthenticated="/dashboard">
-                <Home />
-              </PublicRoute>
-            }
-          />
+          <Route path="/" element={<Home />} />
           <Route
             path="/signup"
             element={
@@ -61,6 +116,14 @@ function App() {
             element={
               <PublicRoute redirectIfAuthenticated="/dashboard">
                 <Login />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <PublicRoute>
+                <ForgotPassword />
               </PublicRoute>
             }
           />
@@ -116,6 +179,42 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/profile/verification"
+            element={
+              <ProtectedRoute>
+                <VerificationPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/verification/success"
+            element={
+              <ProtectedRoute>
+                <VerificationSuccess />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* User profile route */}
+          <Route
+            path="/users/:userId"
+            element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Discovery route */}
+          <Route
+            path="/discover"
+            element={
+              <ProtectedRoute>
+                <Discover />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Activity routes */}
           <Route
@@ -139,6 +238,24 @@ function App() {
             element={
               <ProtectedRoute>
                 <ActivityDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/activities/:activityId/edit"
+            element={
+              <ProtectedRoute>
+                <EditActivity />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Calendar route */}
+          <Route
+            path="/calendar"
+            element={
+              <ProtectedRoute>
+                <Calendar />
               </ProtectedRoute>
             }
           />
@@ -182,6 +299,7 @@ function App() {
           {/* Catch all - 404 Not Found */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </Suspense>
       </ProfileCreationProvider>
     </BrowserRouter>
   );

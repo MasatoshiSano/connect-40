@@ -10,6 +10,7 @@ export interface ApiStackProps extends cdk.StackProps {
     userPool: cognito.UserPool;
     table: dynamodb.Table;
     bucket: s3.Bucket;
+    webSocketEndpoint?: string;
 }
 export declare class ApiStack extends cdk.Stack {
     readonly api: apigateway.RestApi;

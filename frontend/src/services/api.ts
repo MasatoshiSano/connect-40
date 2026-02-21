@@ -1,10 +1,13 @@
 import { useAuthStore } from '../stores/auth';
+import { refreshSession } from './auth';
 import type {
   Activity,
   CreateActivityInput,
+  UpdateActivityInput,
   ActivityCategory,
   ActivityStatus,
   Location,
+  Review,
 } from '../types/activity';
 
 const API_BASE_URL = import.meta.env.VITE_API_ENDPOINT || 'http://localhost:3000/dev';
@@ -13,13 +16,33 @@ const API_BASE_URL = import.meta.env.VITE_API_ENDPOINT || 'http://localhost:3000
 export type {
   Activity,
   CreateActivityInput,
+  UpdateActivityInput,
   ActivityCategory,
   ActivityStatus,
   Location,
+  Review,
 };
 
 /**
- * Make authenticated API request
+ * Make a single fetch request with the given token
+ */
+async function doFetch(
+  endpoint: string,
+  token: string,
+  options: RequestInit = {}
+): Promise<Response> {
+  return fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      ...options.headers,
+    },
+  });
+}
+
+/**
+ * Make authenticated API request with automatic token refresh on 401
  */
 async function fetchWithAuth<T>(
   endpoint: string,
@@ -31,14 +54,24 @@ async function fetchWithAuth<T>(
     throw new Error('Not authenticated');
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${idToken}`,
-      ...options.headers,
-    },
-  });
+  let response = await doFetch(endpoint, idToken, options);
+
+  // On 401, attempt token refresh and retry once
+  if (response.status === 401) {
+    try {
+      const newTokens = await refreshSession();
+      useAuthStore.getState().setTokens({
+        accessToken: newTokens.accessToken,
+        idToken: newTokens.idToken,
+        refreshToken: newTokens.refreshToken,
+      });
+      response = await doFetch(endpoint, newTokens.idToken, options);
+    } catch {
+      // Refresh failed — clear auth and redirect to login
+      useAuthStore.getState().clearAuth();
+      throw new Error('Session expired. Please log in again.');
+    }
+  }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({
@@ -58,19 +91,61 @@ async function fetchWithAuth<T>(
  * Upload file to S3 (presigned URL)
  */
 export async function uploadProfilePhoto(file: File): Promise<string> {
-  // TODO: Implement S3 presigned URL upload
-  // 1. Request presigned URL from backend
-  // 2. Upload file to S3 using presigned URL
-  // 3. Return S3 object URL
+  return uploadFile(file, 'profile');
+}
 
-  // Placeholder: return data URL for now
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      resolve(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  });
+/**
+ * Upload activity image to S3
+ */
+export async function uploadActivityImage(file: File): Promise<string> {
+  return uploadFile(file, 'activity');
+}
+
+/**
+ * Generic file upload function using presigned URLs
+ */
+async function uploadFile(file: File, uploadType: 'profile' | 'activity'): Promise<string> {
+  try {
+    // Step 1: Get presigned URL from backend
+    const response = await fetch(`${API_BASE_URL}/uploads/presigned-url`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${useAuthStore.getState().idToken}`,
+      },
+      body: JSON.stringify({
+        fileName: file.name,
+        fileType: file.type,
+        uploadType,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to get presigned URL');
+    }
+
+    const { presignedUrl, publicUrl } = await response.json();
+
+    // Step 2: Upload file to S3 using presigned URL
+    const uploadResponse = await fetch(presignedUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type,
+      },
+      body: file,
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('Failed to upload file to S3');
+    }
+
+    // Step 3: Return the public URL
+    return publicUrl;
+  } catch (error) {
+    console.error('File upload error:', error);
+    throw error;
+  }
 }
 
 export interface CreateUserProfileInput {
@@ -138,15 +213,51 @@ export async function updateUserProfile(
   });
 }
 
-// Activity API
+// Public Profile API
+
+export interface PublicProfile {
+  userId: string;
+  nickname: string;
+  age: number;
+  bio: string;
+  interests: string[];
+  profilePhoto: string;
+  verificationStatus: 'pending' | 'approved' | 'rejected';
+  createdAt: string;
+}
 
 /**
- * Upload activity image
+ * Get public profile for a user
  */
-export async function uploadActivityImage(file: File): Promise<string> {
-  // TODO: Implement S3 presigned URL upload
-  return uploadProfilePhoto(file);
+export async function getUserPublicProfile(userId: string): Promise<PublicProfile> {
+  return fetchWithAuth<PublicProfile>(`/users/${userId}/profile`, {
+    method: 'GET',
+  });
 }
+
+/**
+ * Block a user
+ */
+export async function blockUser(userId: string): Promise<{ message: string }> {
+  return fetchWithAuth<{ message: string }>(`/users/${userId}/block`, {
+    method: 'POST',
+  });
+}
+
+/**
+ * Report a user
+ */
+export async function reportUser(
+  reportedUserId: string,
+  reason: string
+): Promise<{ message: string; reportId: string }> {
+  return fetchWithAuth<{ message: string; reportId: string }>('/reports', {
+    method: 'POST',
+    body: JSON.stringify({ reportedUserId, reason }),
+  });
+}
+
+// Activity API
 
 /**
  * Create activity
@@ -187,8 +298,179 @@ export async function getActivity(activityId: string): Promise<Activity> {
 /**
  * Join activity
  */
-export async function joinActivity(activityId: string): Promise<{ message: string }> {
-  return fetchWithAuth<{ message: string }>(`/activities/${activityId}/join`, {
+export async function joinActivity(activityId: string): Promise<{ message: string; chatRoomId?: string }> {
+  return fetchWithAuth<{ message: string; chatRoomId?: string }>(`/activities/${activityId}/join`, {
     method: 'POST',
+  });
+}
+
+/**
+ * Leave activity
+ */
+export async function leaveActivity(activityId: string): Promise<{ message: string }> {
+  return fetchWithAuth<{ message: string }>(`/activities/${activityId}/leave`, {
+    method: 'POST',
+  });
+}
+
+/**
+ * Update activity
+ */
+export async function updateActivity(
+  activityId: string,
+  input: UpdateActivityInput
+): Promise<Activity> {
+  return fetchWithAuth<Activity>(`/activities/${activityId}`, {
+    method: 'PUT',
+    body: JSON.stringify(input),
+  });
+}
+
+/**
+ * Create review for activity
+ */
+export async function createReview(
+  activityId: string,
+  rating: number,
+  comment: string
+): Promise<Review> {
+  return fetchWithAuth<Review>(`/activities/${activityId}/reviews`, {
+    method: 'POST',
+    body: JSON.stringify({ rating, comment }),
+  });
+}
+
+/**
+ * Get reviews for activity
+ */
+export async function getReviews(
+  activityId: string
+): Promise<{ reviews: Review[]; count: number }> {
+  return fetchWithAuth<{ reviews: Review[]; count: number }>(
+    `/activities/${activityId}/reviews`,
+    { method: 'GET' }
+  );
+}
+
+// Discovery API
+
+interface DiscoverUserResponse {
+  userId: string;
+  nickname: string;
+  age: number;
+  bio: string;
+  profilePhoto: string;
+  interests: string[];
+  matchScore: number;
+}
+
+/**
+ * Discover users with similar interests
+ */
+export async function discoverUsers(): Promise<{ users: DiscoverUserResponse[] }> {
+  return fetchWithAuth<{ users: DiscoverUserResponse[] }>('/users/discover', {
+    method: 'GET',
+  });
+}
+
+// Photo Gallery API
+
+interface PhotoItem {
+  photoId: string;
+  activityId: string;
+  userId: string;
+  nickname: string;
+  photoUrl: string;
+  createdAt: string;
+}
+
+/**
+ * Upload photo to activity gallery (returns presigned URL)
+ */
+export async function uploadActivityPhoto(
+  activityId: string,
+  fileName: string,
+  contentType: string
+): Promise<{ photoId: string; presignedUrl: string; photoUrl: string; expiresIn: number }> {
+  return fetchWithAuth<{ photoId: string; presignedUrl: string; photoUrl: string; expiresIn: number }>(
+    `/activities/${activityId}/photos`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ fileName, contentType }),
+    }
+  );
+}
+
+/**
+ * Get photos for an activity
+ */
+export async function getActivityPhotos(
+  activityId: string
+): Promise<{ photos: PhotoItem[]; count: number }> {
+  return fetchWithAuth<{ photos: PhotoItem[]; count: number }>(
+    `/activities/${activityId}/photos`,
+    { method: 'GET' }
+  );
+}
+
+// Verification types and API calls
+
+export interface VerificationStatus {
+  status: 'unverified' | 'payment_pending' | 'pending' | 'approved' | 'rejected';
+  submittedAt?: string;
+  reviewedAt?: string;
+  reviewNote?: string;
+}
+
+export async function getVerificationStatus(): Promise<VerificationStatus> {
+  return fetchWithAuth<VerificationStatus>('/verification/status');
+}
+
+export async function createVerificationCheckout(data: {
+  documentUrl: string;
+  email: string;
+}): Promise<{ sessionId: string; url: string }> {
+  return fetchWithAuth<{ sessionId: string; url: string }>('/verification/checkout', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+// Recommendations API
+
+interface RecommendedActivity {
+  activityId: string;
+  title: string;
+  category: string;
+  dateTime: string;
+  location: { latitude: number; longitude: number; address: string };
+  hostNickname: string;
+  imageUrl?: string;
+  tags: string[];
+  currentParticipants: number;
+  maxParticipants: number;
+  score: number;
+}
+
+interface RecommendedUser {
+  userId: string;
+  nickname: string;
+  profilePhoto: string;
+  interests: string[];
+  matchScore: number;
+}
+
+/**
+ * Get personalized recommendations
+ */
+export async function getRecommendations(): Promise<{
+  recommendedActivities: RecommendedActivity[];
+  recommendedUsers: RecommendedUser[];
+}> {
+  return fetchWithAuth<{
+    recommendedActivities: RecommendedActivity[];
+    recommendedUsers: RecommendedUser[];
+  }>('/recommendations', {
+    method: 'GET',
   });
 }
