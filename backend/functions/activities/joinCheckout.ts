@@ -42,6 +42,13 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return errorResponse(400, 'INVALID_INPUT', 'This activity is free. Use the regular join endpoint.');
     }
 
+    // 定員チェック（課金前に満員を弾く）
+    const currentParticipants = (activityResult.Item.currentParticipants as number | undefined) ?? 0;
+    const maxParticipants = activityResult.Item.maxParticipants as number | undefined;
+    if (maxParticipants !== undefined && currentParticipants >= maxParticipants) {
+      return errorResponse(409, 'ACTIVITY_FULL', 'このアクティビティは満員です');
+    }
+
     // すでに参加しているか確認
     const participants = activityResult.Item.participants as string[] | undefined ?? [];
     if (participants.includes(userId)) {

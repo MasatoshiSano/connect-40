@@ -238,9 +238,9 @@ async function handleActivityJoinCheckoutCompleted(
     return;
   }
 
-  // 支払い記録保存 + 参加者追加（並行実行）
-  await Promise.all([
-    ddbDocClient.send(new PutCommand({
+  // 支払い記録保存（冪等性: attribute_not_exists で重複防止）
+  try {
+    await ddbDocClient.send(new PutCommand({
       TableName: TABLE_NAME,
       Item: {
         PK: `ACTIVITY#${activityId}`,
@@ -251,21 +251,29 @@ async function handleActivityJoinCheckoutCompleted(
         paidAt: now,
       },
       ConditionExpression: 'attribute_not_exists(PK)',
-    })),
-    ddbDocClient.send(new UpdateCommand({
-      TableName: TABLE_NAME,
-      Key: { PK: `ACTIVITY#${activityId}`, SK: 'METADATA' },
-      UpdateExpression: 'SET participants = list_append(if_not_exists(participants, :empty), :userIdList), currentParticipants = currentParticipants + :one, updatedAt = :now',
-      ConditionExpression: 'currentParticipants < maxParticipants AND not contains(participants, :userId)',
-      ExpressionAttributeValues: {
-        ':userIdList': [userId],
-        ':userId': userId,
-        ':one': 1,
-        ':now': now,
-        ':empty': [] as string[],
-      },
-    })),
-  ]);
+    }));
+  } catch (err) {
+    if (err instanceof Error && err.name === 'ConditionalCheckFailedException') {
+      console.log(`Payment already recorded for activity ${activityId}, user ${userId} (idempotent)`);
+      return;
+    }
+    throw err;
+  }
+
+  // PutCommand 成功後のみ参加者追加を実行（TOCTOU競合を排除）
+  await ddbDocClient.send(new UpdateCommand({
+    TableName: TABLE_NAME,
+    Key: { PK: `ACTIVITY#${activityId}`, SK: 'METADATA' },
+    UpdateExpression: 'SET participants = list_append(if_not_exists(participants, :empty), :userIdList), currentParticipants = currentParticipants + :one, updatedAt = :now',
+    ConditionExpression: 'currentParticipants < maxParticipants AND not contains(participants, :userId)',
+    ExpressionAttributeValues: {
+      ':userIdList': [userId],
+      ':userId': userId,
+      ':one': 1,
+      ':now': now,
+      ':empty': [] as string[],
+    },
+  }));
 
   console.log(`User ${userId} successfully joined activity ${activityId} via payment`);
 }
