@@ -123,7 +123,7 @@ export const INTEREST_CATEGORIES: InterestCategory[] = [
       '瞑想',
       'ワークライフバランス',
       '子育て・子供の教育',
-      '地域ボランティア',
+      '親の介護・地域福祉',
     ],
   },
 ];
