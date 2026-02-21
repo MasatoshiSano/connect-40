@@ -351,7 +351,7 @@ export const HeroCarousel = () => {
           {/* 左矢印（ホバーで表示） */}
           <button
             onClick={goPrev}
-            className="absolute left-5 top-1/2 -translate-y-1/2 z-20 p-3 text-white/0 group-hover:text-white/30 hover:!text-white/80 transition-all duration-slow ease-luxe"
+            className="absolute left-5 top-1/2 -translate-y-1/2 z-20 p-3 text-white opacity-0 group-hover:opacity-30 hover:!opacity-80 transition-all duration-slow ease-luxe"
             aria-label="前のスライド"
           >
             <Icon name="arrow_back_ios" className="!text-[26px]" />
@@ -360,7 +360,7 @@ export const HeroCarousel = () => {
           {/* 右矢印（ホバーで表示） */}
           <button
             onClick={goNext}
-            className="absolute right-5 top-1/2 -translate-y-1/2 z-20 p-3 text-white/0 group-hover:text-white/30 hover:!text-white/80 transition-all duration-slow ease-luxe"
+            className="absolute right-5 top-1/2 -translate-y-1/2 z-20 p-3 text-white opacity-0 group-hover:opacity-30 hover:!opacity-80 transition-all duration-slow ease-luxe"
             aria-label="次のスライド"
           >
             <Icon name="arrow_forward_ios" className="!text-[26px]" />
