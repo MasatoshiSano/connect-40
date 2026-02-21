@@ -70,8 +70,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
         new PostToConnectionCommand({
           ConnectionId: connectionId,
           Data: Buffer.from(JSON.stringify({
-            type: 'error',
-            code: 'VERIFICATION_REQUIRED',
+            type: 'VERIFICATION_REQUIRED',
             message: '本人確認が必要です。プロフィールから本人確認を行ってください。',
           })),
         })
