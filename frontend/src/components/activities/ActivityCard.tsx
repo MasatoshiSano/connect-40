@@ -1,7 +1,8 @@
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '../ui/Icon';
 import { ACTIVITY_CATEGORIES, RECURRENCE_LABELS } from '../../constants/activities';
+import { fetchActivityPhoto } from '../../utils/activityPhoto';
 import type { Activity } from '../../types/activity';
 
 interface ActivityCardProps {
@@ -10,6 +11,17 @@ interface ActivityCardProps {
 
 export const ActivityCard = memo(({ activity }: ActivityCardProps) => {
   const navigate = useNavigate();
+  const [autoPhotoUrl, setAutoPhotoUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!activity.imageUrl && activity.category) {
+      fetchActivityPhoto(activity.category).then((url) => {
+        if (url) setAutoPhotoUrl(url);
+      });
+    }
+  }, [activity.imageUrl, activity.category]);
+
+  const displayImageUrl = activity.imageUrl || autoPhotoUrl;
 
   const category = ACTIVITY_CATEGORIES.find((c) => c.id === activity.category);
   const activityDate = new Date(activity.dateTime);
@@ -41,10 +53,10 @@ export const ActivityCard = memo(({ activity }: ActivityCardProps) => {
       className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:border-gold/40 hover:-translate-y-0.5 transition-all duration-base ease-elegant cursor-pointer overflow-hidden"
     >
       {/* Image */}
-      {activity.imageUrl ? (
+      {displayImageUrl ? (
         <div className="h-48 overflow-hidden">
           <img
-            src={activity.imageUrl}
+            src={displayImageUrl}
             alt={activity.title}
             loading="lazy"
             className="w-full h-full object-cover"

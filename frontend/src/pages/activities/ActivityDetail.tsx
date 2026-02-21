@@ -9,6 +9,7 @@ import { ReviewList } from '../../components/activities/ReviewList';
 import { PhotoGallery } from '../../components/activities/PhotoGallery';
 import { useAuthStore } from '../../stores/auth';
 import { notify } from '../../stores/notification';
+import { fetchActivityPhoto } from '../../utils/activityPhoto';
 import type { Activity, Review } from '../../types/activity';
 
 const REMINDER_STORAGE_KEY = 'connect40_reminders';
@@ -52,6 +53,7 @@ export const ActivityDetail = () => {
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+  const [autoPhotoUrl, setAutoPhotoUrl] = useState<string | null>(null);
 
   // Load activity data
   useEffect(() => {
@@ -79,6 +81,17 @@ export const ActivityDetail = () => {
 
     loadActivity();
   }, [activityId]);
+
+  // Fetch auto photo from Unsplash if no imageUrl
+  useEffect(() => {
+    if (activity && !activity.imageUrl && activity.category) {
+      fetchActivityPhoto(activity.category).then((url) => {
+        if (url) setAutoPhotoUrl(url);
+      });
+    }
+  }, [activity?.imageUrl, activity?.category]);
+
+  const displayImageUrl = activity?.imageUrl || autoPhotoUrl;
 
   // Load reviews
   useEffect(() => {
@@ -282,10 +295,10 @@ export const ActivityDetail = () => {
 
             <div className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark overflow-hidden">
               {/* Image */}
-              {activity.imageUrl ? (
+              {displayImageUrl ? (
                 <div className="h-64 md:h-96 overflow-hidden">
                   <img
-                    src={activity.imageUrl}
+                    src={displayImageUrl}
                     alt={activity.title}
                     loading="lazy"
                     className="w-full h-full object-cover"
