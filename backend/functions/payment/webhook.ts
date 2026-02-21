@@ -239,6 +239,7 @@ async function handleActivityJoinCheckoutCompleted(
   }
 
   // 支払い記録保存（冪等性: attribute_not_exists で重複防止）
+  let paymentAlreadyRecorded = false;
   try {
     await ddbDocClient.send(new PutCommand({
       TableName: TABLE_NAME,
@@ -254,26 +255,44 @@ async function handleActivityJoinCheckoutCompleted(
     }));
   } catch (err) {
     if (err instanceof Error && err.name === 'ConditionalCheckFailedException') {
-      console.log(`Payment already recorded for activity ${activityId}, user ${userId} (idempotent)`);
+      // 支払い記録は既に存在する（再送または重複イベント）
+      // UpdateCommand が前回失敗している可能性があるため、処理を続行する
+      paymentAlreadyRecorded = true;
+    } else {
+      throw err;
+    }
+  }
+
+  // 参加者追加（PutCommand 成功・失敗どちらの場合も実行）
+  // 前回 PutCommand 成功後に UpdateCommand がタイムアウト等で失敗した場合の再送に対応
+  try {
+    await ddbDocClient.send(new UpdateCommand({
+      TableName: TABLE_NAME,
+      Key: { PK: `ACTIVITY#${activityId}`, SK: 'METADATA' },
+      UpdateExpression: 'SET participants = list_append(if_not_exists(participants, :empty), :userIdList), currentParticipants = currentParticipants + :one, updatedAt = :now',
+      ConditionExpression: 'currentParticipants < maxParticipants AND not contains(participants, :userId)',
+      ExpressionAttributeValues: {
+        ':userIdList': [userId],
+        ':userId': userId,
+        ':one': 1,
+        ':now': now,
+        ':empty': [] as string[],
+      },
+    }));
+  } catch (err) {
+    if (err instanceof Error && err.name === 'ConditionalCheckFailedException') {
+      if (paymentAlreadyRecorded) {
+        // 再送 + 既に参加済み → 完全な冪等処理完了
+        console.log(`User ${userId} already fully processed for activity ${activityId}`);
+      } else {
+        // 初回処理 + 満員 → 課金済みだが参加不可（手動返金が必要）
+        console.error(`CRITICAL: User ${userId} paid for activity ${activityId} but activity is full. Manual refund required.`);
+      }
+      // Stripe への応答は成功とし、無限再送を防止する
       return;
     }
     throw err;
   }
-
-  // PutCommand 成功後のみ参加者追加を実行（TOCTOU競合を排除）
-  await ddbDocClient.send(new UpdateCommand({
-    TableName: TABLE_NAME,
-    Key: { PK: `ACTIVITY#${activityId}`, SK: 'METADATA' },
-    UpdateExpression: 'SET participants = list_append(if_not_exists(participants, :empty), :userIdList), currentParticipants = currentParticipants + :one, updatedAt = :now',
-    ConditionExpression: 'currentParticipants < maxParticipants AND not contains(participants, :userId)',
-    ExpressionAttributeValues: {
-      ':userIdList': [userId],
-      ':userId': userId,
-      ':one': 1,
-      ':now': now,
-      ':empty': [] as string[],
-    },
-  }));
 
   console.log(`User ${userId} successfully joined activity ${activityId} via payment`);
 }

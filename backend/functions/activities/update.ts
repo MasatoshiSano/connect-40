@@ -62,6 +62,16 @@ export const handler = async (
       return errorResponse(403, 'FORBIDDEN', 'Only the host can edit this activity');
     }
 
+    // entryFee の特別バリデーション（負値・非有限数・非数値を拒否）
+    if (input.entryFee !== undefined) {
+      const fee = input.entryFee;
+      if (typeof fee !== 'number' || fee < 0 || !Number.isFinite(fee)) {
+        return errorResponse(400, 'INVALID_ENTRY_FEE', 'entryFee must be a non-negative finite number');
+      }
+      // 小数点以下を切り捨て（Stripe の unit_amount は整数を期待）
+      input.entryFee = Math.floor(fee);
+    }
+
     // Build update expression
     const expressionParts: string[] = [];
     const expressionValues: Record<string, unknown> = {};
