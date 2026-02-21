@@ -540,9 +540,14 @@ export const CreateActivity = () => {
                         max={100000}
                         step={100}
                         value={field.value ?? ''}
-                        onChange={(e) =>
-                          field.onChange(e.target.value === '' ? undefined : parseInt(e.target.value, 10))
-                        }
+                        onChange={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(undefined);
+                            return;
+                          }
+                          const parsed = parseInt(e.target.value, 10);
+                          field.onChange(isNaN(parsed) ? undefined : parsed);
+                        }}
                         className="w-full px-4 py-3 border-b border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
                         placeholder="例: 1000（0または空欄 = 無料）"
                       />

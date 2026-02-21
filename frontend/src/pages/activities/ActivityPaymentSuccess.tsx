@@ -1,10 +1,22 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
 import { Icon } from '../../components/ui/Icon';
 
 export const ActivityPaymentSuccess = () => {
   const { activityId } = useParams<{ activityId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get('session_id');
+
+  // session_id が存在しない場合はアクティビティ一覧へリダイレクト
+  useEffect(() => {
+    if (!sessionId) {
+      navigate(activityId ? `/activities/${activityId}` : '/activities', { replace: true });
+    }
+  }, [sessionId, navigate, activityId]);
+
+  if (!sessionId) return null;
 
   return (
     <Layout isAuthenticated={true}>
@@ -18,8 +30,10 @@ export const ActivityPaymentSuccess = () => {
           <h1 className="text-2xl font-serif font-light tracking-ryokan text-text-primary dark:text-text-dark-primary mb-4">
             お支払いが完了しました
           </h1>
-          <p className="text-text-secondary dark:text-text-dark-secondary mb-10">
-            参加登録が完了しました。<br />
+          <p className="text-text-secondary dark:text-text-dark-secondary mb-2">
+            参加登録が完了しました。
+          </p>
+          <p className="text-sm text-text-secondary dark:text-text-dark-secondary mb-10">
             アクティビティへの参加をお楽しみください。
           </p>
 

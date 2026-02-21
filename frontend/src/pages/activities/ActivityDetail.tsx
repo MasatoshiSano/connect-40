@@ -112,11 +112,19 @@ export const ActivityDetail = () => {
     try {
       // 有料アクティビティの場合は Stripe Checkout へリダイレクト
       if (activity.entryFee && activity.entryFee > 0) {
-        const email = idToken
-          ? (JSON.parse(atob(idToken.split('.')[1])) as { email?: string }).email ?? ''
-          : '';
+        let email = '';
+        try {
+          const parts = idToken ? idToken.split('.') : [];
+          if (parts.length < 2) throw new Error('Invalid token format');
+          const payload = JSON.parse(atob(parts[1])) as { email?: string };
+          email = payload.email ?? '';
+        } catch {
+          setError('メールアドレスの取得に失敗しました。ログアウトして再度お試しください。');
+          setIsJoining(false);
+          return;
+        }
         if (!email) {
-          setError('メールアドレスの取得に失敗しました');
+          setError('メールアドレスが見つかりませんでした');
           setIsJoining(false);
           return;
         }
