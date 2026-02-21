@@ -9,7 +9,7 @@ export interface User {
   location: Location;
   profilePhoto: string;
   interests: string[];
-  verificationStatus: 'pending' | 'approved' | 'rejected';
+  verificationStatus: 'unverified' | 'pending' | 'approved' | 'rejected';
   membershipTier: 'free' | 'premium';
   createdAt: string;
   updatedAt: string;
@@ -20,6 +20,8 @@ export interface Location {
   longitude: number;
   address: string;
 }
+
+export type Recurrence = 'none' | 'weekly' | 'biweekly' | 'monthly';
 
 export interface Activity {
   activityId: string;
@@ -35,10 +37,22 @@ export interface Activity {
   currentParticipants: number;
   participants: string[]; // userIds
   status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
+  entryFee?: number; // 円単位, 0 or undefined = 無料
+  recurrence?: Recurrence;
   imageUrl?: string;
   tags: string[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Review {
+  reviewId: string;
+  activityId: string;
+  userId: string;
+  nickname: string;
+  rating: number; // 1-5
+  comment: string;
+  createdAt: string;
 }
 
 export interface ChatRoom {
@@ -65,6 +79,16 @@ export interface Subscription {
   subscriptionId: string;
   status: 'active' | 'canceled' | 'past_due';
   currentPeriodEnd: string;
+}
+
+export interface VerificationRecord {
+  userId: string;
+  documentUrl: string;
+  paymentStatus: 'payment_pending' | 'pending' | 'approved' | 'rejected';
+  submittedAt: string;
+  reviewedAt?: string;
+  reviewNote?: string;
+  stripeSessionId?: string;
 }
 
 export interface Usage {
