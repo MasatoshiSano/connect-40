@@ -20,6 +20,9 @@ export const INTEREST_CATEGORIES: InterestCategory[] = [
       'ヨガ',
       '水泳',
       '登山',
+      'ピラティス',
+      'ウォーキング',
+      '卓球',
     ],
   },
   {
@@ -33,6 +36,8 @@ export const INTEREST_CATEGORIES: InterestCategory[] = [
       'サーフィン',
       'スノーボード',
       'スキー',
+      '星空観察',
+      '家庭菜園',
     ],
   },
   {
@@ -51,6 +56,10 @@ export const INTEREST_CATEGORIES: InterestCategory[] = [
       'DIY',
       '園芸',
       'ペット',
+      '書道',
+      '陶芸',
+      '落語・演芸鑑賞',
+      'ミニチュア・プラモデル',
     ],
   },
   {
@@ -66,6 +75,8 @@ export const INTEREST_CATEGORIES: InterestCategory[] = [
       'コーヒー',
       '料理',
       'パン作り',
+      'ウイスキー',
+      '食べ歩き',
     ],
   },
   {
@@ -79,6 +90,9 @@ export const INTEREST_CATEGORIES: InterestCategory[] = [
       '旅行',
       '温泉',
       '街歩き',
+      '茶道・華道',
+      '古民家・建築巡り',
+      '読書会・文学サークル',
     ],
   },
   {
@@ -91,6 +105,9 @@ export const INTEREST_CATEGORIES: InterestCategory[] = [
       '英語',
       '資格取得',
       'ビジネス書',
+      'ライフプランニング',
+      '副業・フリーランス',
+      '健康管理・医療知識',
     ],
   },
   {
@@ -104,6 +121,9 @@ export const INTEREST_CATEGORIES: InterestCategory[] = [
       'ボランティア',
       '語学',
       '瞑想',
+      'ワークライフバランス',
+      '子育て・子供の教育',
+      '地域ボランティア',
     ],
   },
 ];
