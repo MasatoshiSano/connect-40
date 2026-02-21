@@ -37,20 +37,26 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return errorResponse(404, 'NOT_FOUND', 'Activity not found');
     }
 
-    const entryFee = activityResult.Item.entryFee as number | undefined;
-    if (!entryFee || entryFee <= 0) {
+    const rawEntryFee = activityResult.Item.entryFee;
+    const entryFee = typeof rawEntryFee === 'number' && Number.isFinite(rawEntryFee) ? rawEntryFee : 0;
+    if (entryFee <= 0) {
       return errorResponse(400, 'INVALID_INPUT', 'This activity is free. Use the regular join endpoint.');
     }
 
     // 定員チェック（課金前に満員を弾く）
-    const currentParticipants = (activityResult.Item.currentParticipants as number | undefined) ?? 0;
-    const maxParticipants = activityResult.Item.maxParticipants as number | undefined;
+    const rawCurrent = activityResult.Item.currentParticipants;
+    const currentParticipants = typeof rawCurrent === 'number' && Number.isFinite(rawCurrent) ? rawCurrent : 0;
+    const rawMax = activityResult.Item.maxParticipants;
+    const maxParticipants = typeof rawMax === 'number' && Number.isFinite(rawMax) ? rawMax : undefined;
     if (maxParticipants !== undefined && currentParticipants >= maxParticipants) {
       return errorResponse(409, 'ACTIVITY_FULL', 'このアクティビティは満員です');
     }
 
     // すでに参加しているか確認
-    const participants = activityResult.Item.participants as string[] | undefined ?? [];
+    const rawParticipants = activityResult.Item.participants;
+    const participants = Array.isArray(rawParticipants)
+      ? rawParticipants.filter((p): p is string => typeof p === 'string')
+      : [];
     if (participants.includes(userId)) {
       return errorResponse(409, 'ALREADY_JOINED', 'Already joined this activity');
     }
@@ -61,6 +67,9 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return errorResponse(400, 'INVALID_INPUT', 'email is required');
     }
 
+    const rawTitle = activityResult.Item.title;
+    const title = typeof rawTitle === 'string' ? rawTitle : activityId;
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
@@ -69,8 +78,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
           currency: 'jpy',
           unit_amount: entryFee,
           product_data: {
-            name: activityResult.Item.title as string,
-            description: `${activityResult.Item.title as string} への参加費`,
+            name: title,
+            description: `${title} への参加費`,
           },
         },
         quantity: 1,
