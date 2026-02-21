@@ -7,6 +7,7 @@ import { Layout } from '../../components/layout/Layout';
 import { Icon } from '../../components/ui/Icon';
 import { getUserProfile, updateUserProfile, uploadProfilePhoto } from '../../services/api';
 import { RefineButton } from '../../components/ui/RefineButton';
+import { useDarkMode } from '../../hooks/useDarkMode';
 import { INTEREST_CATEGORIES } from '../../constants/interests';
 import type { UserProfile } from '../../services/api';
 
@@ -40,6 +41,7 @@ export const EditProfile = () => {
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { isDark, toggle } = useDarkMode();
 
   const {
     register,
@@ -351,6 +353,35 @@ export const EditProfile = () => {
                       </div>
                     </div>
                   ))}
+                </div>
+
+                {/* 表示設定 */}
+                <div className="border-t border-border-light dark:border-border-dark pt-6 mt-6">
+                  <h3 className="text-sm font-medium text-text-secondary dark:text-text-dark-secondary mb-4 tracking-wider uppercase">
+                    表示設定
+                  </h3>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-text-primary dark:text-text-dark-primary text-sm">テーマ</p>
+                      <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
+                        {isDark ? 'ダークモード' : 'ライトモード'}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={toggle}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-base ${
+                        isDark ? 'bg-gold' : 'bg-border-light dark:bg-border-dark'
+                      }`}
+                      aria-label="テーマ切り替え"
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-base ${
+                          isDark ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Buttons */}
