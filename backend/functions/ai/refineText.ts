@@ -71,7 +71,7 @@ ${input.text}`;
     };
 
     const command = new InvokeModelCommand({
-      modelId: 'anthropic.claude-haiku-4-5-20251001',
+      modelId: 'anthropic.claude-haiku-4-5-20251001-v1:0',
       body: JSON.stringify(payload),
       contentType: 'application/json',
     });

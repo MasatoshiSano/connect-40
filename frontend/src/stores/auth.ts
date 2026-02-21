@@ -13,10 +13,12 @@ interface AuthState {
   refreshToken: string | null;
   isAuthenticated: boolean;
   verificationStatus: VerificationStatus;
+  chatCredits: number | null;
   setTokens: (tokens: { accessToken: string; idToken: string; refreshToken: string }) => void;
   setUser: (user: CognitoUser | null, userId?: string | null) => void;
   setNickname: (nickname: string) => void;
   setVerificationStatus: (status: VerificationStatus) => void;
+  setChatCredits: (credits: number | null) => void;
   clearAuth: () => void;
 }
 
@@ -31,6 +33,7 @@ export const useAuthStore = create<AuthState>()(
       refreshToken: null,
       isAuthenticated: false,
       verificationStatus: 'unverified',
+      chatCredits: null,
       setTokens: (tokens) =>
         set({
           accessToken: tokens.accessToken,
@@ -41,6 +44,7 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user, userId = null) => set({ user, userId }),
       setNickname: (nickname) => set({ nickname }),
       setVerificationStatus: (status) => set({ verificationStatus: status }),
+      setChatCredits: (credits) => set({ chatCredits: credits }),
       clearAuth: () =>
         set({
           user: null,
@@ -51,6 +55,7 @@ export const useAuthStore = create<AuthState>()(
           refreshToken: null,
           isAuthenticated: false,
           verificationStatus: 'unverified',
+          chatCredits: null,
         }),
     }),
     {
@@ -63,6 +68,7 @@ export const useAuthStore = create<AuthState>()(
         refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
         verificationStatus: state.verificationStatus,
+        chatCredits: state.chatCredits,
       }),
     }
   )

@@ -12,6 +12,7 @@ interface MessageInputProps {
 
 export const MessageInput = ({ onSend, disabled = false, externalMessage, onExternalMessageConsumed }: MessageInputProps) => {
   const verificationStatus = useAuthStore((state) => state.verificationStatus);
+  const chatCredits = useAuthStore((state) => state.chatCredits);
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -61,6 +62,23 @@ export const MessageInput = ({ onSend, disabled = false, externalMessage, onExte
     );
   }
 
+  if (chatCredits !== null && chatCredits <= 0) {
+    return (
+      <div className="p-4 border-t border-border-light dark:border-border-dark">
+        <div className="flex items-center gap-3 p-3 bg-amber-950/20 border border-amber-500/30">
+          <Icon name="chat_bubble_outline" className="text-amber-400 flex-shrink-0" />
+          <p className="text-sm text-text-secondary dark:text-text-dark-secondary">
+            チャット回数が上限に達しました。
+            <Link to="/activities" className="text-gold underline underline-offset-2 ml-1">
+              アクティビティに参加
+            </Link>
+            すると増えます。
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="border-t border-border-dark p-4 bg-base-800">
       <div className="flex items-end gap-2">
@@ -82,9 +100,16 @@ export const MessageInput = ({ onSend, disabled = false, externalMessage, onExte
           <Icon name="send" size="md" />
         </button>
       </div>
-      <p className="text-xs text-text-dark-muted mt-2">
-        Enter で送信、Shift + Enter で改行
-      </p>
+      <div className="flex items-center justify-between mt-2">
+        <p className="text-xs text-text-dark-muted">
+          Enter で送信、Shift + Enter で改行
+        </p>
+        {chatCredits !== null && (
+          <p className="text-xs text-text-secondary dark:text-text-dark-muted">
+            残りチャット回数: {chatCredits}回
+          </p>
+        )}
+      </div>
     </div>
   );
 };

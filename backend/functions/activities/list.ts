@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { ddbDocClient } from '../../layers/common/nodejs/dynamodb';
-import { QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { QueryCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { successResponse, errorResponse } from '../../layers/common/nodejs/utils';
 import type { Activity } from '../../types';
 
@@ -15,7 +15,8 @@ export const handler = async (
 ): Promise<APIGatewayProxyResult> => {
   try {
     const category = event.queryStringParameters?.category;
-    const limit = parseInt(event.queryStringParameters?.limit || '20');
+    const rawLimit = parseInt(event.queryStringParameters?.limit || '20');
+    const limit = Math.min(Math.max(1, isNaN(rawLimit) ? 20 : rawLimit), 100);
 
     let result;
 
@@ -34,19 +35,33 @@ export const handler = async (
         })
       );
     } else {
-      // Scan all activities (not efficient for large datasets)
-      // TODO: Implement better pagination strategy
+      // Try GSI2 query first (ACTIVITIES partition) for efficient listing
       result = await ddbDocClient.send(
         new QueryCommand({
           TableName: TABLE_NAME,
-          IndexName: 'GSI1',
-          KeyConditionExpression: 'begins_with(GSI1PK, :prefix)',
+          IndexName: 'GSI2',
+          KeyConditionExpression: 'GSI2PK = :pk',
           ExpressionAttributeValues: {
-            ':prefix': 'CATEGORY#',
+            ':pk': 'ACTIVITIES',
           },
           Limit: limit,
+          ScanIndexForward: false,
         })
       );
+
+      // Fallback to scan if GSI2 is not populated for this pattern
+      if (!result.Items || result.Items.length === 0) {
+        result = await ddbDocClient.send(
+          new ScanCommand({
+            TableName: TABLE_NAME,
+            FilterExpression: 'begins_with(PK, :prefix)',
+            ExpressionAttributeValues: {
+              ':prefix': 'ACTIVITY#',
+            },
+            Limit: limit,
+          })
+        );
+      }
     }
 
     const activities = (result.Items || []).map((item) => {

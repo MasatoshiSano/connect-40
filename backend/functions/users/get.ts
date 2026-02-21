@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { ddbDocClient } from '../../layers/common/nodejs/dynamodb';
-import { GetCommand } from '@aws-sdk/lib-dynamodb';
+import { GetCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { successResponse, errorResponse } from '../../layers/common/nodejs/utils';
 import type { User } from '../../types';
 
@@ -36,8 +36,33 @@ export const handler = async (
       return errorResponse(404, 'USER_NOT_FOUND', 'User profile not found');
     }
 
+    // Daily credit grant for free plan users
+    const profile = result.Item;
+    if (profile.membershipTier === 'free') {
+      const today = new Date().toISOString().split('T')[0];
+      const lastDate = profile.lastCreditDate as string | undefined;
+
+      if (lastDate !== today) {
+        try {
+          await ddbDocClient.send(new UpdateCommand({
+            TableName: TABLE_NAME,
+            Key: { PK: `USER#${userId}`, SK: 'PROFILE' },
+            UpdateExpression: 'ADD chatCredits :credits SET lastCreditDate = :today',
+            ExpressionAttributeValues: {
+              ':credits': 3,
+              ':today': today,
+            },
+          }));
+          profile.chatCredits = ((profile.chatCredits as number) || 0) + 3;
+          profile.lastCreditDate = today;
+        } catch {
+          // Ignore errors
+        }
+      }
+    }
+
     // Extract user data (remove DynamoDB keys)
-    const { PK, SK, GSI1PK, GSI1SK, GSI2PK, GSI2SK, Type, geohash, ...user } = result.Item;
+    const { PK, SK, GSI1PK, GSI1SK, GSI2PK, GSI2SK, Type, geohash, ...user } = profile;
 
     return successResponse(user as User);
   } catch (error) {

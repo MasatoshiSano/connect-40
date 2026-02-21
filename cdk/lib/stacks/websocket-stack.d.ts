@@ -7,6 +7,7 @@ import { Construct } from 'constructs';
 export interface WebSocketStackProps extends cdk.StackProps {
     envName: string;
     userPool: cognito.UserPool;
+    userPoolClient: cognito.UserPoolClient;
     table: dynamodb.Table;
 }
 export declare class WebSocketStack extends cdk.Stack {

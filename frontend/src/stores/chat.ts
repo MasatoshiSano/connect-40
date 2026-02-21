@@ -5,6 +5,7 @@ export interface Message {
   chatRoomId: string;
   senderId: string;
   content: string;
+  messageType: 'user' | 'system';
   readBy: string[];
   createdAt: string;
   timestamp: number;
@@ -12,6 +13,7 @@ export interface Message {
 
 export interface ChatRoom {
   chatRoomId: string;
+  name?: string;
   participantIds: string[];
   type: 'direct' | 'group';
   activityId?: string;
@@ -30,6 +32,7 @@ interface ChatState {
   setCurrentRoom: (room: ChatRoom | null) => void;
   setMessages: (messages: Message[]) => void;
   addMessage: (message: Message) => void;
+  removeMessage: (messageId: string) => void;
   setConnected: (connected: boolean) => void;
   markAsRead: (messageId: string, userId: string) => void;
   updateUnreadCount: (chatRoomId: string, count: number) => void;
@@ -44,8 +47,24 @@ export const useChatStore = create<ChatState>((set) => ({
   setCurrentRoom: (room) => set({ currentRoom: room }),
   setMessages: (messages) => set({ messages }),
   addMessage: (message) =>
+    set((state) => {
+      // Prevent duplicate messages (from optimistic add + WebSocket broadcast)
+      // Check by messageId first, then by sender+content within 5 seconds
+      const isDuplicate = state.messages.some(
+        (m) =>
+          m.messageId === message.messageId ||
+          (m.senderId === message.senderId &&
+            m.content === message.content &&
+            Math.abs(m.timestamp - message.timestamp) < 5000)
+      );
+      if (isDuplicate) {
+        return state;
+      }
+      return { messages: [...state.messages, message] };
+    }),
+  removeMessage: (messageId) =>
     set((state) => ({
-      messages: [...state.messages, message],
+      messages: state.messages.filter((m) => m.messageId !== messageId),
     })),
   setConnected: (connected) => set({ isConnected: connected }),
   markAsRead: (messageId, userId) =>

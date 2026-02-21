@@ -10,6 +10,7 @@ const TABLE_NAME = process.env.TABLE_NAME!;
 interface CreateChatRoomInput {
   participantIds: string[];
   activityId?: string;
+  name?: string;
 }
 
 /**
@@ -27,8 +28,17 @@ export const handler = async (
 
     const input: CreateChatRoomInput = JSON.parse(event.body || '{}');
 
-    if (!input.participantIds || input.participantIds.length === 0) {
+    if (!input.participantIds || !Array.isArray(input.participantIds) || input.participantIds.length === 0) {
       return errorResponse(400, 'INVALID_INPUT', 'Participant IDs required');
+    }
+
+    // Validate participant IDs are strings and limit count
+    if (input.participantIds.some((id) => typeof id !== 'string' || id.length === 0)) {
+      return errorResponse(400, 'INVALID_INPUT', 'All participant IDs must be non-empty strings');
+    }
+
+    if (input.participantIds.length > 50) {
+      return errorResponse(400, 'INVALID_INPUT', 'Maximum 50 participants allowed');
     }
 
     // Include current user in participants if not already
@@ -74,6 +84,7 @@ export const handler = async (
 
     const chatRoom = {
       chatRoomId,
+      name: input.name,
       participantIds: input.participantIds,
       type,
       activityId: input.activityId,

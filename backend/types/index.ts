@@ -11,6 +11,8 @@ export interface User {
   interests: string[];
   verificationStatus: 'unverified' | 'pending' | 'approved' | 'rejected';
   membershipTier: 'free' | 'premium';
+  chatCredits?: number;
+  lastCreditDate?: string;
   createdAt: string;
   updatedAt: string;
 }

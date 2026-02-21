@@ -1,4 +1,4 @@
-type MessageHandler = (data: any) => void;
+type MessageHandler = (data: Record<string, unknown>) => void;
 
 export class WebSocketService {
   private ws: WebSocket | null;
@@ -6,7 +6,9 @@ export class WebSocketService {
   private reconnectAttempts: number;
   private maxReconnectAttempts: number;
   private reconnectDelay: number;
-  private heartbeatInterval: any;
+  private heartbeatInterval: ReturnType<typeof setInterval> | null;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null;
+  private intentionalClose: boolean;
 
   private url: string;
   private getAccessToken: () => string | null;
@@ -20,9 +22,21 @@ export class WebSocketService {
     this.maxReconnectAttempts = 5;
     this.reconnectDelay = 1000;
     this.heartbeatInterval = null;
+    this.reconnectTimer = null;
+    this.intentionalClose = false;
   }
 
   connect(): Promise<void> {
+    // Close any existing zombie connection before creating a new one
+    if (this.ws) {
+      this.ws.onclose = null; // Prevent reconnect attempt from the old connection
+      this.ws.close();
+      this.ws = null;
+      this.stopHeartbeat();
+    }
+
+    this.intentionalClose = false;
+
     return new Promise((resolve, reject) => {
       const token = this.getAccessToken();
       if (!token) {
@@ -44,7 +58,7 @@ export class WebSocketService {
 
       this.ws.onmessage = (event) => {
         try {
-          const message = JSON.parse(event.data);
+          const message = JSON.parse(event.data) as Record<string, unknown>;
           this.messageHandlers.forEach((handler) => handler(message));
         } catch (error) {
           console.error('Failed to parse WebSocket message:', error);
@@ -59,12 +73,19 @@ export class WebSocketService {
       this.ws.onclose = () => {
         console.log('WebSocket disconnected');
         this.stopHeartbeat();
-        this.attemptReconnect();
+        if (!this.intentionalClose) {
+          this.attemptReconnect();
+        }
       };
     });
   }
 
   disconnect(): void {
+    this.intentionalClose = true;
+    if (this.reconnectTimer !== null) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
     if (this.ws) {
       this.ws.close();
       this.ws = null;
@@ -73,7 +94,7 @@ export class WebSocketService {
     this.messageHandlers.clear();
   }
 
-  sendMessage(action: string, data: any): void {
+  sendMessage(action: string, data: Record<string, unknown>): void {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
       throw new Error('WebSocket is not connected');
     }
@@ -104,7 +125,8 @@ export class WebSocketService {
 
     console.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
 
-    setTimeout(() => {
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null;
       this.connect().catch((error) => {
         console.error('Reconnect failed:', error);
       });
@@ -112,16 +134,17 @@ export class WebSocketService {
   }
 
   private startHeartbeat(): void {
-    this.heartbeatInterval = window.setInterval(() => {
+    this.stopHeartbeat();
+    this.heartbeatInterval = setInterval(() => {
       if (this.ws && this.ws.readyState === WebSocket.OPEN) {
         this.ws.send(JSON.stringify({ action: 'ping' }));
       }
-    }, 30000) as number; // 30 seconds
+    }, 30000); // 30 seconds
   }
 
   private stopHeartbeat(): void {
     if (this.heartbeatInterval !== null) {
-      window.clearInterval(this.heartbeatInterval);
+      clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = null;
     }
   }

@@ -10,6 +10,7 @@ import * as path from 'path';
 export interface WebSocketStackProps extends cdk.StackProps {
   envName: string;
   userPool: cognito.UserPool;
+  userPoolClient: cognito.UserPoolClient;
   table: dynamodb.Table;
 }
 
@@ -56,6 +57,8 @@ export class WebSocketStack extends cdk.Stack {
       role: lambdaRole,
       environment: {
         TABLE_NAME: props.table.tableName,
+        USER_POOL_ID: props.userPool.userPoolId,
+        CLIENT_ID: props.userPoolClient.userPoolClientId,
       },
       timeout: cdk.Duration.seconds(30),
     });

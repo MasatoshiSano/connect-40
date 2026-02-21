@@ -41,14 +41,33 @@ export const handler = async (
       return errorResponse(400, 'INVALID_INPUT', 'No fields to update');
     }
 
+    // Validate nickname if provided
+    if (input.nickname !== undefined && (typeof input.nickname !== 'string' || input.nickname.length < 1 || input.nickname.length > 50)) {
+      return errorResponse(400, 'INVALID_INPUT', 'Nickname must be 1-50 characters');
+    }
+
+    // Validate bio if provided
+    if (input.bio !== undefined && (typeof input.bio !== 'string' || input.bio.length > 1000)) {
+      return errorResponse(400, 'INVALID_INPUT', 'Bio must be 1000 characters or less');
+    }
+
     // Validate age if provided
-    if (input.age !== undefined && (input.age < 35 || input.age > 49)) {
+    if (input.age !== undefined && (typeof input.age !== 'number' || input.age < 35 || input.age > 49)) {
       return errorResponse(400, 'INVALID_AGE', 'Age must be between 35 and 49');
     }
 
     // Validate interests if provided
-    if (input.interests !== undefined && (input.interests.length < 3 || input.interests.length > 10)) {
+    if (input.interests !== undefined && (!Array.isArray(input.interests) || input.interests.length < 3 || input.interests.length > 10)) {
       return errorResponse(400, 'INVALID_INTERESTS', 'Must select 3-10 interests');
+    }
+
+    // Validate location if provided
+    if (input.location !== undefined) {
+      if (typeof input.location.latitude !== 'number' || typeof input.location.longitude !== 'number' ||
+          input.location.latitude < -90 || input.location.latitude > 90 ||
+          input.location.longitude < -180 || input.location.longitude > 180) {
+        return errorResponse(400, 'INVALID_INPUT', 'Invalid location coordinates');
+      }
     }
 
     const now = new Date().toISOString();

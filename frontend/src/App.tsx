@@ -52,7 +52,7 @@ const PageLoader = () => (
 
 function App() {
   const { toasts, removeToast } = useToastStore();
-  const { idToken, userId, nickname, verificationStatus, setUser, setNickname, setVerificationStatus } = useAuthStore();
+  const { idToken, userId, nickname, verificationStatus, setUser, setNickname, setVerificationStatus, setChatCredits } = useAuthStore();
 
   // Extract and set userId from idToken on app initialization
   useEffect(() => {
@@ -84,6 +84,9 @@ function App() {
           if (profile.verificationStatus) {
             setVerificationStatus(profile.verificationStatus);
           }
+          if (profile.chatCredits !== undefined) {
+            setChatCredits(profile.chatCredits);
+          }
         } catch (e) {
           console.error('Failed to fetch user profile:', e);
         }
@@ -91,7 +94,7 @@ function App() {
     };
 
     fetchProfile();
-  }, [userId, nickname, verificationStatus, setNickname, setVerificationStatus]);
+  }, [userId, nickname, verificationStatus, setNickname, setVerificationStatus, setChatCredits]);
 
   return (
     <BrowserRouter>

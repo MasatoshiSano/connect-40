@@ -94,6 +94,7 @@ export const handler = async (
       interests: input.interests,
       verificationStatus: 'pending',
       membershipTier: 'free',
+      chatCredits: 10,
       createdAt: now,
       updatedAt: now,
     };
