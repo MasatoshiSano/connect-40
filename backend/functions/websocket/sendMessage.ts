@@ -196,18 +196,38 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
             })
           );
         } catch (error: unknown) {
-          // If connection is stale (GoneException), delete it
-          if (error && typeof error === 'object' && 'statusCode' in error && (error as { statusCode: number }).statusCode === 410) {
-            console.log(`Stale connection: ${connId}, deleting...`);
-            await ddbDocClient.send(
-              new DeleteCommand({
+          // If connection is stale (GoneException), delete both connection records
+          if (error instanceof Error && error.name === 'GoneException') {
+            console.log(`Stale connection: ${connId}, deleting both records...`);
+            // Fetch connection metadata to get userId
+            const connRecord = await ddbDocClient.send(
+              new GetCommand({
                 TableName: TABLE_NAME,
-                Key: {
-                  PK: `CONNECTION#${connId}`,
-                  SK: 'METADATA',
-                },
+                Key: { PK: `CONNECTION#${connId}`, SK: 'METADATA' },
               })
             );
+            const connUserId = connRecord.Item?.userId as string | undefined;
+
+            // Delete both records in parallel
+            const deletePromises: Promise<unknown>[] = [
+              ddbDocClient.send(
+                new DeleteCommand({
+                  TableName: TABLE_NAME,
+                  Key: { PK: `CONNECTION#${connId}`, SK: 'METADATA' },
+                })
+              ),
+            ];
+            if (connUserId) {
+              deletePromises.push(
+                ddbDocClient.send(
+                  new DeleteCommand({
+                    TableName: TABLE_NAME,
+                    Key: { PK: `USER#${connUserId}`, SK: `CONNECTION#${connId}` },
+                  })
+                )
+              );
+            }
+            await Promise.all(deletePromises);
           }
         }
       })
