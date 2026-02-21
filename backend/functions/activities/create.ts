@@ -20,6 +20,7 @@ interface CreateActivityInput {
   dateTime: string;
   duration: number;
   maxParticipants: number;
+  entryFee?: number;
   imageUrl?: string;
   tags: string[];
 }
@@ -44,6 +45,25 @@ export const handler = async (
     // Validate input
     if (!input.title || !input.description || !input.category || !input.location || !input.dateTime) {
       return errorResponse(400, 'INVALID_INPUT', 'Missing required fields');
+    }
+
+    // Validate category
+    const VALID_CATEGORIES: Activity['category'][] = ['sports', 'outdoor', 'hobby', 'food', 'culture', 'business', 'other'];
+    if (!VALID_CATEGORIES.includes(input.category as Activity['category'])) {
+      return errorResponse(400, 'INVALID_CATEGORY', 'Invalid activity category');
+    }
+
+    // Validate title and description length
+    if (input.title.length > 200) {
+      return errorResponse(400, 'INVALID_INPUT', 'Title must be 200 characters or less');
+    }
+    if (input.description.length > 5000) {
+      return errorResponse(400, 'INVALID_INPUT', 'Description must be 5000 characters or less');
+    }
+
+    // Validate maxParticipants
+    if (!input.maxParticipants || input.maxParticipants < 2 || input.maxParticipants > 100) {
+      return errorResponse(400, 'INVALID_INPUT', 'maxParticipants must be between 2 and 100');
     }
 
     // Validate future date
@@ -87,13 +107,16 @@ export const handler = async (
     const now = new Date().toISOString();
     const geohash = encodeGeohash(input.location.latitude, input.location.longitude, 7);
 
+    const rawFee = input.entryFee;
+    const entryFee = typeof rawFee === 'number' && rawFee >= 0 ? Math.floor(rawFee) : 0;
+
     const activity: Activity = {
       activityId,
       hostUserId: userId,
       hostNickname: userResult.Item.nickname,
       title: input.title,
       description: input.description,
-      category: input.category as any,
+      category: input.category as Activity['category'],
       location: input.location,
       dateTime: input.dateTime,
       duration: input.duration,
@@ -101,6 +124,7 @@ export const handler = async (
       currentParticipants: 0,
       participants: [],
       status: 'upcoming',
+      entryFee,
       imageUrl: input.imageUrl,
       tags: input.tags || [],
       createdAt: now,

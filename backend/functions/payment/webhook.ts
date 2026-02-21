@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import Stripe from 'stripe';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2026-01-28.clover',
@@ -40,6 +40,8 @@ export const handler = async (
         const sessionType = session.metadata?.type;
         if (sessionType === 'verification') {
           await handleVerificationCheckoutCompleted(session);
+        } else if (sessionType === 'activity_join') {
+          await handleActivityJoinCheckoutCompleted(session);
         } else {
           await handleCheckoutCompleted(session);
         }
@@ -206,6 +208,65 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice): Promise<void> {
 async function handlePaymentFailed(invoice: Stripe.Invoice): Promise<void> {
   console.log('Payment failed for invoice:', invoice.id);
   // Additional logic if needed (e.g., send payment failure notification)
+}
+
+async function handleActivityJoinCheckoutCompleted(
+  session: Stripe.Checkout.Session
+): Promise<void> {
+  const { activityId, userId } = session.metadata ?? {};
+  if (!activityId || !userId) {
+    console.error('Missing activityId or userId in activity_join session metadata');
+    return;
+  }
+
+  const now = new Date().toISOString();
+
+  // アクティビティ取得
+  const activityResult = await ddbDocClient.send(new GetCommand({
+    TableName: TABLE_NAME,
+    Key: { PK: `ACTIVITY#${activityId}`, SK: 'METADATA' },
+  }));
+
+  if (!activityResult.Item) {
+    console.error(`Activity ${activityId} not found`);
+    return;
+  }
+
+  const participants = activityResult.Item.participants as string[] | undefined ?? [];
+  if (participants.includes(userId)) {
+    console.log(`User ${userId} already joined activity ${activityId} (idempotent)`);
+    return;
+  }
+
+  // 支払い記録保存 + 参加者追加（並行実行）
+  await Promise.all([
+    ddbDocClient.send(new PutCommand({
+      TableName: TABLE_NAME,
+      Item: {
+        PK: `ACTIVITY#${activityId}`,
+        SK: `PAYMENT#${userId}`,
+        amount: session.amount_total ?? 0,
+        stripeSessionId: session.id,
+        status: 'paid',
+        paidAt: now,
+      },
+      ConditionExpression: 'attribute_not_exists(PK)',
+    })),
+    ddbDocClient.send(new UpdateCommand({
+      TableName: TABLE_NAME,
+      Key: { PK: `ACTIVITY#${activityId}`, SK: 'METADATA' },
+      UpdateExpression: 'SET participants = list_append(if_not_exists(participants, :empty), :userId), currentParticipants = currentParticipants + :one, updatedAt = :now',
+      ConditionExpression: 'currentParticipants < maxParticipants',
+      ExpressionAttributeValues: {
+        ':userId': [userId],
+        ':one': 1,
+        ':now': now,
+        ':empty': [] as string[],
+      },
+    })),
+  ]);
+
+  console.log(`User ${userId} successfully joined activity ${activityId} via payment`);
 }
 
 async function handleVerificationCheckoutCompleted(
