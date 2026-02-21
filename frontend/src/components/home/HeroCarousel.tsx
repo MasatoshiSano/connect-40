@@ -56,16 +56,16 @@ interface UnsplashSearchResponse {
 }
 
 const VIDEO_QUERIES = [
-  'japanese mountain nature ambient',
-  'sake japanese bar evening',
-  'tokyo lifestyle adult',
+  'middle aged friends hiking together group',
+  'group adults laughing outdoor adventure',
+  'friends cooking dinner together fun',
 ];
 
 const IMAGE_QUERIES = [
-  'japan outdoor mountain hiking',
-  'japanese sake culture',
-  'golf japan green',
-  'japanese restaurant dinner',
+  'middle aged men friends hiking mountain',
+  'adult men friends golf laughing',
+  'group friends drinking beer laughing',
+  'adults friends outdoor activity smiling',
 ];
 
 const SLIDE_CONTENT = [
