@@ -219,32 +219,41 @@ async function handleVerificationCheckoutCompleted(
 
   const now = new Date().toISOString();
 
-  await Promise.all([
-    // VERIFICATION レコードを pending（admin審査待ち）に更新
-    ddbDocClient.send(
+  // VERIFICATION レコードを pending（admin審査待ち）に更新（payment_pending の時のみ、べき等性のため）
+  try {
+    await ddbDocClient.send(
       new UpdateCommand({
         TableName: TABLE_NAME,
         Key: { PK: `USER#${userId}`, SK: 'VERIFICATION' },
         UpdateExpression: 'SET paymentStatus = :status, paidAt = :now',
+        ConditionExpression: 'paymentStatus = :payment_pending',
         ExpressionAttributeValues: {
           ':status': 'pending',
           ':now': now,
+          ':payment_pending': 'payment_pending',
         },
       })
-    ),
-    // USER PROFILE の verificationStatus も 'pending' に
-    ddbDocClient.send(
-      new UpdateCommand({
-        TableName: TABLE_NAME,
-        Key: { PK: `USER#${userId}`, SK: 'PROFILE' },
-        UpdateExpression: 'SET verificationStatus = :status, updatedAt = :now',
-        ExpressionAttributeValues: {
-          ':status': 'pending',
-          ':now': now,
-        },
-      })
-    ),
-  ]);
+    );
+  } catch (conditionError) {
+    if (conditionError instanceof Error && conditionError.name !== 'ConditionalCheckFailedException') {
+      throw conditionError;
+    }
+    console.log(`Verification already processed for user ${userId} (idempotent)`);
+    return;
+  }
+
+  // USER PROFILE の verificationStatus も 'pending' に
+  await ddbDocClient.send(
+    new UpdateCommand({
+      TableName: TABLE_NAME,
+      Key: { PK: `USER#${userId}`, SK: 'PROFILE' },
+      UpdateExpression: 'SET verificationStatus = :status, updatedAt = :now',
+      ExpressionAttributeValues: {
+        ':status': 'pending',
+        ':now': now,
+      },
+    })
+  );
 
   console.log(`Verification payment received for user ${userId}, awaiting admin review`);
 }

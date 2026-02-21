@@ -33,22 +33,23 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     const now = new Date().toISOString();
 
-    await Promise.all([
-      // VERIFICATION レコード更新
-      ddb.send(new UpdateCommand({
-        TableName: TABLE_NAME,
-        Key: { PK: `USER#${targetUserId}`, SK: 'VERIFICATION' },
-        UpdateExpression: 'SET paymentStatus = :status, reviewedAt = :now',
-        ExpressionAttributeValues: { ':status': 'approved', ':now': now },
-      })),
-      // USER PROFILE の verificationStatus 更新
-      ddb.send(new UpdateCommand({
-        TableName: TABLE_NAME,
-        Key: { PK: `USER#${targetUserId}`, SK: 'PROFILE' },
-        UpdateExpression: 'SET verificationStatus = :status, updatedAt = :now',
-        ExpressionAttributeValues: { ':status': 'approved', ':now': now },
-      })),
-    ]);
+    // VERIFICATION レコード更新（存在確認 + pending 状態のみ承認可能）
+    await ddb.send(new UpdateCommand({
+      TableName: TABLE_NAME,
+      Key: { PK: `USER#${targetUserId}`, SK: 'VERIFICATION' },
+      UpdateExpression: 'SET paymentStatus = :status, reviewedAt = :now',
+      ConditionExpression: 'attribute_exists(PK) AND paymentStatus = :pending',
+      ExpressionAttributeValues: { ':status': 'approved', ':now': now, ':pending': 'pending' },
+    }));
+
+    // USER PROFILE の verificationStatus 更新（存在確認付き）
+    await ddb.send(new UpdateCommand({
+      TableName: TABLE_NAME,
+      Key: { PK: `USER#${targetUserId}`, SK: 'PROFILE' },
+      UpdateExpression: 'SET verificationStatus = :status, updatedAt = :now',
+      ConditionExpression: 'attribute_exists(PK)',
+      ExpressionAttributeValues: { ':status': 'approved', ':now': now },
+    }));
 
     return {
       statusCode: 200,
@@ -56,6 +57,9 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       body: JSON.stringify({ data: { success: true } }),
     };
   } catch (error) {
+    if (error instanceof Error && error.name === 'ConditionalCheckFailedException') {
+      return { statusCode: 404, headers: corsHeaders, body: JSON.stringify({ error: 'Verification record not found or not in pending status' }) };
+    }
     console.error('Error approving verification:', error);
     return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: 'Internal server error' }) };
   }

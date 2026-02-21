@@ -19,6 +19,8 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'OPTIONS,POST',
 };
 
+const S3_URL_PATTERN = /^https:\/\/[a-z0-9][a-z0-9.-]+\.s3(\.[a-z0-9-]+)?\.amazonaws\.com\//;
+
 /**
  * POST /verification/checkout
  * 本人確認の支払いセッションを作成する
@@ -39,13 +41,19 @@ export const handler = async (
       return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'documentUrl and email are required' }) };
     }
 
-    // すでに承認済みならエラー
+    // documentUrl の S3 URL バリデーション
+    if (!S3_URL_PATTERN.test(documentUrl)) {
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'documentUrl must be a valid S3 URL' }) };
+    }
+
+    // 既存レコードのステータスチェック（TOCTOU対策の第一層）
     const existing = await ddb.send(new GetCommand({
       TableName: TABLE_NAME,
       Key: { PK: `USER#${userId}`, SK: 'VERIFICATION' },
     }));
-    if (existing.Item?.paymentStatus === 'approved') {
-      return { statusCode: 409, headers: corsHeaders, body: JSON.stringify({ error: 'Already verified' }) };
+    const existingStatus = existing.Item?.paymentStatus as string | undefined;
+    if (existingStatus === 'approved' || existingStatus === 'payment_pending' || existingStatus === 'pending') {
+      return { statusCode: 409, headers: corsHeaders, body: JSON.stringify({ error: 'Verification already submitted or approved' }) };
     }
 
     // Stripe Checkout セッション作成 (一回限り支払い)
@@ -73,7 +81,7 @@ export const handler = async (
       customer_email: email,
     });
 
-    // DynamoDB に支払い待ちレコードを保存
+    // DynamoDB に支払い待ちレコードを保存（アトミックな競合防止）
     await ddb.send(new PutCommand({
       TableName: TABLE_NAME,
       Item: {
@@ -84,6 +92,8 @@ export const handler = async (
         stripeSessionId: session.id,
         submittedAt: new Date().toISOString(),
       },
+      ConditionExpression: 'attribute_not_exists(PK) OR paymentStatus = :rejected',
+      ExpressionAttributeValues: { ':rejected': 'rejected' },
     }));
 
     return {
@@ -92,6 +102,9 @@ export const handler = async (
       body: JSON.stringify({ sessionId: session.id, url: session.url }),
     };
   } catch (error) {
+    if (error instanceof Error && error.name === 'ConditionalCheckFailedException') {
+      return { statusCode: 409, headers: corsHeaders, body: JSON.stringify({ error: 'Verification already in progress or approved' }) };
+    }
     console.error('Error creating verification checkout:', error);
     return {
       statusCode: 500,
