@@ -7,12 +7,40 @@ const ddbDocClient = DynamoDBDocumentClient.from(client);
 
 const TABLE_NAME = process.env.TABLE_NAME!;
 
+function isAdmin(claims: Record<string, string>): boolean {
+  const groups = claims['cognito:groups'];
+  if (!groups) return false;
+  const groupList = Array.isArray(groups) ? groups : groups.split(',').map((g) => g.trim());
+  return groupList.includes('admin');
+}
+
 export const handler: APIGatewayProxyHandler = async (event) => {
+  const userId = event.requestContext.authorizer?.claims?.sub;
+  if (!userId) {
+    return {
+      statusCode: 401,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+      },
+      body: JSON.stringify({
+        error: {
+          code: 'UNAUTHORIZED',
+          message: 'User not authenticated',
+        },
+      }),
+    };
+  }
+
   const chatRoomId = event.pathParameters?.chatRoomId;
 
   if (!chatRoomId) {
     return {
       statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+      },
       body: JSON.stringify({
         error: {
           code: 'INVALID_REQUEST',
@@ -38,6 +66,10 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     if (!roomResult.Items || roomResult.Items.length === 0) {
       return {
         statusCode: 404,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        },
         body: JSON.stringify({
           error: {
             code: 'NOT_FOUND',
@@ -48,6 +80,25 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     }
 
     const chatRoom = roomResult.Items[0];
+
+    // Verify the requesting user is a participant (admin bypasses this)
+    const claims = (event.requestContext.authorizer?.claims ?? {}) as Record<string, string>;
+    const roomParticipantIds = chatRoom.participantIds as string[];
+    if (!isAdmin(claims) && !roomParticipantIds.includes(userId)) {
+      return {
+        statusCode: 403,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        },
+        body: JSON.stringify({
+          error: {
+            code: 'FORBIDDEN',
+            message: 'Not a participant of this chat room',
+          },
+        }),
+      };
+    }
 
     // Get recent messages (last 50)
     const messagesResult = await ddbDocClient.send(
@@ -68,6 +119,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         messageId: item.messageId,
         senderId: item.senderId,
         content: item.content,
+        messageType: (item.messageType as string) || 'user',
         readBy: item.readBy || [],
         createdAt: item.createdAt,
         timestamp: item.timestamp,
@@ -76,9 +128,14 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     return {
       statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+      },
       body: JSON.stringify({
         data: {
           chatRoomId: chatRoom.chatRoomId,
+          name: chatRoom.name,
           participantIds: chatRoom.participantIds,
           type: chatRoom.type,
           activityId: chatRoom.activityId,
@@ -92,6 +149,10 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     console.error('Error getting chat room:', error);
     return {
       statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+      },
       body: JSON.stringify({
         error: {
           code: 'INTERNAL_ERROR',

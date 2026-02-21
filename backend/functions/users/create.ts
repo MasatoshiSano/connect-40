@@ -5,6 +5,13 @@ import { successResponse, errorResponse } from '../../layers/common/nodejs/utils
 import { v4 as uuidv4 } from 'uuid';
 import type { User } from '../../types';
 
+function isAdmin(claims: Record<string, string>): boolean {
+  const groups = claims['cognito:groups'];
+  if (!groups) return false;
+  const groupList = Array.isArray(groups) ? groups : groups.split(',').map((g) => g.trim());
+  return groupList.includes('admin');
+}
+
 const TABLE_NAME = process.env.TABLE_NAME!;
 
 interface CreateUserInput {
@@ -44,12 +51,29 @@ export const handler = async (
       return errorResponse(400, 'INVALID_INPUT', 'Missing required fields');
     }
 
-    if (input.age < 35 || input.age > 49) {
+    // Validate string lengths to prevent abuse
+    if (typeof input.nickname !== 'string' || input.nickname.length < 1 || input.nickname.length > 50) {
+      return errorResponse(400, 'INVALID_INPUT', 'Nickname must be 1-50 characters');
+    }
+
+    if (typeof input.bio !== 'string' || input.bio.length > 1000) {
+      return errorResponse(400, 'INVALID_INPUT', 'Bio must be 1000 characters or less');
+    }
+
+    const claims = (event.requestContext.authorizer?.claims ?? {}) as Record<string, string>;
+    if (!isAdmin(claims) && (typeof input.age !== 'number' || input.age < 35 || input.age > 49)) {
       return errorResponse(400, 'INVALID_AGE', 'Age must be between 35 and 49');
     }
 
-    if (input.interests.length < 3 || input.interests.length > 10) {
+    if (!Array.isArray(input.interests) || input.interests.length < 3 || input.interests.length > 10) {
       return errorResponse(400, 'INVALID_INTERESTS', 'Must select 3-10 interests');
+    }
+
+    // Validate location coordinates
+    if (typeof input.location.latitude !== 'number' || typeof input.location.longitude !== 'number' ||
+        input.location.latitude < -90 || input.location.latitude > 90 ||
+        input.location.longitude < -180 || input.location.longitude > 180) {
+      return errorResponse(400, 'INVALID_INPUT', 'Invalid location coordinates');
     }
 
     // Calculate geohash for location indexing
