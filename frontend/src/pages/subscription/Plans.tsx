@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
 import { Icon } from '../../components/ui/Icon';
 import { useAuthStore } from '../../stores/auth';
@@ -56,9 +57,16 @@ export const Plans = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { idToken } = useAuthStore();
+  const navigate = useNavigate();
+  const isAuthenticated = !!idToken;
 
   const handleSubscribe = async (planId: string) => {
     if (planId === 'free') return;
+
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
 
     const plan = PLANS.find((p) => p.id === planId);
     if (!plan || !plan.stripePriceId) {
@@ -93,15 +101,15 @@ export const Plans = () => {
   };
 
   return (
-    <Layout isAuthenticated={true}>
-      <div className="min-h-screen bg-bg-light dark:bg-bg-dark py-12">
+    <Layout isAuthenticated={isAuthenticated}>
+      <div className="min-h-screen bg-base dark:bg-base py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
-              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              <h1 className="text-3xl font-serif font-light tracking-ryokan text-text-primary dark:text-text-dark-primary mb-4">
                 プランを選択
               </h1>
-              <p className="text-xl text-gray-600 dark:text-gray-400">
+              <p className="text-xl text-text-secondary dark:text-text-dark-secondary font-light">
                 あなたに最適なプランを選んでください
               </p>
             </div>
@@ -111,41 +119,41 @@ export const Plans = () => {
                 <div
                   key={plan.id}
                   className={`
-                    bg-white dark:bg-surface-dark rounded-2xl shadow-lg p-8
-                    ${plan.recommended ? 'ring-4 ring-primary relative' : ''}
+                    bg-surface-light dark:bg-surface-dark border p-8
+                    ${plan.recommended ? 'border-gold border-2 relative' : 'border-border-light dark:border-border-dark'}
                   `}
                 >
                   {plan.recommended && (
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                      <span className="px-4 py-1 bg-primary text-white text-sm font-semibold rounded-full">
+                      <span className="px-4 py-1 bg-gold text-base text-sm font-light tracking-ryokan-wide uppercase">
                         おすすめ
                       </span>
                     </div>
                   )}
 
                   <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                    <h2 className="text-2xl font-serif font-light tracking-wide text-text-primary dark:text-text-dark-primary mb-4">
                       {plan.name}
                     </h2>
                     <div className="mb-2">
-                      <span className="text-5xl font-bold text-gray-900 dark:text-white">
+                      <span className="text-4xl font-serif font-light text-gold">
                         ¥{plan.price.toLocaleString()}
                       </span>
-                      <span className="text-gray-600 dark:text-gray-400">/月</span>
+                      <span className="text-text-secondary dark:text-text-dark-secondary font-light">/月</span>
                     </div>
                   </div>
 
                   <ul className="space-y-4 mb-8">
                     {plan.features.map((feature, index) => (
                       <li key={index} className="flex items-start gap-3">
-                        <Icon name="check_circle" className="text-green-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700 dark:text-gray-300">{feature}</span>
+                        <Icon name="check_circle" className="text-gold flex-shrink-0 mt-0.5" />
+                        <span className="text-text-secondary dark:text-text-dark-secondary font-light">{feature}</span>
                       </li>
                     ))}
                     {plan.limitations?.map((limitation, index) => (
                       <li key={`limit-${index}`} className="flex items-start gap-3">
-                        <Icon name="cancel" className="text-red-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-500 dark:text-gray-400">{limitation}</span>
+                        <Icon name="cancel" className="text-text-dark-muted flex-shrink-0 mt-0.5" />
+                        <span className="text-text-muted dark:text-text-dark-muted font-light">{limitation}</span>
                       </li>
                     ))}
                   </ul>
@@ -154,10 +162,10 @@ export const Plans = () => {
                     onClick={() => handleSubscribe(plan.id)}
                     disabled={isProcessing || plan.id === 'free'}
                     className={`
-                      w-full py-4 rounded-lg font-semibold transition
+                      w-full py-4 font-light transition duration-base
                       ${plan.recommended
-                        ? 'bg-primary text-white hover:bg-primary-600'
-                        : 'border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+                        ? 'border border-gold text-gold hover:bg-gold/10'
+                        : 'border border-border-light dark:border-border-dark text-text-secondary dark:text-text-dark-secondary hover:border-gold/40'
                       }
                       disabled:opacity-50 disabled:cursor-not-allowed
                     `}
@@ -169,20 +177,20 @@ export const Plans = () => {
             </div>
 
             {error && (
-              <div className="mt-8 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <div className="mt-8 p-4 bg-red-900/20 border border-red-800">
                 <div className="flex items-center gap-2">
-                  <Icon name="error" className="text-red-600 dark:text-red-400" />
-                  <p className="text-red-900 dark:text-red-100">{error}</p>
+                  <Icon name="error" className="text-red-400" />
+                  <p className="text-red-400 font-light">{error}</p>
                 </div>
               </div>
             )}
 
-            <div className="mt-12 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+            <div className="mt-12 p-6 bg-gold/5 border border-gold/20">
               <div className="flex items-start gap-3">
-                <Icon name="info" className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
-                <div className="text-sm text-blue-900 dark:text-blue-100">
-                  <p className="font-semibold mb-2">お支払いについて</p>
-                  <ul className="list-disc list-inside space-y-1 text-blue-800 dark:text-blue-200">
+                <Icon name="info" className="text-gold flex-shrink-0" />
+                <div className="text-sm text-text-dark-secondary font-light">
+                  <p className="font-light mb-2 text-text-primary dark:text-text-dark-primary">お支払いについて</p>
+                  <ul className="list-disc list-inside space-y-1">
                     <li>クレジットカード決済（Stripe）</li>
                     <li>初月無料トライアル実施中</li>
                     <li>いつでもキャンセル可能</li>

@@ -292,11 +292,7 @@ function App() {
           {/* Subscription routes */}
           <Route
             path="/subscription/plans"
-            element={
-              <ProtectedRoute>
-                <Plans />
-              </ProtectedRoute>
-            }
+            element={<Plans />}
           />
           <Route
             path="/subscription/success"
