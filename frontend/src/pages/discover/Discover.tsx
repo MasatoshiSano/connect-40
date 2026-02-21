@@ -13,6 +13,15 @@ interface DiscoverUser {
   profilePhoto: string;
   interests: string[];
   matchScore: number;
+  location?: { latitude: number; longitude: number; address: string };
+}
+
+function calcDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 export const Discover = () => {
@@ -22,6 +31,9 @@ export const Discover = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedInterest, setSelectedInterest] = useState<string | null>(null);
+  const [nearbyEnabled, setNearbyEnabled] = useState(false);
+  const [myLocation, setMyLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -43,9 +55,35 @@ export const Discover = () => {
     new Set(users.flatMap((u) => u.interests))
   ).sort();
 
-  const filteredUsers = selectedInterest
+  const handleNearbyToggle = () => {
+    if (!nearbyEnabled) {
+      setIsGettingLocation(true);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setMyLocation({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+          setNearbyEnabled(true);
+          setIsGettingLocation(false);
+        },
+        () => {
+          setIsGettingLocation(false);
+        }
+      );
+    } else {
+      setNearbyEnabled(false);
+    }
+  };
+
+  const filteredByInterest = selectedInterest
     ? users.filter((u) => u.interests.includes(selectedInterest))
     : users;
+
+  const filteredUsers = nearbyEnabled && myLocation
+    ? [...filteredByInterest].sort((a, b) => {
+        const distA = a.location ? calcDistance(myLocation.latitude, myLocation.longitude, a.location.latitude, a.location.longitude) : 9999;
+        const distB = b.location ? calcDistance(myLocation.latitude, myLocation.longitude, b.location.latitude, b.location.longitude) : 9999;
+        return distA - distB;
+      })
+    : filteredByInterest;
 
   if (isLoading) {
     return (
@@ -86,6 +124,23 @@ export const Discover = () => {
                   }`}
                 >
                   すべて
+                </button>
+                <button
+                  onClick={handleNearbyToggle}
+                  disabled={isGettingLocation}
+                  className={`px-3 py-1.5 text-xs font-light border transition-colors duration-base ${
+                    nearbyEnabled
+                      ? 'bg-gold/10 border-gold/60 text-gold'
+                      : 'border-border-light dark:border-border-dark text-text-secondary dark:text-text-dark-muted hover:border-gold/40'
+                  }`}
+                >
+                  {isGettingLocation ? '取得中...' : (
+                    <>
+                      <Icon name="near_me" size="sm" className="inline-block align-text-bottom mr-1" />
+                      近所を優先
+                      {nearbyEnabled && <Icon name="check" size="sm" className="inline-block align-text-bottom ml-1" />}
+                    </>
+                  )}
                 </button>
                 {allInterests.map((interest) => (
                   <button

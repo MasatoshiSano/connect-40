@@ -362,6 +362,7 @@ interface DiscoverUserResponse {
   profilePhoto: string;
   interests: string[];
   matchScore: number;
+  location?: { latitude: number; longitude: number; address: string };
 }
 
 /**
@@ -486,6 +487,36 @@ export async function getRecommendations(): Promise<{
   }>('/recommendations', {
     method: 'GET',
   });
+}
+
+// Public Profile by userId (for chat sender display)
+
+export async function getPublicProfile(userId: string): Promise<{
+  userId: string;
+  nickname: string;
+  profilePhoto: string;
+  age?: number;
+  bio?: string;
+  interests?: string[];
+}> {
+  return fetchWithAuth<{
+    userId: string;
+    nickname: string;
+    profilePhoto: string;
+    age?: number;
+    bio?: string;
+    interests?: string[];
+  }>(`/users/${userId}/public`);
+}
+
+// Chat read status API
+
+export async function markRoomAsRead(chatRoomId: string): Promise<void> {
+  try {
+    await fetchWithAuth(`/chat/rooms/${chatRoomId}/read`, { method: 'POST' });
+  } catch {
+    // エンドポイントが存在しない場合はサイレントに無視
+  }
 }
 
 // AI Text Refinement API
