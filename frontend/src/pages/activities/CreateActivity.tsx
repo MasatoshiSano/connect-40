@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { Layout } from '../../components/layout/Layout';
 import { Icon } from '../../components/ui/Icon';
 import { ACTIVITY_CATEGORIES, DURATION_OPTIONS, MAX_PARTICIPANTS_OPTIONS, RECURRENCE_OPTIONS } from '../../constants/activities';
+import { RefineButton } from '../../components/ui/RefineButton';
 import type { Location } from '../../types/activity';
 
 const createActivitySchema = z.object({
@@ -51,6 +52,7 @@ export const CreateActivity = () => {
     handleSubmit,
     control,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<CreateActivityFormData>({
     resolver: zodResolver(createActivitySchema),
@@ -380,6 +382,13 @@ export const CreateActivity = () => {
                     <p className={`text-xs ml-auto ${descriptionLength > 1000 ? 'text-red-500' : 'text-text-secondary dark:text-text-dark-muted'}`}>
                       {descriptionLength} / 1000
                     </p>
+                  </div>
+                  <div className="flex justify-end mt-1">
+                    <RefineButton
+                      text={watch('description') ?? ''}
+                      type="activity"
+                      onRefined={(refined) => setValue('description', refined)}
+                    />
                   </div>
                 </div>
 

@@ -4,6 +4,7 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import * as path from 'path';
@@ -793,6 +794,37 @@ export class ApiStack extends cdk.Stack {
 
     const verificationRejectResource = verification.addResource('reject');
     verificationRejectResource.addMethod('POST', new apigateway.LambdaIntegration(rejectVerificationFunction), {
+      authorizer: this.authorizer,
+    });
+
+    // AI Text Refinement Lambda function
+    const refineTextFunction = new NodejsFunction(this, 'RefineTextFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      entry: path.join(__dirname, '../../../backend/functions/ai/refineText.ts'),
+      environment: {},
+      bundling: {
+        minify: true,
+        sourceMap: true,
+        externalModules: ['@aws-sdk/*'],
+        forceDockerBundling: false,
+      },
+      timeout: cdk.Duration.seconds(30),
+    });
+
+    // Grant Bedrock InvokeModel permission
+    refineTextFunction.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['bedrock:InvokeModel'],
+        resources: ['arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-haiku-4-5-20251001'],
+      })
+    );
+
+    this.functions.push(refineTextFunction);
+
+    // AI API Routes - POST /ai/refine
+    const ai = this.api.root.addResource('ai');
+    const aiRefine = ai.addResource('refine');
+    aiRefine.addMethod('POST', new apigateway.LambdaIntegration(refineTextFunction), {
       authorizer: this.authorizer,
     });
 

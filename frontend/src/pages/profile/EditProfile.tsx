@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { Layout } from '../../components/layout/Layout';
 import { Icon } from '../../components/ui/Icon';
 import { getUserProfile, updateUserProfile, uploadProfilePhoto } from '../../services/api';
+import { RefineButton } from '../../components/ui/RefineButton';
 import { INTEREST_CATEGORIES } from '../../constants/interests';
 import type { UserProfile } from '../../services/api';
 
@@ -45,6 +46,7 @@ export const EditProfile = () => {
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<EditProfileFormData>({
     resolver: zodResolver(editProfileSchema),
@@ -297,6 +299,13 @@ export const EditProfile = () => {
                       <p className={`text-xs ml-auto font-light ${bioLength > 500 ? 'text-red-500' : 'text-text-muted dark:text-text-dark-muted'}`}>
                         {bioLength} / 500
                       </p>
+                    </div>
+                    <div className="flex justify-end mt-1">
+                      <RefineButton
+                        text={watch('bio') ?? ''}
+                        type="bio"
+                        onRefined={(refined) => setValue('bio', refined)}
+                      />
                     </div>
                   </div>
                 </div>

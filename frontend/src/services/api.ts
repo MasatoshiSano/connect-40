@@ -487,3 +487,20 @@ export async function getRecommendations(): Promise<{
     method: 'GET',
   });
 }
+
+// AI Text Refinement API
+
+/**
+ * Refine text using AI (Bedrock Claude Haiku)
+ */
+export async function refineText(
+  text: string,
+  type: 'activity' | 'bio',
+  userContext: { nickname: string; age: number; interests: string[]; location?: string }
+): Promise<string> {
+  const response = await fetchWithAuth<{ refinedText: string }>('/ai/refine', {
+    method: 'POST',
+    body: JSON.stringify({ text, type, userContext }),
+  });
+  return response.refinedText;
+}
