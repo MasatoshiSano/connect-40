@@ -507,7 +507,7 @@ export async function getPublicProfile(userId: string): Promise<{
     age?: number;
     bio?: string;
     interests?: string[];
-  }>(`/users/${userId}/public`);
+  }>(`/users/${userId}/profile`);
 }
 
 // Chat read status API
