@@ -78,22 +78,22 @@ export const Header = ({ isAuthenticated = false }: HeaderProps) => {
           {/* Navigation */}
           {isAuthenticated ? (
             <nav className="hidden md:flex items-center gap-6">
-              <button onClick={() => navigate('/')} className="text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
+              <button onClick={() => navigate('/')} className="whitespace-nowrap text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
                 ホーム
               </button>
-              <button onClick={() => navigate('/activities')} className="text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
+              <button onClick={() => navigate('/activities')} className="whitespace-nowrap text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
                 アクティビティ
               </button>
-              <button onClick={() => navigate('/chat')} className="text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
+              <button onClick={() => navigate('/chat')} className="whitespace-nowrap text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
                 チャット
               </button>
-              <button onClick={() => navigate('/discover')} className="text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
+              <button onClick={() => navigate('/discover')} className="whitespace-nowrap text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
                 仲間を探す
               </button>
-              <button onClick={() => navigate('/calendar')} className="text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
+              <button onClick={() => navigate('/calendar')} className="whitespace-nowrap text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
                 カレンダー
               </button>
-              <button onClick={() => navigate('/dashboard')} className="text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
+              <button onClick={() => navigate('/dashboard')} className="whitespace-nowrap text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
                 ダッシュボード
               </button>
               {nickname && (
@@ -104,16 +104,16 @@ export const Header = ({ isAuthenticated = false }: HeaderProps) => {
             </nav>
           ) : (
             <nav className="hidden md:flex items-center gap-6">
-              <button onClick={() => navigate('/')} className="text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
+              <button onClick={() => navigate('/')} className="whitespace-nowrap text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
                 ホーム
               </button>
-              <button onClick={() => navigate('/about')} className="text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
+              <button onClick={() => navigate('/about')} className="whitespace-nowrap text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
                 コンセプト
               </button>
-              <button onClick={() => navigate('/activities')} className="text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
+              <button onClick={() => navigate('/activities')} className="whitespace-nowrap text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
                 アクティビティ
               </button>
-              <button onClick={() => navigate('/subscription/plans')} className="text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
+              <button onClick={() => navigate('/subscription/plans')} className="whitespace-nowrap text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors duration-base">
                 料金プラン
               </button>
             </nav>
@@ -210,37 +210,37 @@ export const Header = ({ isAuthenticated = false }: HeaderProps) => {
                 )}
                 <button
                   onClick={() => { navigate('/'); setIsMobileMenuOpen(false); }}
-                  className="px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
+                  className="whitespace-nowrap px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
                 >
                   ホーム
                 </button>
                 <button
                   onClick={() => { navigate('/activities'); setIsMobileMenuOpen(false); }}
-                  className="px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
+                  className="whitespace-nowrap px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
                 >
                   アクティビティ
                 </button>
                 <button
                   onClick={() => { navigate('/chat'); setIsMobileMenuOpen(false); }}
-                  className="px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
+                  className="whitespace-nowrap px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
                 >
                   チャット
                 </button>
                 <button
                   onClick={() => { navigate('/discover'); setIsMobileMenuOpen(false); }}
-                  className="px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
+                  className="whitespace-nowrap px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
                 >
                   仲間を探す
                 </button>
                 <button
                   onClick={() => { navigate('/calendar'); setIsMobileMenuOpen(false); }}
-                  className="px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
+                  className="whitespace-nowrap px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
                 >
                   カレンダー
                 </button>
                 <button
                   onClick={() => { navigate('/dashboard'); setIsMobileMenuOpen(false); }}
-                  className="px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
+                  className="whitespace-nowrap px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
                 >
                   ダッシュボード
                 </button>
@@ -249,25 +249,25 @@ export const Header = ({ isAuthenticated = false }: HeaderProps) => {
               <div className="flex flex-col space-y-3">
                 <button
                   onClick={() => { navigate('/'); setIsMobileMenuOpen(false); }}
-                  className="px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
+                  className="whitespace-nowrap px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
                 >
                   ホーム
                 </button>
                 <button
                   onClick={() => { navigate('/about'); setIsMobileMenuOpen(false); }}
-                  className="px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
+                  className="whitespace-nowrap px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
                 >
                   コンセプト
                 </button>
                 <button
                   onClick={() => { navigate('/activities'); setIsMobileMenuOpen(false); }}
-                  className="px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
+                  className="whitespace-nowrap px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
                 >
                   アクティビティ
                 </button>
                 <button
                   onClick={() => { navigate('/subscription/plans'); setIsMobileMenuOpen(false); }}
-                  className="px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
+                  className="whitespace-nowrap px-4 py-3 text-left text-text-secondary dark:text-text-dark-muted hover:text-gold hover:bg-gold/5 transition-colors duration-base"
                 >
                   料金プラン
                 </button>

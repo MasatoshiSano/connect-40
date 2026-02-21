@@ -87,6 +87,10 @@ export const Dashboard = () => {
   }, []);
 
   const handleOpenPortal = async () => {
+    if (profile?.membershipTier !== 'premium') {
+      navigate('/subscription/plans');
+      return;
+    }
     setIsPortalLoading(true);
     try {
       const { createPortalSession } = await import('../services/payment');

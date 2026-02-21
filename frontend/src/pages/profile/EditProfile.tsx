@@ -40,6 +40,7 @@ export const EditProfile = () => {
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isPlanLoading, setIsPlanLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { isDark, toggle } = useDarkMode();
 
@@ -157,6 +158,22 @@ export const EditProfile = () => {
       setError(err instanceof Error ? err.message : 'プロフィールの更新に失敗しました');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handlePlanManagement = async () => {
+    if (profile?.membershipTier !== 'premium') {
+      navigate('/subscription/plans');
+      return;
+    }
+    setIsPlanLoading(true);
+    try {
+      const { createPortalSession } = await import('../../services/payment');
+      const { url } = await createPortalSession();
+      window.location.href = url;
+    } catch (err) {
+      console.error('Failed to open portal:', err);
+      setIsPlanLoading(false);
     }
   };
 
@@ -380,6 +397,36 @@ export const EditProfile = () => {
                           isDark ? 'translate-x-6' : 'translate-x-1'
                         }`}
                       />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Plan Management */}
+                <div className="border-t border-border-light dark:border-border-dark pt-6 mt-6">
+                  <h3 className="text-sm font-medium text-text-secondary dark:text-text-dark-secondary mb-4 tracking-wider uppercase">
+                    プラン管理
+                  </h3>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-text-primary dark:text-text-dark-primary text-sm">
+                        現在のプラン: {profile?.membershipTier === 'premium' ? 'プレミアム' : '無料'}
+                      </p>
+                      <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
+                        {profile?.membershipTier === 'premium' ? 'プランの変更・解約はこちら' : 'プレミアムにアップグレード'}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handlePlanManagement}
+                      disabled={isPlanLoading}
+                      className="px-4 py-2 border border-gold/30 text-gold text-sm hover:bg-gold/10 transition-all duration-base flex items-center gap-2 disabled:opacity-50"
+                    >
+                      {isPlanLoading ? (
+                        <Icon name="sync" size="sm" className="animate-spin" />
+                      ) : (
+                        <Icon name="credit_card" size="sm" />
+                      )}
+                      {profile?.membershipTier === 'premium' ? 'プラン管理' : 'アップグレード'}
                     </button>
                   </div>
                 </div>
