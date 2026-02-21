@@ -255,10 +255,11 @@ async function handleActivityJoinCheckoutCompleted(
     ddbDocClient.send(new UpdateCommand({
       TableName: TABLE_NAME,
       Key: { PK: `ACTIVITY#${activityId}`, SK: 'METADATA' },
-      UpdateExpression: 'SET participants = list_append(if_not_exists(participants, :empty), :userId), currentParticipants = currentParticipants + :one, updatedAt = :now',
-      ConditionExpression: 'currentParticipants < maxParticipants',
+      UpdateExpression: 'SET participants = list_append(if_not_exists(participants, :empty), :userIdList), currentParticipants = currentParticipants + :one, updatedAt = :now',
+      ConditionExpression: 'currentParticipants < maxParticipants AND not contains(participants, :userId)',
       ExpressionAttributeValues: {
-        ':userId': [userId],
+        ':userIdList': [userId],
+        ':userId': userId,
         ':one': 1,
         ':now': now,
         ':empty': [] as string[],

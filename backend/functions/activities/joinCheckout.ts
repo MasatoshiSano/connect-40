@@ -1,22 +1,14 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import Stripe from 'stripe';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb';
+import { ddbDocClient, GetCommand } from '../../layers/common/nodejs/dynamodb';
+import { successResponse, errorResponse } from '../../layers/common/nodejs/utils';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2026-01-28.clover',
 });
 
-const client = new DynamoDBClient({});
-const ddb = DynamoDBDocumentClient.from(client);
 const TABLE_NAME = process.env.TABLE_NAME!;
 const FRONTEND_URL = process.env.FRONTEND_URL!;
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-  'Access-Control-Allow-Methods': 'OPTIONS,POST',
-};
 
 /**
  * POST /activities/{id}/join-checkout
@@ -27,39 +19,39 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   try {
     const userId = event.requestContext.authorizer?.claims?.sub;
     if (!userId) {
-      return { statusCode: 401, headers: corsHeaders, body: JSON.stringify({ error: 'Unauthorized' }) };
+      return errorResponse(401, 'UNAUTHORIZED', 'Unauthorized');
     }
 
     const activityId = event.pathParameters?.id;
     if (!activityId) {
-      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Activity ID required' }) };
+      return errorResponse(400, 'INVALID_INPUT', 'Activity ID required');
     }
 
     // アクティビティ取得
-    const activityResult = await ddb.send(new GetCommand({
+    const activityResult = await ddbDocClient.send(new GetCommand({
       TableName: TABLE_NAME,
       Key: { PK: `ACTIVITY#${activityId}`, SK: 'METADATA' },
     }));
 
     if (!activityResult.Item) {
-      return { statusCode: 404, headers: corsHeaders, body: JSON.stringify({ error: 'Activity not found' }) };
+      return errorResponse(404, 'NOT_FOUND', 'Activity not found');
     }
 
     const entryFee = activityResult.Item.entryFee as number | undefined;
     if (!entryFee || entryFee <= 0) {
-      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'This activity is free. Use the regular join endpoint.' }) };
+      return errorResponse(400, 'INVALID_INPUT', 'This activity is free. Use the regular join endpoint.');
     }
 
     // すでに参加しているか確認
     const participants = activityResult.Item.participants as string[] | undefined ?? [];
     if (participants.includes(userId)) {
-      return { statusCode: 409, headers: corsHeaders, body: JSON.stringify({ error: 'Already joined this activity' }) };
+      return errorResponse(409, 'ALREADY_JOINED', 'Already joined this activity');
     }
 
     const body = JSON.parse(event.body || '{}') as { email?: string };
     const { email } = body;
     if (!email) {
-      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'email is required' }) };
+      return errorResponse(400, 'INVALID_INPUT', 'email is required');
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -86,13 +78,9 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       customer_email: email,
     });
 
-    return {
-      statusCode: 200,
-      headers: corsHeaders,
-      body: JSON.stringify({ sessionId: session.id, url: session.url }),
-    };
+    return successResponse({ sessionId: session.id, url: session.url });
   } catch (error) {
     console.error('Error creating activity join checkout:', error);
-    return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: 'Internal server error' }) };
+    return errorResponse(500, 'INTERNAL_ERROR', 'Internal server error');
   }
 };
