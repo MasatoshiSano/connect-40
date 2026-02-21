@@ -10,11 +10,13 @@ import { useAuthStore } from '../stores/auth';
 import { useChatStore } from '../stores/chat';
 import type { Activity } from '../types/activity';
 import type { UserProfile } from '../services/api';
+import { BADGES, getEarnedBadges } from '../constants/badges';
 import type { UserStats } from '../constants/badges';
 
 export const Dashboard = () => {
   const navigate = useNavigate();
   const { userId, nickname } = useAuthStore();
+  const chatCredits = useAuthStore((state) => state.chatCredits);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [hostedActivities, setHostedActivities] = useState<Activity[]>([]);
   const [joinedActivities, setJoinedActivities] = useState<Activity[]>([]);
@@ -231,6 +233,20 @@ export const Dashboard = () => {
             </div>
           )}
 
+          {/* Chat Credits */}
+          {profile?.membershipTier !== 'premium' && chatCredits !== null && (
+            <div className="mb-8 p-4 border border-border-light dark:border-border-dark">
+              <h3 className="text-sm font-light text-text-secondary dark:text-text-dark-muted mb-2">チャット残り回数</h3>
+              <div className="flex items-center gap-3">
+                <span className="text-2xl font-light text-gold">{chatCredits}</span>
+                <span className="text-sm text-text-secondary dark:text-text-dark-muted">回</span>
+              </div>
+              <p className="text-xs text-text-secondary dark:text-text-dark-muted mt-1">
+                毎日3回 · アクティビティ参加で+20回
+              </p>
+            </div>
+          )}
+
           {/* Stats Cards */}
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             <div className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-6">
@@ -363,6 +379,42 @@ export const Dashboard = () => {
             <h2 className="text-xl font-light tracking-ryokan text-text-primary dark:text-text-dark-primary mb-4">
               バッジ
             </h2>
+
+            {/* Badge status message */}
+            {(() => {
+              const earnedBadges = getEarnedBadges(userStats);
+              const badgeCount = earnedBadges.length;
+              const statusMessages = [
+                { min: 0, message: '最初のバッジを獲得しよう！アクティビティに参加してみましょう' },
+                { min: 1, message: 'コミュニティの第一歩を踏み出しました！' },
+                { min: 3, message: '常連メンバーとして認められています！' },
+                { min: 5, message: 'コミュニティリーダーです！おめでとうございます！' },
+              ];
+              const statusMessage = [...statusMessages].reverse().find(s => badgeCount >= s.min)?.message;
+              const earnedIds = new Set(earnedBadges.map(b => b.id));
+              const unearnedBadges = BADGES.filter(b => !earnedIds.has(b.id));
+              const nextBadge = unearnedBadges[0];
+
+              return (
+                <div className="mb-4 p-4 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Icon name="emoji_events" size="sm" className="text-gold" />
+                    <p className="text-sm font-light text-text-primary dark:text-text-dark-primary">
+                      {badgeCount} / {BADGES.length} バッジ獲得
+                    </p>
+                  </div>
+                  {statusMessage && (
+                    <p className="text-xs text-gold font-light mb-2">{statusMessage}</p>
+                  )}
+                  {nextBadge && (
+                    <p className="text-xs text-text-secondary dark:text-text-dark-muted font-light">
+                      次のバッジまで: {nextBadge.name} — {nextBadge.description}
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
+
             <BadgeGrid stats={userStats} />
           </div>
         </div>

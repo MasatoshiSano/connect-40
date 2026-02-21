@@ -241,6 +241,11 @@ export const Discover = () => {
                           {user.matchScore}%
                         </p>
                         <p className="text-[10px] text-text-secondary dark:text-text-dark-muted">一致</p>
+                        {user.matchScore >= 80 && (
+                          <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 border border-gold/40 text-gold font-light">
+                            相性◎
+                          </span>
+                        )}
                       </div>
                     )}
                   </div>

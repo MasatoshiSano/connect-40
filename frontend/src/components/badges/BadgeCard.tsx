@@ -36,6 +36,11 @@ export const BadgeCard = ({ badge, earned }: BadgeCardProps) => {
       <p className="text-xs text-text-secondary dark:text-text-dark-muted text-center mt-1 font-light">
         {badge.description}
       </p>
+      {earned && (
+        <p className="text-[10px] text-gold text-center mt-2 font-light">
+          &#10024; 特典: {badge.perk}
+        </p>
+      )}
     </div>
   );
 };
