@@ -212,7 +212,7 @@ export const BadgeLoginPopup = ({ userStats, userId, nickname }: BadgeLoginPopup
       onClick={handleClose}
     >
       <div
-        className="bg-base dark:bg-surface-dark border border-gold/30 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-xl relative"
+        className="bg-surface-light dark:bg-surface-dark border border-gold/30 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-xl relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 閉じるボタン */}
@@ -228,7 +228,7 @@ export const BadgeLoginPopup = ({ userStats, userId, nickname }: BadgeLoginPopup
           {/* ヘッダー */}
           <div className="text-center mb-6">
             <div className="text-3xl mb-3">{isCelebration ? '🎉' : '🏅'}</div>
-            <h2 className="text-xl font-serif font-light tracking-ryokan text-text-primary dark:text-text-dark-primary mb-2">
+            <h2 className="text-xl font-serif font-light tracking-ryokan text-gold mb-2">
               {isCelebration ? 'バッジを獲得しました！' : 'バッジを集めよう！'}
             </h2>
             <p className="text-sm text-text-secondary dark:text-text-dark-muted font-light">
