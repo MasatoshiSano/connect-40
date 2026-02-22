@@ -165,7 +165,7 @@ export const Dashboard = () => {
 
   return (
     <Layout isAuthenticated={true}>
-      {!isLoading && userId && (
+      {userId && (
         <BadgeLoginPopup
           userStats={userStats}
           userId={userId}
