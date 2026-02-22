@@ -4,6 +4,7 @@ import { Layout } from '../components/layout/Layout';
 import { Icon } from '../components/ui/Icon';
 import { ActivityCard } from '../components/activities/ActivityCard';
 import { BadgeGrid } from '../components/badges/BadgeGrid';
+import { BadgeLoginPopup } from '../components/badges/BadgeLoginPopup';
 import { RecommendedActivities } from '../components/recommendations/RecommendedActivities';
 import { RecommendedUsers } from '../components/recommendations/RecommendedUsers';
 import { useAuthStore } from '../stores/auth';
@@ -164,6 +165,13 @@ export const Dashboard = () => {
 
   return (
     <Layout isAuthenticated={true}>
+      {!isLoading && userId && (
+        <BadgeLoginPopup
+          userStats={userStats}
+          userId={userId}
+          nickname={nickname ?? ''}
+        />
+      )}
       <div className="container mx-auto px-4 py-20">
         <div className="max-w-ryokan mx-auto">
           {/* Header */}
