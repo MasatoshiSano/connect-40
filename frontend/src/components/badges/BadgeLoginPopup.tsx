@@ -150,6 +150,8 @@ export const BadgeLoginPopup = ({ userStats, userId, nickname }: BadgeLoginPopup
   const [nextBadges, setNextBadges] = useState<BadgeProgress[]>([]);
 
   useEffect(() => {
+    if (visible) return;  // すでに表示済みなら再実行しない
+
     const earned = getEarnedBadges(userStats);
     const earnedIds = new Set(earned.map((b) => b.id));
     const raw = localStorage.getItem(storageKey);
@@ -167,7 +169,15 @@ export const BadgeLoginPopup = ({ userStats, userId, nickname }: BadgeLoginPopup
       }
     } else {
       // 2回目以降
-      const seenIds: string[] = JSON.parse(raw) as string[];
+      let seenIds: string[] = [];
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          seenIds = (parsed as string[]).filter((item) => typeof item === 'string');
+        }
+      } catch {
+        // 不正なデータは無視し、初回訪問として扱う
+      }
       const seenSet = new Set(seenIds);
       const freshBadges = earned.filter((b) => !seenSet.has(b.id));
       if (freshBadges.length > 0) {
@@ -184,7 +194,7 @@ export const BadgeLoginPopup = ({ userStats, userId, nickname }: BadgeLoginPopup
       setNextBadges(getNextBadges(userStats, earnedIds));
       setVisible(true);
     }
-  }, [userId, userStats, storageKey]);
+  }, [userId, userStats]);
 
   const handleClose = () => {
     setVisible(false);
