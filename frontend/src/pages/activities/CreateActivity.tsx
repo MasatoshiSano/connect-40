@@ -5,9 +5,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Layout } from '../../components/layout/Layout';
 import { Icon } from '../../components/ui/Icon';
-import { ACTIVITY_CATEGORIES, DURATION_OPTIONS, MAX_PARTICIPANTS_OPTIONS, RECURRENCE_OPTIONS } from '../../constants/activities';
+import { ACTIVITY_CATEGORIES, DURATION_OPTIONS, MAX_PARTICIPANTS_OPTIONS, RECURRENCE_OPTIONS, ACTIVITY_TAGS, SITUATION_TAGS } from '../../constants/activities';
 import { RefineButton } from '../../components/ui/RefineButton';
 import type { Location } from '../../types/activity';
+
+const MAX_TAGS = 10;
 
 const createActivitySchema = z.object({
   title: z
@@ -23,7 +25,6 @@ const createActivitySchema = z.object({
   duration: z.number().min(30, '期間を選択してください'),
   maxParticipants: z.number().min(2, '最大参加者数を選択してください'),
   recurrence: z.enum(['none', 'weekly', 'biweekly', 'monthly']),
-  tags: z.string().optional(),
   entryFee: z
     .number()
     .min(0, '入場料は0以上の金額を入力してください')
@@ -49,6 +50,12 @@ export const CreateActivity = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
   const [isCheckingProfile, setIsCheckingProfile] = useState(true);
+  const [isRecommendingCategory, setIsRecommendingCategory] = useState(false);
+  const [situationTags, setSituationTags] = useState<string[]>([]);
+  const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
+  const [manualTags, setManualTags] = useState<string[]>([]);
+  const [isSuggestingTags, setIsSuggestingTags] = useState(false);
+  const [showMoreTags, setShowMoreTags] = useState(false);
 
   const {
     register,
@@ -67,6 +74,8 @@ export const CreateActivity = () => {
   });
 
   const descriptionLength = watch('description')?.length || 0;
+  const currentTitle = watch('title');
+  const currentDescription = watch('description');
 
   // Check if user has profile on mount
   useEffect(() => {
@@ -164,16 +173,68 @@ export const CreateActivity = () => {
         setLocation(locationData);
         setIsGettingLocation(false);
       },
-      (error) => {
-        console.error('Geolocation error:', error);
+      (geoError) => {
+        console.error('Geolocation error:', geoError);
         setLocationError(
-          error.code === 1
+          geoError.code === 1
             ? '位置情報の利用が許可されていません'
             : '位置情報の取得に失敗しました'
         );
         setIsGettingLocation(false);
       }
     );
+  };
+
+  const handleRecommendCategory = async () => {
+    if (!currentTitle || isRecommendingCategory) return;
+    setIsRecommendingCategory(true);
+    try {
+      const { recommendCategory } = await import('../../services/api');
+      const category = await recommendCategory(currentTitle, currentDescription);
+      setValue('category', category as CreateActivityFormData['category']);
+    } catch (err) {
+      console.error('Category recommendation failed:', err);
+    } finally {
+      setIsRecommendingCategory(false);
+    }
+  };
+
+  const totalTagCount = situationTags.length + suggestedTags.length + manualTags.length;
+  const canAddMore = totalTagCount < MAX_TAGS;
+
+  const handleSituationTagToggle = (tag: string) => {
+    setSituationTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : canAddMore ? [...prev, tag] : prev
+    );
+  };
+
+  const handleSuggestedTagToggle = (tag: string) => {
+    setSuggestedTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : canAddMore ? [...prev, tag] : prev
+    );
+  };
+
+  const handleManualTagToggle = (tag: string) => {
+    setManualTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : canAddMore ? [...prev, tag] : prev
+    );
+  };
+
+  const handleSuggestTags = async () => {
+    const title = watch('title');
+    const description = watch('description');
+    const category = watch('category');
+    if (!title && !description) return;
+    setIsSuggestingTags(true);
+    try {
+      const { recommendTags } = await import('../../services/api');
+      const tags = await recommendTags(title ?? '', description ?? '', category ?? '');
+      setSuggestedTags(tags);
+    } catch (error) {
+      console.error('Tag suggestion failed:', error);
+    } finally {
+      setIsSuggestingTags(false);
+    }
   };
 
   const onSubmit = async (data: CreateActivityFormData) => {
@@ -201,10 +262,6 @@ export const CreateActivity = () => {
         imageUrl = await uploadActivityImage(activityImage);
       }
 
-      const tags = data.tags
-        ? data.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
-        : [];
-
       await createActivity({
         title: data.title,
         description: data.description,
@@ -215,7 +272,7 @@ export const CreateActivity = () => {
         recurrence: data.recurrence,
         imageUrl,
         location,
-        tags,
+        tags: [...new Set([...situationTags, ...suggestedTags, ...manualTags])],
         ...(data.entryFee !== undefined && data.entryFee > 0 ? { entryFee: data.entryFee } : {}),
       });
 
@@ -359,9 +416,24 @@ export const CreateActivity = () => {
 
                 {/* Category */}
                 <div>
-                  <label className="block text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase mb-3">
-                    カテゴリー <span className="text-red-500">*</span>
-                  </label>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase">
+                      カテゴリー <span className="text-red-500">*</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleRecommendCategory}
+                      disabled={isRecommendingCategory || !currentTitle}
+                      className="text-sm text-gold border border-gold/40 hover:border-gold hover:bg-gold/5 disabled:opacity-40 disabled:cursor-not-allowed px-3 py-1 transition-all duration-base flex items-center gap-1"
+                    >
+                      {isRecommendingCategory ? (
+                        <Icon name="sync" size="sm" className="animate-spin" />
+                      ) : (
+                        <Icon name="auto_awesome" size="sm" />
+                      )}
+                      {isRecommendingCategory ? '推薦中...' : 'AIで自動選択'}
+                    </button>
+                  </div>
                   <Controller
                     name="category"
                     control={control}
@@ -418,10 +490,11 @@ export const CreateActivity = () => {
                       {descriptionLength} / 1000
                     </p>
                   </div>
-                  <div className="flex justify-end mt-1">
+                  <div className="mt-1">
                     <RefineButton
                       text={watch('description') ?? ''}
                       type="activity"
+                      title={currentTitle}
                       onRefined={(refined) => setValue('description', refined)}
                     />
                   </div>
@@ -622,18 +695,128 @@ export const CreateActivity = () => {
 
                 {/* Tags */}
                 <div>
-                  <label className="block text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase mb-2">
-                    タグ <span className="text-text-secondary dark:text-text-dark-muted normal-case tracking-normal">(任意)</span>
-                  </label>
-                  <input
-                    type="text"
-                    {...register('tags')}
-                    className="w-full px-4 py-3 border-b border-border-light dark:border-border-dark border-t-0 border-l-0 border-r-0 bg-transparent focus:outline-none focus:border-b-gold text-text-primary dark:text-text-dark-primary"
-                    placeholder="例: 初心者歓迎, 雨天中止, カジュアル（カンマ区切り）"
-                  />
-                  <p className="mt-1 text-xs text-text-secondary dark:text-text-dark-muted">
-                    カンマ（,）で区切って複数のタグを入力できます
-                  </p>
+                  {/* ヘッダー */}
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase">
+                      タグ <span className="text-text-secondary dark:text-text-dark-muted normal-case tracking-normal">(任意・最大{MAX_TAGS}個)</span>
+                    </label>
+                    {totalTagCount > 0 && (
+                      <span className="text-xs text-text-secondary dark:text-text-dark-muted">
+                        {totalTagCount} / {MAX_TAGS}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* 状況タグ */}
+                  <p className="text-xs text-text-secondary dark:text-text-dark-muted mb-2 font-light">状況・時間帯</p>
+                  <div className="flex flex-wrap gap-2 mb-5">
+                    {SITUATION_TAGS.map((tag) => {
+                      const isSelected = situationTags.includes(tag);
+                      const isDisabled = !isSelected && !canAddMore;
+                      return (
+                        <button
+                          key={tag}
+                          type="button"
+                          onClick={() => handleSituationTagToggle(tag)}
+                          disabled={isDisabled}
+                          className={`px-3 py-1.5 text-sm border transition-all duration-base ${
+                            isSelected
+                              ? 'border-gold bg-gold/10 text-gold'
+                              : isDisabled
+                                ? 'border-border-light dark:border-border-dark text-text-secondary dark:text-text-dark-muted opacity-40 cursor-not-allowed'
+                                : 'border-border-light dark:border-border-dark text-text-secondary dark:text-text-dark-secondary hover:border-gold/40 hover:text-gold/80'
+                          }`}
+                        >
+                          {tag}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* 内容タグ */}
+                  <p className="text-xs text-text-secondary dark:text-text-dark-muted mb-2 font-light">内容タグ</p>
+                  <div className="mb-3">
+                    <button
+                      type="button"
+                      onClick={handleSuggestTags}
+                      disabled={isSuggestingTags || (!watch('title') && !watch('description'))}
+                      className="text-sm text-gold border border-gold/40 hover:border-gold hover:bg-gold/5 disabled:opacity-40 disabled:cursor-not-allowed px-3 py-1.5 transition-all duration-base flex items-center gap-1.5"
+                    >
+                      {isSuggestingTags ? (
+                        <Icon name="sync" size="sm" className="animate-spin" />
+                      ) : (
+                        <Icon name="auto_awesome" size="sm" />
+                      )}
+                      {isSuggestingTags ? 'AI提案中...' : 'AIでタグを提案'}
+                    </button>
+                  </div>
+
+                  {suggestedTags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {suggestedTags.map((tag) => (
+                        <button
+                          key={tag}
+                          type="button"
+                          onClick={() => handleSuggestedTagToggle(tag)}
+                          className="px-3 py-1.5 text-sm border border-gold bg-gold/10 text-gold transition-all duration-base flex items-center gap-1 hover:bg-gold/20"
+                        >
+                          {tag}
+                          <span className="text-xs opacity-60">✕</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setShowMoreTags(prev => !prev)}
+                    className="text-xs text-text-secondary dark:text-text-dark-muted hover:text-gold transition-colors flex items-center gap-1 mb-2"
+                  >
+                    <Icon name={showMoreTags ? 'expand_less' : 'expand_more'} size="sm" />
+                    他のタグを追加
+                  </button>
+
+                  {showMoreTags && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {ACTIVITY_TAGS.map((tag) => {
+                        const isInSuggested = suggestedTags.includes(tag);
+                        const isSelected = manualTags.includes(tag);
+                        const isDisabled = !isSelected && (!canAddMore || isInSuggested);
+                        return (
+                          <button
+                            key={tag}
+                            type="button"
+                            onClick={() => !isInSuggested && handleManualTagToggle(tag)}
+                            disabled={isDisabled}
+                            className={`px-3 py-1.5 text-sm border transition-all duration-base ${
+                              isInSuggested
+                                ? 'border-border-light dark:border-border-dark text-text-secondary dark:text-text-dark-muted opacity-40 cursor-not-allowed'
+                                : isSelected
+                                  ? 'border-gold bg-gold/10 text-gold'
+                                  : isDisabled
+                                    ? 'border-border-light dark:border-border-dark text-text-secondary dark:text-text-dark-muted opacity-40 cursor-not-allowed'
+                                    : 'border-border-light dark:border-border-dark text-text-secondary dark:text-text-dark-secondary hover:border-gold/40 hover:text-gold/80'
+                            }`}
+                          >
+                            {tag}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {totalTagCount > 0 && (
+                    <div className="mt-3 flex items-start gap-2">
+                      <p className="text-xs text-text-secondary dark:text-text-dark-muted mt-0.5 shrink-0">選択中:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {[...situationTags, ...suggestedTags, ...manualTags].map((tag) => (
+                          <span key={tag} className="inline-flex items-center gap-1 px-2 py-0.5 text-xs border border-gold/30 bg-gold/5 text-gold">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Buttons */}
