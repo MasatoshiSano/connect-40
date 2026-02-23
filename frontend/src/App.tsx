@@ -29,8 +29,7 @@ const EditActivity = lazy(() => import('./pages/activities/EditActivity').then(m
 const ActivityPaymentSuccess = lazy(() =>
   import('./pages/activities/ActivityPaymentSuccess').then(m => ({ default: m.ActivityPaymentSuccess }))
 );
-const ChatList = lazy(() => import('./pages/chat/ChatList').then(m => ({ default: m.ChatList })));
-const ChatRoom = lazy(() => import('./pages/chat/ChatRoom').then(m => ({ default: m.ChatRoom })));
+const Chat = lazy(() => import('./pages/chat/Chat').then(m => ({ default: m.Chat })));
 const Plans = lazy(() => import('./pages/subscription/Plans').then(m => ({ default: m.Plans })));
 const SubscriptionSuccess = lazy(() => import('./pages/subscription/Success').then(m => ({ default: m.Success })));
 const UserProfile = lazy(() => import('./pages/profile/UserProfile').then(m => ({ default: m.UserProfile })));
@@ -282,7 +281,7 @@ function App() {
             path="/chat"
             element={
               <ProtectedRoute>
-                <ChatList />
+                <Chat />
               </ProtectedRoute>
             }
           />
@@ -290,7 +289,7 @@ function App() {
             path="/chat/:chatRoomId"
             element={
               <ProtectedRoute>
-                <ChatRoom />
+                <Chat />
               </ProtectedRoute>
             }
           />

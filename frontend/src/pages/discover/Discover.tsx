@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
 import { Icon } from '../../components/ui/Icon';
@@ -16,6 +16,10 @@ interface DiscoverUser {
   location?: { latitude: number; longitude: number; address: string };
 }
 
+const RADIUS_OPTIONS = [1, 3, 5, 10, 20, 50] as const;
+type RadiusKm = typeof RADIUS_OPTIONS[number];
+const DEFAULT_RADIUS: RadiusKm = 5;
+
 function calcDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -32,23 +36,33 @@ export const Discover = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedInterest, setSelectedInterest] = useState<string | null>(null);
   const [nearbyEnabled, setNearbyEnabled] = useState(false);
+  const [nearbyRadius, setNearbyRadius] = useState<RadiusKm>(DEFAULT_RADIUS);
   const [myLocation, setMyLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
 
-  useEffect(() => {
-    const loadUsers = async () => {
-      try {
-        const result = await discoverUsers();
-        setUsers(result.users);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'ユーザーの取得に失敗しました');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const loadUsers = useCallback(async (location?: { latitude: number; longitude: number }, radius?: number) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const params = location && radius !== undefined
+        ? { radius, latitude: location.latitude, longitude: location.longitude }
+        : undefined;
+      const result = await discoverUsers(params);
+      setUsers(result.users);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'ユーザーの取得に失敗しました');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-    loadUsers();
-  }, [userId]);
+  useEffect(() => {
+    if (nearbyEnabled && myLocation) {
+      loadUsers(myLocation, nearbyRadius);
+    } else {
+      loadUsers();
+    }
+  }, [userId, nearbyEnabled, myLocation, nearbyRadius, loadUsers]);
 
   // Collect all unique interests from discovered users for filter tags
   const allInterests = Array.from(
@@ -142,6 +156,19 @@ export const Discover = () => {
                     </>
                   )}
                 </button>
+                {nearbyEnabled && (
+                  <select
+                    value={nearbyRadius}
+                    onChange={(e) => setNearbyRadius(Number(e.target.value) as RadiusKm)}
+                    className="px-2 py-1.5 text-xs font-light border border-gold/60 bg-gold/10 text-gold transition-colors duration-base focus:outline-none cursor-pointer"
+                  >
+                    {RADIUS_OPTIONS.map((r) => (
+                      <option key={r} value={r}>
+                        {r}km
+                      </option>
+                    ))}
+                  </select>
+                )}
                 {allInterests.map((interest) => (
                   <button
                     key={interest}

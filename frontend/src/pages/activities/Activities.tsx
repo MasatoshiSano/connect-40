@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
 import { Icon } from '../../components/ui/Icon';
@@ -7,6 +7,10 @@ import { ActivitiesMap } from '../../components/map/ActivitiesMap';
 import type { Activity, ActivityCategory } from '../../types/activity';
 
 type DateFilter = 'all' | 'today' | 'week' | 'month';
+
+const RADIUS_OPTIONS = [1, 3, 5, 10, 20, 50] as const;
+type RadiusKm = typeof RADIUS_OPTIONS[number];
+const DEFAULT_RADIUS: RadiusKm = 5;
 
 export const Activities = () => {
   const navigate = useNavigate();
@@ -20,22 +24,53 @@ export const Activities = () => {
   const [dateFilter, setDateFilter] = useState<DateFilter>('all');
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const [nearbyEnabled, setNearbyEnabled] = useState(false);
+  const [nearbyRadius, setNearbyRadius] = useState<RadiusKm>(DEFAULT_RADIUS);
+  const [myLocation, setMyLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
+
+  const loadActivities = useCallback(async (location?: { latitude: number; longitude: number }, radius?: number) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { getActivities } = await import('../../services/api');
+      const params = location && radius !== undefined
+        ? { radius, latitude: location.latitude, longitude: location.longitude }
+        : undefined;
+      const data = await getActivities(params);
+      setActivities(data.activities);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'アクティビティの読み込みに失敗しました');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const loadActivities = async () => {
-      try {
-        const { getActivities } = await import('../../services/api');
-        const data = await getActivities();
-        setActivities(data.activities);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'アクティビティの読み込みに失敗しました');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    if (nearbyEnabled && myLocation) {
+      loadActivities(myLocation, nearbyRadius);
+    } else {
+      loadActivities();
+    }
+  }, [nearbyEnabled, myLocation, nearbyRadius, loadActivities]);
 
-    loadActivities();
-  }, []);
+  const handleNearbyToggle = () => {
+    if (!nearbyEnabled) {
+      setIsGettingLocation(true);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setMyLocation({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+          setNearbyEnabled(true);
+          setIsGettingLocation(false);
+        },
+        () => {
+          setIsGettingLocation(false);
+        }
+      );
+    } else {
+      setNearbyEnabled(false);
+    }
+  };
 
   // Filter activities based on current filter settings
   const filteredActivities = useMemo(() => activities.filter((activity) => {
@@ -139,7 +174,7 @@ export const Activities = () => {
               </div>
 
               {/* Filters */}
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-4 gap-4">
                 {/* Category Filter */}
                 <div>
                   <label className="block text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase mb-2">
@@ -173,6 +208,40 @@ export const Activities = () => {
                     <option value="week">今週</option>
                     <option value="month">今月</option>
                   </select>
+                </div>
+
+                {/* Nearby Radius Filter */}
+                <div>
+                  <label className="block text-xs tracking-ryokan-wide text-text-secondary dark:text-text-dark-secondary uppercase mb-2">
+                    近所
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleNearbyToggle}
+                      disabled={isGettingLocation}
+                      className={`flex items-center gap-1 px-4 py-2.5 border-b text-sm font-light transition-all duration-base ease-elegant ${
+                        nearbyEnabled
+                          ? 'border-gold text-gold'
+                          : 'border-border-light dark:border-border-dark text-text-secondary dark:text-text-dark-secondary hover:border-gold/40'
+                      }`}
+                    >
+                      <Icon name="near_me" size="sm" />
+                      {isGettingLocation ? '取得中...' : nearbyEnabled ? 'ON' : 'OFF'}
+                    </button>
+                    {nearbyEnabled && (
+                      <select
+                        value={nearbyRadius}
+                        onChange={(e) => setNearbyRadius(Number(e.target.value) as RadiusKm)}
+                        className="px-2 py-2.5 bg-transparent border-b border-gold border-t-0 border-l-0 border-r-0 focus:outline-none text-gold text-sm font-light cursor-pointer"
+                      >
+                        {RADIUS_OPTIONS.map((r) => (
+                          <option key={r} value={r}>
+                            {r}km
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
                 </div>
 
                 {/* Available Only */}
