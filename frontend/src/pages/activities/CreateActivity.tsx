@@ -51,9 +51,11 @@ export const CreateActivity = () => {
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
   const [isCheckingProfile, setIsCheckingProfile] = useState(true);
   const [isRecommendingCategory, setIsRecommendingCategory] = useState(false);
-  const [situationTags, setSituationTags] = useState<string[]>([]);
-  const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
-  const [manualTags, setManualTags] = useState<string[]>([]);
+  const [tagGroups, setTagGroups] = useState<{
+    situation: string[];
+    suggested: string[];
+    manual: string[];
+  }>({ situation: [], suggested: [], manual: [] });
   const [isSuggestingTags, setIsSuggestingTags] = useState(false);
   const [showMoreTags, setShowMoreTags] = useState(false);
 
@@ -199,25 +201,43 @@ export const CreateActivity = () => {
     }
   };
 
-  const totalTagCount = situationTags.length + suggestedTags.length + manualTags.length;
+  const totalTagCount = tagGroups.situation.length + tagGroups.suggested.length + tagGroups.manual.length;
   const canAddMore = totalTagCount < MAX_TAGS;
 
   const handleSituationTagToggle = (tag: string) => {
-    setSituationTags(prev =>
-      prev.includes(tag) ? prev.filter(t => t !== tag) : canAddMore ? [...prev, tag] : prev
-    );
+    setTagGroups(prev => {
+      const total = prev.situation.length + prev.suggested.length + prev.manual.length;
+      return {
+        ...prev,
+        situation: prev.situation.includes(tag)
+          ? prev.situation.filter(t => t !== tag)
+          : total < MAX_TAGS ? [...prev.situation, tag] : prev.situation,
+      };
+    });
   };
 
   const handleSuggestedTagToggle = (tag: string) => {
-    setSuggestedTags(prev =>
-      prev.includes(tag) ? prev.filter(t => t !== tag) : canAddMore ? [...prev, tag] : prev
-    );
+    setTagGroups(prev => {
+      const total = prev.situation.length + prev.suggested.length + prev.manual.length;
+      return {
+        ...prev,
+        suggested: prev.suggested.includes(tag)
+          ? prev.suggested.filter(t => t !== tag)
+          : total < MAX_TAGS ? [...prev.suggested, tag] : prev.suggested,
+      };
+    });
   };
 
   const handleManualTagToggle = (tag: string) => {
-    setManualTags(prev =>
-      prev.includes(tag) ? prev.filter(t => t !== tag) : canAddMore ? [...prev, tag] : prev
-    );
+    setTagGroups(prev => {
+      const total = prev.situation.length + prev.suggested.length + prev.manual.length;
+      return {
+        ...prev,
+        manual: prev.manual.includes(tag)
+          ? prev.manual.filter(t => t !== tag)
+          : total < MAX_TAGS ? [...prev.manual, tag] : prev.manual,
+      };
+    });
   };
 
   const handleSuggestTags = async () => {
@@ -229,7 +249,7 @@ export const CreateActivity = () => {
     try {
       const { recommendTags } = await import('../../services/api');
       const tags = await recommendTags(title ?? '', description ?? '', category ?? '');
-      setSuggestedTags(tags);
+      setTagGroups(prev => ({ ...prev, suggested: tags }));
     } catch (error) {
       console.error('Tag suggestion failed:', error);
     } finally {
@@ -272,7 +292,7 @@ export const CreateActivity = () => {
         recurrence: data.recurrence,
         imageUrl,
         location,
-        tags: [...new Set([...situationTags, ...suggestedTags, ...manualTags])],
+        tags: [...new Set([...tagGroups.situation, ...tagGroups.suggested, ...tagGroups.manual])],
         ...(data.entryFee !== undefined && data.entryFee > 0 ? { entryFee: data.entryFee } : {}),
       });
 
@@ -711,7 +731,7 @@ export const CreateActivity = () => {
                   <p className="text-xs text-text-secondary dark:text-text-dark-muted mb-2 font-light">状況・時間帯</p>
                   <div className="flex flex-wrap gap-2 mb-5">
                     {SITUATION_TAGS.map((tag) => {
-                      const isSelected = situationTags.includes(tag);
+                      const isSelected = tagGroups.situation.includes(tag);
                       const isDisabled = !isSelected && !canAddMore;
                       return (
                         <button
@@ -751,9 +771,9 @@ export const CreateActivity = () => {
                     </button>
                   </div>
 
-                  {suggestedTags.length > 0 && (
+                  {tagGroups.suggested.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-3">
-                      {suggestedTags.map((tag) => (
+                      {tagGroups.suggested.map((tag) => (
                         <button
                           key={tag}
                           type="button"
@@ -779,8 +799,8 @@ export const CreateActivity = () => {
                   {showMoreTags && (
                     <div className="flex flex-wrap gap-2 mb-3">
                       {ACTIVITY_TAGS.map((tag) => {
-                        const isInSuggested = suggestedTags.includes(tag);
-                        const isSelected = manualTags.includes(tag);
+                        const isInSuggested = tagGroups.suggested.includes(tag);
+                        const isSelected = tagGroups.manual.includes(tag);
                         const isDisabled = !isSelected && (!canAddMore || isInSuggested);
                         return (
                           <button
@@ -809,8 +829,12 @@ export const CreateActivity = () => {
                     <div className="mt-3 flex items-start gap-2">
                       <p className="text-xs text-text-secondary dark:text-text-dark-muted mt-0.5 shrink-0">選択中:</p>
                       <div className="flex flex-wrap gap-1">
-                        {[...situationTags, ...suggestedTags, ...manualTags].map((tag) => (
-                          <span key={tag} className="inline-flex items-center gap-1 px-2 py-0.5 text-xs border border-gold/30 bg-gold/5 text-gold">
+                        {[
+                          ...tagGroups.situation.map(tag => ({ tag, prefix: 'sit' })),
+                          ...tagGroups.suggested.map(tag => ({ tag, prefix: 'sug' })),
+                          ...tagGroups.manual.map(tag => ({ tag, prefix: 'man' })),
+                        ].map(({ tag, prefix }) => (
+                          <span key={`${prefix}-${tag}`} className="inline-flex items-center gap-1 px-2 py-0.5 text-xs border border-gold/30 bg-gold/5 text-gold">
                             {tag}
                           </span>
                         ))}
