@@ -121,11 +121,12 @@ async function uploadFile(file: File, uploadType: 'profile' | 'activity'): Promi
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to get presigned URL');
+      const errorBody = await response.json();
+      throw new Error(errorBody.error?.message || 'Failed to get presigned URL');
     }
 
-    const { presignedUrl, publicUrl } = await response.json();
+    const responseData = await response.json();
+    const { presignedUrl, publicUrl } = responseData.data as { presignedUrl: string; publicUrl: string };
 
     // Step 2: Upload file to S3 using presigned URL
     const uploadResponse = await fetch(presignedUrl, {
@@ -276,10 +277,16 @@ export async function createActivity(input: CreateActivityInput): Promise<Activi
 export async function getActivities(params?: {
   category?: string;
   limit?: number;
+  radius?: number;
+  latitude?: number;
+  longitude?: number;
 }): Promise<{ activities: Activity[]; count: number }> {
   const queryParams = new URLSearchParams();
   if (params?.category) queryParams.append('category', params.category);
   if (params?.limit) queryParams.append('limit', params.limit.toString());
+  if (params?.radius !== undefined) queryParams.append('radius', params.radius.toString());
+  if (params?.latitude !== undefined) queryParams.append('latitude', params.latitude.toString());
+  if (params?.longitude !== undefined) queryParams.append('longitude', params.longitude.toString());
 
   const query = queryParams.toString();
   return fetchWithAuth(`/activities${query ? `?${query}` : ''}`, {
@@ -369,10 +376,21 @@ interface DiscoverUserResponse {
 /**
  * Discover users with similar interests
  */
-export async function discoverUsers(): Promise<{ users: DiscoverUserResponse[] }> {
-  return fetchWithAuth<{ users: DiscoverUserResponse[] }>('/users/discover', {
-    method: 'GET',
-  });
+export async function discoverUsers(params?: {
+  radius?: number;
+  latitude?: number;
+  longitude?: number;
+}): Promise<{ users: DiscoverUserResponse[] }> {
+  const queryParams = new URLSearchParams();
+  if (params?.radius !== undefined) queryParams.append('radius', params.radius.toString());
+  if (params?.latitude !== undefined) queryParams.append('latitude', params.latitude.toString());
+  if (params?.longitude !== undefined) queryParams.append('longitude', params.longitude.toString());
+
+  const query = queryParams.toString();
+  return fetchWithAuth<{ users: DiscoverUserResponse[] }>(
+    `/users/discover${query ? `?${query}` : ''}`,
+    { method: 'GET' }
+  );
 }
 
 // Photo Gallery API
@@ -510,7 +528,45 @@ export async function getPublicProfile(userId: string): Promise<{
   }>(`/users/${userId}/profile`);
 }
 
-// Chat read status API
+// Chat API
+
+export interface ChatRoomSummary {
+  chatRoomId: string;
+  name?: string;
+  participantIds: string[];
+  type: 'direct' | 'group';
+  activityId?: string;
+  lastMessageAt: string;
+  lastMessage?: string;
+  unreadCount?: number;
+}
+
+export interface ChatRoomDetail {
+  chatRoomId: string;
+  name?: string;
+  participantIds: string[];
+  type: 'direct' | 'group';
+  activityId?: string;
+  createdAt: string;
+  messages: Array<{
+    messageId: string;
+    chatRoomId: string;
+    senderId: string;
+    content: string;
+    messageType: 'user' | 'system';
+    readBy: string[];
+    createdAt: string;
+    timestamp: number;
+  }>;
+}
+
+export async function getChatRooms(): Promise<{ rooms: ChatRoomSummary[] }> {
+  return fetchWithAuth<{ rooms: ChatRoomSummary[] }>('/chat/rooms');
+}
+
+export async function getChatRoom(chatRoomId: string): Promise<ChatRoomDetail> {
+  return fetchWithAuth<ChatRoomDetail>(`/chat/rooms/${chatRoomId}`);
+}
 
 export async function markRoomAsRead(chatRoomId: string): Promise<void> {
   try {
@@ -528,11 +584,41 @@ export async function markRoomAsRead(chatRoomId: string): Promise<void> {
 export async function refineText(
   text: string,
   type: 'activity' | 'bio',
-  userContext: { nickname: string; age: number; interests: string[]; location?: string }
+  userContext: { nickname: string; age: number; interests: string[]; location?: string },
+  title?: string
 ): Promise<string> {
   const response = await fetchWithAuth<{ refinedText: string }>('/ai/refine', {
     method: 'POST',
-    body: JSON.stringify({ text, type, userContext }),
+    body: JSON.stringify({ text, type, mode: 'refine', title, userContext }),
   });
   return response.refinedText;
+}
+
+/**
+ * Recommend category using AI based on title and description
+ */
+export async function recommendCategory(
+  title: string,
+  description?: string
+): Promise<string> {
+  const response = await fetchWithAuth<{ category: string }>('/ai/refine', {
+    method: 'POST',
+    body: JSON.stringify({ text: description ?? '', title, mode: 'category' }),
+  });
+  return response.category;
+}
+
+/**
+ * Recommend content tags using AI based on title, description, and category
+ */
+export async function recommendTags(
+  title: string,
+  description: string,
+  category: string
+): Promise<string[]> {
+  const response = await fetchWithAuth<{ tags: string[] }>('/ai/refine', {
+    method: 'POST',
+    body: JSON.stringify({ title, text: description, category, mode: 'tags' }),
+  });
+  return response.tags;
 }
