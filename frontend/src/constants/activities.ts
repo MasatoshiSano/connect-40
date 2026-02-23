@@ -1,4 +1,4 @@
-import type { ActivityCategory } from '../types/activity';
+import type { ActivityCategory, Recurrence } from '../types/activity';
 
 export interface CategoryInfo {
   id: ActivityCategory;
@@ -68,7 +68,7 @@ export const DURATION_OPTIONS = [
   { value: 240, label: '4時間' },
   { value: 480, label: '半日（4-8時間）' },
   { value: 720, label: '終日（8時間以上）' },
-];
+] as const;
 
 export const MAX_PARTICIPANTS_OPTIONS = [
   { value: 2, label: '2人' },
@@ -80,7 +80,7 @@ export const MAX_PARTICIPANTS_OPTIONS = [
   { value: 10, label: '10人' },
   { value: 15, label: '15人' },
   { value: 20, label: '20人' },
-];
+] as const;
 
 export const RECURRENCE_OPTIONS = [
   { value: 'none', label: 'なし' },
@@ -89,7 +89,7 @@ export const RECURRENCE_OPTIONS = [
   { value: 'monthly', label: '毎月' },
 ] as const;
 
-export const RECURRENCE_LABELS: Record<string, string> = {
+export const RECURRENCE_LABELS: Record<Recurrence, string> = {
   none: 'なし',
   weekly: '毎週開催',
   biweekly: '隔週開催',
