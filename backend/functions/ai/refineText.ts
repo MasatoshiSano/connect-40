@@ -97,7 +97,7 @@ export const handler = async (
       };
 
       const command = new InvokeModelCommand({
-        modelId: 'us.anthropic.claude-haiku-4-5-20251001-v1:0',
+        modelId: 'anthropic.claude-3-haiku-20240307-v1:0',
         body: JSON.stringify(payload),
         contentType: 'application/json',
       });
@@ -142,7 +142,7 @@ ${input.text}`;
     };
 
     const command = new InvokeModelCommand({
-      modelId: 'us.anthropic.claude-haiku-4-5-20251001-v1:0',
+      modelId: 'anthropic.claude-3-haiku-20240307-v1:0',
       body: JSON.stringify(payload),
       contentType: 'application/json',
     });
