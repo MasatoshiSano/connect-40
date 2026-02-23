@@ -4,13 +4,14 @@ import { errorResponse, successResponse } from '../../layers/common/nodejs/utils
 
 const bedrockClient = new BedrockRuntimeClient({ region: 'us-east-1' });
 
-type RefineMode = 'refine' | 'category';
+type RefineMode = 'refine' | 'category' | 'tags';
 
 interface RefineTextInput {
   text: string;
   type: 'activity' | 'bio';
   mode?: RefineMode;
   title?: string;
+  category?: string;
   userContext: {
     nickname: string;
     age: number;
@@ -20,6 +21,19 @@ interface RefineTextInput {
 }
 
 const VALID_CATEGORIES = ['sports', 'outdoor', 'hobby', 'food', 'culture', 'business', 'other'] as const;
+
+const ACTIVITY_TAGS_LIST = [
+  '料理教室', 'ハイキング', '写真撮影', '読書会', '語学交換',
+  'ボードゲーム', 'サイクリング', 'ヨガ・瞑想', '音楽演奏', 'アート・クラフト',
+  '釣り', 'ガーデニング', '映画鑑賞', 'ランニング', 'ダンス',
+  'キャンプ', 'バードウォッチング', '茶道・華道', 'カフェ巡り', '旅行計画',
+  'ボランティア', 'スポーツ観戦', '料理・グルメ', '登山', '温泉巡り',
+  'DIY・ものづくり', '天体観測', '動物・ペット', '音楽鑑賞', '歴史探訪',
+  'ゴルフ', 'テニス', 'フットサル', 'バスケットボール', 'バドミントン',
+  'スキー・スノボ', 'サーフィン', 'マラソン', '温泉・サウナ', 'ワイン・日本酒',
+  'コーヒー巡り', 'プログラミング', '副業・起業', '資格勉強', '子育て仲間',
+  'ペット連れOK', 'シニア歓迎', '外国語', 'オンライン可', 'グルメ探索',
+] as const;
 
 const SYSTEM_PROMPTS: Record<'activity' | 'bio', string> = {
   activity: `あなたはConnect40（40代のためのコミュニティアプリ）のライティングアシスタントです。
@@ -108,6 +122,53 @@ export const handler = async (
       const category = isValidCategory(rawCategory) ? rawCategory : 'other';
 
       return successResponse({ category });
+    }
+
+    if (mode === 'tags') {
+      const tagSystemPrompt = `あなたはConnect40（40代のためのコミュニティアプリ）のタグ推薦アシスタントです。
+アクティビティのタイトル・説明・カテゴリから、最も関連性の高いタグを以下のリストから3〜5件選んでください。
+
+利用可能なタグ:
+${ACTIVITY_TAGS_LIST.join('、')}
+
+必ずJSONの配列形式のみで返してください。例: ["ゴルフ","ランニング","仲間募集"]
+余計な説明・前置きは一切不要です。`;
+
+      const tagUserMessage = `タイトル: ${input.title ?? ''}
+カテゴリ: ${input.category ?? ''}
+説明: ${input.text ?? ''}`;
+
+      const tagPayload = {
+        anthropic_version: 'bedrock-2023-05-31',
+        max_tokens: 200,
+        system: tagSystemPrompt,
+        messages: [{ role: 'user', content: tagUserMessage }],
+      };
+
+      const tagCommand = new InvokeModelCommand({
+        modelId: 'anthropic.claude-3-haiku-20240307-v1:0',
+        body: JSON.stringify(tagPayload),
+        contentType: 'application/json',
+      });
+
+      const tagResponse = await bedrockClient.send(tagCommand);
+      const tagResponseBody = JSON.parse(new TextDecoder().decode(tagResponse.body));
+      const rawTagText = (tagResponseBody.content?.[0]?.text ?? '[]').trim();
+
+      let tags: string[] = [];
+      try {
+        const parsed = JSON.parse(rawTagText);
+        if (Array.isArray(parsed)) {
+          tags = parsed
+            .filter((t): t is string => typeof t === 'string')
+            .filter((t) => (ACTIVITY_TAGS_LIST as readonly string[]).includes(t))
+            .slice(0, 5);
+        }
+      } catch {
+        tags = [];
+      }
+
+      return successResponse({ tags });
     }
 
     // Refine mode (default)
