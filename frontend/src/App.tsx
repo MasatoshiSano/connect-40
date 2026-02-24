@@ -51,7 +51,7 @@ const PageLoader = () => (
 
 function App() {
   const { toasts, removeToast } = useToastStore();
-  const { idToken, userId, nickname, verificationStatus, setUser, setNickname, setVerificationStatus, setChatCredits } = useAuthStore();
+  const { idToken, userId, setUser, setNickname, setVerificationStatus, setChatCredits } = useAuthStore();
 
   // Extract and set userId from idToken on app initialization
   useEffect(() => {
