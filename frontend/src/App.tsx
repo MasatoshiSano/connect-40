@@ -69,31 +69,46 @@ function App() {
     }
   }, [idToken, userId, setUser]);
 
+  // Prefetch frequently used route chunks after authentication
+  useEffect(() => {
+    if (!userId) return;
+    const id = requestIdleCallback(() => {
+      import('./pages/Dashboard');
+      import('./pages/activities/Activities');
+      import('./pages/chat/Chat');
+    });
+    return () => cancelIdleCallback(id);
+  }, [userId]);
+
   // Fetch user profile to get nickname
   useEffect(() => {
     const fetchProfile = async () => {
-      if (userId && (!nickname || verificationStatus !== 'approved')) {
-        try {
-          const { getUserProfile } = await import('./services/api');
-          const profile = await getUserProfile();
-          if (profile.nickname) {
-            setNickname(profile.nickname);
-            console.log('Nickname loaded:', profile.nickname);
-          }
-          if (profile.verificationStatus) {
-            setVerificationStatus(profile.verificationStatus);
-          }
-          if (profile.chatCredits !== undefined) {
-            setChatCredits(profile.chatCredits);
-          }
-        } catch (e) {
-          console.error('Failed to fetch user profile:', e);
+      if (!userId) return;
+      // Read current values from store without adding them as dependencies
+      const { nickname: currentNickname, verificationStatus: currentStatus } = useAuthStore.getState();
+      if (currentNickname && currentStatus === 'approved') return;
+
+      try {
+        const { getUserProfile } = await import('./services/api');
+        const profile = await getUserProfile();
+        if (profile.nickname) {
+          setNickname(profile.nickname);
         }
+        if (profile.verificationStatus) {
+          setVerificationStatus(profile.verificationStatus);
+        }
+        if (profile.chatCredits !== undefined) {
+          setChatCredits(profile.chatCredits);
+        }
+      } catch (e) {
+        console.error('Failed to fetch user profile:', e);
       }
     };
 
     fetchProfile();
-  }, [userId, nickname, verificationStatus, setNickname, setVerificationStatus, setChatCredits]);
+  // Only re-fetch when userId changes (not when nickname/verificationStatus are set by this effect)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   return (
     <BrowserRouter>

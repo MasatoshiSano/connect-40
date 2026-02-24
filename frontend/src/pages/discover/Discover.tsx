@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
 import { Icon } from '../../components/ui/Icon';
@@ -65,11 +65,12 @@ export const Discover = () => {
   }, [userId, nearbyEnabled, myLocation, nearbyRadius, loadUsers]);
 
   // Collect all unique interests from discovered users for filter tags
-  const allInterests = Array.from(
-    new Set(users.flatMap((u) => u.interests))
-  ).sort();
+  const allInterests = useMemo(
+    () => Array.from(new Set(users.flatMap((u) => u.interests))).sort(),
+    [users]
+  );
 
-  const handleNearbyToggle = () => {
+  const handleNearbyToggle = useCallback(() => {
     if (!nearbyEnabled) {
       setIsGettingLocation(true);
       navigator.geolocation.getCurrentPosition(
@@ -85,19 +86,22 @@ export const Discover = () => {
     } else {
       setNearbyEnabled(false);
     }
-  };
+  }, [nearbyEnabled]);
 
-  const filteredByInterest = selectedInterest
-    ? users.filter((u) => u.interests.includes(selectedInterest))
-    : users;
+  const filteredUsers = useMemo(() => {
+    const byInterest = selectedInterest
+      ? users.filter((u) => u.interests.includes(selectedInterest))
+      : users;
 
-  const filteredUsers = nearbyEnabled && myLocation
-    ? [...filteredByInterest].sort((a, b) => {
+    if (nearbyEnabled && myLocation) {
+      return [...byInterest].sort((a, b) => {
         const distA = a.location ? calcDistance(myLocation.latitude, myLocation.longitude, a.location.latitude, a.location.longitude) : 9999;
         const distB = b.location ? calcDistance(myLocation.latitude, myLocation.longitude, b.location.latitude, b.location.longitude) : 9999;
         return distA - distB;
-      })
-    : filteredByInterest;
+      });
+    }
+    return byInterest;
+  }, [users, selectedInterest, nearbyEnabled, myLocation]);
 
   if (isLoading) {
     return (

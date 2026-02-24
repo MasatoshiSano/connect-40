@@ -54,7 +54,7 @@ export const Activities = () => {
     }
   }, [nearbyEnabled, myLocation, nearbyRadius, loadActivities]);
 
-  const handleNearbyToggle = () => {
+  const handleNearbyToggle = useCallback(() => {
     if (!nearbyEnabled) {
       setIsGettingLocation(true);
       navigator.geolocation.getCurrentPosition(
@@ -70,7 +70,7 @@ export const Activities = () => {
     } else {
       setNearbyEnabled(false);
     }
-  };
+  }, [nearbyEnabled]);
 
   // Filter activities based on current filter settings
   const filteredActivities = useMemo(() => activities.filter((activity) => {

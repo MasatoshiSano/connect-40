@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
 import { Icon } from '../../components/ui/Icon';
@@ -115,18 +115,22 @@ export const Calendar = () => {
     return getWeekDays(currentDate);
   }, [currentDate, viewMode]);
 
-  const navigateMonth = (direction: number) => {
-    const newDate = new Date(currentDate);
-    if (viewMode === 'monthly') {
-      newDate.setMonth(newDate.getMonth() + direction);
-    } else {
-      newDate.setDate(newDate.getDate() + direction * 7);
-    }
-    setCurrentDate(newDate);
-  };
+  const navigateMonth = useCallback((direction: number) => {
+    setCurrentDate((prev) => {
+      const newDate = new Date(prev);
+      if (viewMode === 'monthly') {
+        newDate.setMonth(newDate.getMonth() + direction);
+      } else {
+        newDate.setDate(newDate.getDate() + direction * 7);
+      }
+      return newDate;
+    });
+  }, [viewMode]);
 
-  const today = new Date();
-  const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const todayKey = useMemo(() => {
+    const today = new Date();
+    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  }, []);
 
   const selectedActivities = selectedDate ? activityMap.get(selectedDate) || [] : [];
 

@@ -38,56 +38,47 @@ export const Dashboard = () => {
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
-        const { getUserProfile, getActivities } = await import('../services/api');
+        const { getUserProfile, getActivities, getRecommendations } = await import('../services/api');
 
-        // Load profile
-        try {
-          const userProfile = await getUserProfile();
-          setProfile(userProfile);
-        } catch (err) {
-          console.error('Failed to load profile:', err);
+        // Parallelize all API calls instead of awaiting them sequentially
+        const [profileResult, activitiesResult, recommendationsResult] = await Promise.allSettled([
+          getUserProfile(),
+          userId ? getActivities() : Promise.resolve(null),
+          getRecommendations(),
+        ]);
+
+        if (profileResult.status === 'fulfilled') {
+          setProfile(profileResult.value);
+        } else {
+          console.error('Failed to load profile:', profileResult.reason);
         }
 
-        // Load activities
-        if (userId) {
-          const { activities } = await getActivities();
-
-          // Filter hosted activities
-          const hosted = activities.filter((a) => a.hostUserId === userId);
-          setHostedActivities(hosted);
-
-          // Filter joined activities (excluding hosted ones)
-          const joined = activities.filter(
-            (a) => a.participants.includes(userId) && a.hostUserId !== userId
+        if (activitiesResult.status === 'fulfilled' && activitiesResult.value && userId) {
+          const { activities } = activitiesResult.value;
+          setHostedActivities(activities.filter((a) => a.hostUserId === userId));
+          setJoinedActivities(
+            activities.filter((a) => a.participants.includes(userId) && a.hostUserId !== userId)
           );
-          setJoinedActivities(joined);
+        } else if (activitiesResult.status === 'rejected') {
+          console.error('Failed to load activities:', activitiesResult.reason);
+        }
+
+        if (recommendationsResult.status === 'fulfilled') {
+          setRecommendedActivities(recommendationsResult.value.recommendedActivities);
+          setRecommendedUsers(recommendationsResult.value.recommendedUsers);
+        } else {
+          console.error('Failed to load recommendations:', recommendationsResult.reason);
         }
       } catch (err) {
         console.error('Failed to load dashboard data:', err);
       } finally {
         setIsLoading(false);
+        setIsRecommendationsLoading(false);
       }
     };
 
     loadDashboardData();
   }, [userId]);
-
-  // Load recommendations separately
-  useEffect(() => {
-    const loadRecommendations = async () => {
-      try {
-        const { getRecommendations } = await import('../services/api');
-        const data = await getRecommendations();
-        setRecommendedActivities(data.recommendedActivities);
-        setRecommendedUsers(data.recommendedUsers);
-      } catch (err) {
-        console.error('Failed to load recommendations:', err);
-      } finally {
-        setIsRecommendationsLoading(false);
-      }
-    };
-    loadRecommendations();
-  }, []);
 
   const handleOpenPortal = async () => {
     if (profile?.membershipTier !== 'premium') {
