@@ -13,6 +13,11 @@ export default defineConfig({
     globals: true,
     environment: 'happy-dom',
     setupFiles: './src/test/setup.ts',
+    env: {
+      VITE_COGNITO_USER_POOL_ID: 'ap-northeast-1_testPool',
+      VITE_COGNITO_CLIENT_ID: 'test-client-id',
+      VITE_API_BASE_URL: 'https://test-api.example.com',
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
