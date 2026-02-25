@@ -51,7 +51,7 @@ const PageLoader = () => (
 
 function App() {
   const { toasts, removeToast } = useToastStore();
-  const { idToken, userId, nickname, verificationStatus, setUser, setNickname, setVerificationStatus, setChatCredits } = useAuthStore();
+  const { idToken, userId, setUser, setNickname, setVerificationStatus, setChatCredits } = useAuthStore();
 
   // Extract and set userId from idToken on app initialization
   useEffect(() => {
@@ -72,28 +72,24 @@ function App() {
   // Fetch user profile to get nickname
   useEffect(() => {
     const fetchProfile = async () => {
-      if (userId && (!nickname || verificationStatus !== 'approved')) {
-        try {
-          const { getUserProfile } = await import('./services/api');
-          const profile = await getUserProfile();
-          if (profile.nickname) {
-            setNickname(profile.nickname);
-            console.log('Nickname loaded:', profile.nickname);
-          }
-          if (profile.verificationStatus) {
-            setVerificationStatus(profile.verificationStatus);
-          }
-          if (profile.chatCredits !== undefined) {
-            setChatCredits(profile.chatCredits);
-          }
-        } catch (e) {
-          console.error('Failed to fetch user profile:', e);
+      if (!userId) return;
+      try {
+        const { getUserProfile } = await import('./services/api');
+        const profile = await getUserProfile();
+        if (profile.nickname) {
+          setNickname(profile.nickname);
         }
+        setVerificationStatus(profile.verificationStatus ?? 'unverified');
+        if (profile.chatCredits !== undefined) {
+          setChatCredits(profile.chatCredits);
+        }
+      } catch (e) {
+        console.error('Failed to fetch user profile:', e);
       }
     };
 
     fetchProfile();
-  }, [userId, nickname, verificationStatus, setNickname, setVerificationStatus, setChatCredits]);
+  }, [userId, setNickname, setVerificationStatus, setChatCredits]);
 
   return (
     <BrowserRouter>

@@ -50,13 +50,20 @@ export const MessageInput = ({ onSend, disabled = false, externalMessage, onExte
       <div className="p-4 border-t border-border-light dark:border-border-dark">
         <div className="flex items-center gap-3 p-3 bg-gold/5 border border-gold/20">
           <Icon name="lock" className="text-gold flex-shrink-0" />
-          <p className="text-sm text-text-secondary dark:text-text-dark-secondary">
-            チャットを利用するには{' '}
-            <Link to="/profile/verification" className="text-gold underline underline-offset-2">
-              本人確認
-            </Link>
-            {' '}が必要です
-          </p>
+          <div>
+            <p className="text-sm text-text-secondary dark:text-text-dark-secondary">
+              チャットを利用するには{' '}
+              <Link to="/profile/verification" className="text-gold underline underline-offset-2">
+                本人確認
+              </Link>
+              {' '}が必要です
+            </p>
+            {chatCredits !== null && chatCredits > 0 && (
+              <p className="text-xs text-text-secondary dark:text-text-dark-muted mt-1">
+                本人確認後、残り{chatCredits}回のチャットが利用可能になります
+              </p>
+            )}
+          </div>
         </div>
       </div>
     );

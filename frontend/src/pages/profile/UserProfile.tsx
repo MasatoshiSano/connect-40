@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
 import { Icon } from '../../components/ui/Icon';
 import { useAuthStore } from '../../stores/auth';
+import { InterestCard } from '../../components/interests/InterestCard';
+import { useInterestPhotos } from '../../hooks/useInterestPhotos';
 
 interface PublicProfile {
   userId: string;
@@ -24,6 +26,7 @@ export const UserProfile = () => {
   const [error, setError] = useState<string | null>(null);
   const [showBlockConfirm, setShowBlockConfirm] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
+  const interestPhotos = useInterestPhotos(profile?.interests ?? []);
   const [reportReason, setReportReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
@@ -213,13 +216,13 @@ export const UserProfile = () => {
                       興味・関心
                     </h3>
                     <div className="flex flex-wrap justify-center gap-2">
-                      {profile.interests.map((interest, index) => (
-                        <span
-                          key={index}
-                          className="px-3 py-1 border border-gold/20 text-gold text-sm"
-                        >
-                          {interest}
-                        </span>
+                      {profile.interests.map((interest) => (
+                        <InterestCard
+                          key={interest}
+                          interest={interest}
+                          photoUrl={interestPhotos.get(interest)}
+                          compact
+                        />
                       ))}
                     </div>
                   </div>

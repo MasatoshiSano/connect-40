@@ -4,6 +4,8 @@ import { Icon } from '../../components/ui/Icon';
 import { ProfileCreationLayout } from '../../components/profile/ProfileCreationLayout';
 import { useProfileCreation } from '../../contexts/ProfileCreationContext';
 import { INTEREST_CATEGORIES } from '../../constants/interests';
+import { InterestCard } from '../../components/interests/InterestCard';
+import { useInterestPhotos } from '../../hooks/useInterestPhotos';
 
 const MIN_INTERESTS = 3;
 const MAX_INTERESTS = 10;
@@ -13,6 +15,8 @@ export const CreateProfileStep2 = () => {
   const { formData, updateFormData, setCurrentStep } = useProfileCreation();
   const [selectedInterests, setSelectedInterests] = useState<string[]>(formData.interests);
   const [error, setError] = useState<string | null>(null);
+  const allInterests = INTEREST_CATEGORIES.flatMap((c) => c.interests);
+  const interestPhotos = useInterestPhotos(allInterests);
 
   useEffect(() => {
     setCurrentStep(2);
@@ -92,28 +96,16 @@ export const CreateProfileStep2 = () => {
               <h3 className="text-lg font-serif font-light tracking-wide text-text-primary dark:text-text-dark-primary mb-3 flex items-center gap-2">
                 {category.name}
               </h3>
-              <div className="flex flex-wrap gap-2">
-                {category.interests.map((interest) => {
-                  const isSelected = selectedInterests.includes(interest);
-                  return (
-                    <button
-                      key={interest}
-                      type="button"
-                      onClick={() => toggleInterest(interest)}
-                      className={`
-                        px-4 py-2 font-light transition-all duration-base
-                        ${
-                          isSelected
-                            ? 'bg-gold/10 text-gold border border-gold'
-                            : 'bg-transparent text-text-secondary dark:text-text-dark-secondary border border-border-light dark:border-border-dark hover:border-gold/40'
-                        }
-                      `}
-                    >
-                      {isSelected && <Icon name="check" size="sm" className="inline mr-1" />}
-                      {interest}
-                    </button>
-                  );
-                })}
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                {category.interests.map((interest) => (
+                  <InterestCard
+                    key={interest}
+                    interest={interest}
+                    photoUrl={interestPhotos.get(interest)}
+                    isSelected={selectedInterests.includes(interest)}
+                    onToggle={toggleInterest}
+                  />
+                ))}
               </div>
             </div>
           ))}

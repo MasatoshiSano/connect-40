@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
 import { Icon } from '../components/ui/Icon';
 import { ActivityCard } from '../components/activities/ActivityCard';
@@ -10,7 +10,9 @@ import { RecommendedUsers } from '../components/recommendations/RecommendedUsers
 import { useAuthStore } from '../stores/auth';
 import { useChatStore } from '../stores/chat';
 import type { Activity } from '../types/activity';
+import { getUserProfile, getActivities, getRecommendations } from '../services/api';
 import type { UserProfile } from '../services/api';
+import { createPortalSession } from '../services/payment';
 import { BADGES, getEarnedBadges } from '../constants/badges';
 import type { UserStats } from '../constants/badges';
 
@@ -18,6 +20,7 @@ export const Dashboard = () => {
   const navigate = useNavigate();
   const { userId, nickname } = useAuthStore();
   const chatCredits = useAuthStore((state) => state.chatCredits);
+  const verificationStatus = useAuthStore((state) => state.verificationStatus);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [hostedActivities, setHostedActivities] = useState<Activity[]>([]);
   const [joinedActivities, setJoinedActivities] = useState<Activity[]>([]);
@@ -38,56 +41,46 @@ export const Dashboard = () => {
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
-        const { getUserProfile, getActivities } = await import('../services/api');
+        const [profileResult, activitiesResult, recommendationsResult] = await Promise.allSettled([
+          getUserProfile(),
+          userId ? getActivities() : Promise.resolve({ activities: [] as Activity[], count: 0 }),
+          getRecommendations(),
+        ]);
 
-        // Load profile
-        try {
-          const userProfile = await getUserProfile();
-          setProfile(userProfile);
-        } catch (err) {
-          console.error('Failed to load profile:', err);
+        if (profileResult.status === 'fulfilled') {
+          setProfile(profileResult.value);
+        } else {
+          console.error('Failed to load profile:', profileResult.reason);
         }
 
-        // Load activities
-        if (userId) {
-          const { activities } = await getActivities();
-
-          // Filter hosted activities
+        if (activitiesResult.status === 'fulfilled' && userId) {
+          const { activities } = activitiesResult.value;
           const hosted = activities.filter((a) => a.hostUserId === userId);
           setHostedActivities(hosted);
-
-          // Filter joined activities (excluding hosted ones)
           const joined = activities.filter(
             (a) => a.participants.includes(userId) && a.hostUserId !== userId
           );
           setJoinedActivities(joined);
+        } else if (activitiesResult.status === 'rejected') {
+          console.error('Failed to load activities:', activitiesResult.reason);
+        }
+
+        if (recommendationsResult.status === 'fulfilled') {
+          setRecommendedActivities(recommendationsResult.value.recommendedActivities);
+          setRecommendedUsers(recommendationsResult.value.recommendedUsers);
+        } else {
+          console.error('Failed to load recommendations:', recommendationsResult.reason);
         }
       } catch (err) {
         console.error('Failed to load dashboard data:', err);
       } finally {
         setIsLoading(false);
+        setIsRecommendationsLoading(false);
       }
     };
 
     loadDashboardData();
   }, [userId]);
-
-  // Load recommendations separately
-  useEffect(() => {
-    const loadRecommendations = async () => {
-      try {
-        const { getRecommendations } = await import('../services/api');
-        const data = await getRecommendations();
-        setRecommendedActivities(data.recommendedActivities);
-        setRecommendedUsers(data.recommendedUsers);
-      } catch (err) {
-        console.error('Failed to load recommendations:', err);
-      } finally {
-        setIsRecommendationsLoading(false);
-      }
-    };
-    loadRecommendations();
-  }, []);
 
   const handleOpenPortal = async () => {
     if (profile?.membershipTier !== 'premium') {
@@ -96,7 +89,6 @@ export const Dashboard = () => {
     }
     setIsPortalLoading(true);
     try {
-      const { createPortalSession } = await import('../services/payment');
       const { url } = await createPortalSession();
       window.location.href = url;
     } catch (err) {
@@ -252,6 +244,18 @@ export const Dashboard = () => {
               <p className="text-xs text-text-secondary dark:text-text-dark-muted mt-1">
                 毎日3回 · アクティビティ参加で+20回
               </p>
+              {verificationStatus !== 'approved' && (
+                <div className="mt-2 flex items-center gap-2">
+                  <Icon name="info" size="sm" className="text-amber-400" />
+                  <p className="text-xs text-amber-400">
+                    チャットを利用するには{' '}
+                    <Link to="/profile/verification" className="underline underline-offset-2 hover:text-gold">
+                      本人確認
+                    </Link>
+                    {' '}が必要です
+                  </p>
+                </div>
+              )}
             </div>
           )}
 

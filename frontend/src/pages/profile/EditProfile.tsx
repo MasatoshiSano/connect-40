@@ -9,6 +9,8 @@ import { getUserProfile, updateUserProfile, uploadProfilePhoto } from '../../ser
 import { RefineButton } from '../../components/ui/RefineButton';
 import { useDarkMode } from '../../hooks/useDarkMode';
 import { INTEREST_CATEGORIES } from '../../constants/interests';
+import { InterestCard } from '../../components/interests/InterestCard';
+import { useInterestPhotos } from '../../hooks/useInterestPhotos';
 import type { UserProfile } from '../../services/api';
 
 const editProfileSchema = z.object({
@@ -39,6 +41,8 @@ export const EditProfile = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+  const allInterests = INTEREST_CATEGORIES.flatMap((c) => c.interests);
+  const interestPhotos = useInterestPhotos(allInterests);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isPlanLoading, setIsPlanLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -345,28 +349,16 @@ export const EditProfile = () => {
                       <h4 className="text-md font-light tracking-wide text-text-primary dark:text-text-dark-primary mb-3">
                         {category.name}
                       </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {category.interests.map((interest) => {
-                          const isSelected = selectedInterests.includes(interest);
-                          return (
-                            <button
-                              key={interest}
-                              type="button"
-                              onClick={() => toggleInterest(interest)}
-                              className={`
-                                px-4 py-2 font-light transition-all duration-base
-                                ${
-                                  isSelected
-                                    ? 'bg-gold/10 text-gold border border-gold'
-                                    : 'bg-transparent text-text-secondary dark:text-text-dark-secondary border border-border-light dark:border-border-dark hover:border-gold/40'
-                                }
-                              `}
-                            >
-                              {isSelected && <Icon name="check" size="sm" className="inline mr-1" />}
-                              {interest}
-                            </button>
-                          );
-                        })}
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                        {category.interests.map((interest) => (
+                          <InterestCard
+                            key={interest}
+                            interest={interest}
+                            photoUrl={interestPhotos.get(interest)}
+                            isSelected={selectedInterests.includes(interest)}
+                            onToggle={toggleInterest}
+                          />
+                        ))}
                       </div>
                     </div>
                   ))}
