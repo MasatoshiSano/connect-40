@@ -1,6 +1,7 @@
 import {
   CognitoUserPool,
   CognitoUser,
+  CognitoUserSession,
   AuthenticationDetails,
   CognitoUserAttribute,
 } from 'amazon-cognito-identity-js';
@@ -215,7 +216,7 @@ export const refreshSession = async (): Promise<AuthResult> => {
       return;
     }
 
-    cognitoUser.getSession((err: Error | null, session: any) => {
+    cognitoUser.getSession((err: Error | null, session: CognitoUserSession) => {
       if (err) {
         reject(err);
         return;
